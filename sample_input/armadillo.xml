@@ -1,0 +1,19 @@
+<Scene>
+	<ImageName>../sample_output/armadillo.png</ImageName>
+    <BackgroundColor>128 128 128</BackgroundColor>
+	
+    <Camera>
+        <ScreenCoordinates>-1 1 -1 1</ScreenCoordinates>
+        <Position>0 1 -3</Position>
+        <Direction>0 0 1</Direction>
+        <Up>0 1 0</Up>
+		<Resolution>800 800</Resolution>
+        <NearDistance>1</NearDistance>
+    </Camera>
+	
+    <Objects>
+        <Mesh>
+            <Datapath>../sample_input/armadillo.obj</Datapath>
+        </Mesh>
+    </Objects>
+</Scene>

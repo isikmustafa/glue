@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\geometry">
+      <UniqueIdentifier>{1bb88714-0db9-4b15-92eb-e697ff8d034a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core">
+      <UniqueIdentifier>{f197ab5b-b545-458b-9d3b-60433039d91b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\integrator">
+      <UniqueIdentifier>{c86076b2-ccb0-4540-80d8-d3553a5b1174}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\geometry\triangle.cpp">
+      <Filter>Source Files\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\geometry\bbox.cpp">
+      <Filter>Source Files\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\geometry\mesh.cpp">
+      <Filter>Source Files\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\geometry\ray.cpp">
+      <Filter>Source Files\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\camera.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\timer.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\scene.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\integrator\raytracer.cpp">
+      <Filter>Source Files\integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\parser.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\geometry\triangle.h">
+      <Filter>Source Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\geometry\bbox.h">
+      <Filter>Source Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\geometry\mesh.h">
+      <Filter>Source Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\geometry\ray.h">
+      <Filter>Source Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\geometry\bvh.h">
+      <Filter>Source Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\camera.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\timer.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\scene.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\integrator\raytracer.h">
+      <Filter>Source Files\integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\parser.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\geometry\intersection.h">
+      <Filter>Source Files\geometry</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\geometry\bvh.inl">
+      <Filter>Source Files\geometry</Filter>
+    </None>
+    <None Include="src\core\scene.inl">
+      <Filter>Source Files\core</Filter>
+    </None>
+  </ItemGroup>
+</Project>
