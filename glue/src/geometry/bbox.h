@@ -15,6 +15,7 @@ namespace glue
 
 			void extend(const glm::vec3& point);
 			void extend(const BBox& bbox);
+			float getSurfaceArea() const;
 			float intersect(const glm::vec3& origin, const glm::vec3& inv_dir) const;
 
 			const glm::vec3& get_min() const { return m_min; }

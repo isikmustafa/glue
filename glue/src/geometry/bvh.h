@@ -23,6 +23,11 @@ namespace glue
 				: start(p_start)
 				, end(p_end)
 			{}
+			BVHNode(const BBox& p_bbox, int p_start, int p_end)
+				: bbox(p_bbox)
+				, start(p_start)
+				, end(p_end)
+			{}
 		};
 
 		class Ray;
@@ -32,6 +37,9 @@ namespace glue
 		public:
 			template<typename Primitive>
 			void buildWithMedianSplit(std::vector<Primitive>& objects);
+
+			template<typename Primitive>
+			void buildWithSAHSplit(std::vector<Primitive>& objects);
 
 			template<typename Primitive>
 			bool intersect(const std::vector<Primitive>& objects, const Ray& ray, Intersection& intersection, float max_distance) const;

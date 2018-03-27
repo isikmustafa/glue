@@ -3,6 +3,7 @@
 
 #include "bbox.h"
 
+#include <glm\vec2.hpp>
 #include <glm\vec3.hpp>
 
 namespace glue
@@ -17,6 +18,7 @@ namespace glue
 			Triangle(const glm::vec3& v0, const glm::vec3& edge1, const glm::vec3& edge2);
 
 			BBox getBBox() const;
+			glm::vec2 getBBoxOnAxis(int axis) const;
 			bool intersect(const Ray& ray, Intersection& intersection, float max_distance) const;
 			bool intersectShadowRay(const Ray& ray, float max_distance) const;
 

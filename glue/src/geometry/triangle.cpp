@@ -23,6 +23,14 @@ namespace glue
 			return BBox(glm::min(glm::min(v1, v2), m_v0), glm::max(glm::max(v1, v2), m_v0));
 		}
 
+		glm::vec2 Triangle::getBBoxOnAxis(int axis) const
+		{
+			auto v1 = m_edge1 + m_v0;
+			auto v2 = m_edge2 + m_v0;
+
+			return glm::vec2(glm::min(glm::min(v1[axis], v2[axis]), m_v0[axis]), glm::max(glm::max(v1[axis], v2[axis]), m_v0[axis]));
+		}
+
 		bool Triangle::intersect(const Ray& ray, Intersection& intersection, float max_distance) const
 		{
 			auto pvec = glm::cross(ray.get_direction(), m_edge2);

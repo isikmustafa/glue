@@ -9,7 +9,7 @@ namespace glue
 	{
 		BBox::BBox()
 			: m_min(std::numeric_limits<float>::max())
-			, m_max(std::numeric_limits<float>::min())
+			, m_max(-std::numeric_limits<float>::max())
 		{}
 
 		BBox::BBox(const glm::vec3& min, const glm::vec3& max)
@@ -27,6 +27,12 @@ namespace glue
 		{
 			m_min = glm::min(m_min, bbox.m_min);
 			m_max = glm::max(m_max, bbox.m_max);
+		}
+
+		float BBox::getSurfaceArea() const
+		{
+			auto edges = m_max - m_min;
+			return 2 * (edges.x * edges.y + edges.x * edges.z + edges.y * edges.z);
 		}
 
 		float BBox::intersect(const glm::vec3& origin, const glm::vec3& inv_dir) const

@@ -82,7 +82,7 @@ namespace glue
 						geometry::BVH bvh;
 
 						glue::core::Timer timer; // delete include timer.h as well
-						bvh.buildWithMedianSplit(triangles);
+						bvh.buildWithSAHSplit(triangles);
 						std::cout << "BVH build time: " << timer.getTime() << std::endl;
 
 						path_to_triangles.insert({ datapath_text, std::make_shared<std::vector<geometry::Triangle>>(std::move(triangles)) });

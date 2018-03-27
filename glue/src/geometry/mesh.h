@@ -20,6 +20,7 @@ namespace glue
 			Mesh(const BBox& bbox, const std::shared_ptr<std::vector<Triangle>>& triangles, const std::shared_ptr<BVH>& bvh);
 
 			BBox getBBox() const;
+			glm::vec2 getBBoxOnAxis(int axis) const;
 			bool intersect(const Ray& ray, Intersection& intersection, float max_distance) const;
 			bool intersectShadowRay(const Ray& ray, float max_distance) const;
 

@@ -31,7 +31,9 @@ namespace glue
 			std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->start + ref_node->end) / 2, ref_objects.begin() + ref_node->end,
 				[axis](const Primitive& a, const Primitive& b)
 			{
-				return a.getBBox().get_max()[axis] + a.getBBox().get_min()[axis] < b.getBBox().get_max()[axis] + b.getBBox().get_min()[axis];
+				auto a_bbox = a.getBBoxOnAxis(axis);
+				auto b_bbox = b.getBBoxOnAxis(axis);
+				return a_bbox.x + a_bbox.y < b_bbox.x + b_bbox.y;
 			});
 
 			ref_node->right.reset(new BVHNode((ref_node->start + ref_node->end) / 2, ref_node->end));
@@ -39,8 +41,8 @@ namespace glue
 
 			if (depth <= 2)
 			{
-				std::thread th1(buildWithMedianSplitWork<Primitive>, &ref_objects, &ref_node->right, depth + 1);
-				std::thread th2(buildWithMedianSplitWork<Primitive>, &ref_objects, &ref_node->left, depth + 1);
+				std::thread th1(buildWithMedianSplitWork<Primitive>, objects, &ref_node->right, depth + 1);
+				std::thread th2(buildWithMedianSplitWork<Primitive>, objects, &ref_node->left, depth + 1);
 				th2.join();
 				th1.join();
 			}
@@ -56,6 +58,108 @@ namespace glue
 		{
 			m_root.reset(new BVHNode(0, objects.size()));
 			buildWithMedianSplitWork(&objects, &m_root, 0);
+		}
+
+		template<typename Primitive>
+		void buildWithSAHSplitWork(std::vector<Primitive>* objects, std::unique_ptr<BVHNode>* node, float work)
+		{
+			auto& ref_node = *node;
+			auto& ref_objects = *objects;
+
+			if (ref_node->end - ref_node->start <= 5)
+			{
+				return;
+			}
+
+			auto edges = ref_node->bbox.get_max() - ref_node->bbox.get_min();
+			int axis = edges.z > edges.y && edges.z > edges.x ? 2 : (edges.y > edges.x);
+
+			//Fill the bins and count the objects inside them.
+			constexpr int cBinSize = 128;
+			BBox bins[cBinSize];
+			int counts[cBinSize] = { 0 };
+			auto constant_term = cBinSize * (1 - std::numeric_limits<float>::epsilon()) / (ref_node->bbox.get_max()[axis] - ref_node->bbox.get_min()[axis]);
+			for (int i = ref_node->start; i < ref_node->end; ++i)
+			{
+				auto object_bbox = ref_objects[i].getBBox();
+				auto bin_index = static_cast<int>(((object_bbox.get_min()[axis] + object_bbox.get_max()[axis]) * 0.5f - ref_node->bbox.get_min()[axis]) * constant_term);
+				bins[bin_index].extend(object_bbox);
+				++counts[bin_index];
+			}
+
+			//Compute all the cumulative bboxes by sweeping from left to right.
+			BBox cbins[cBinSize];
+			cbins[0] = bins[0];
+			for (int i = 1; i < cBinSize; ++i)
+			{
+				cbins[i] = cbins[i - 1];
+				cbins[i].extend(bins[i]);
+			}
+
+			//Compute all the possible costs by sweeping from right to left and find the optimal one.
+			int right_count;
+			BBox left_bbox, right_bbox;
+			auto min_cost = std::numeric_limits<float>::max();
+			BBox crightbin;
+			int crightcount = 0;
+			for (int i = cBinSize - 1; i >= 1; --i)
+			{
+				crightbin.extend(bins[i]);
+				crightcount += counts[i];
+
+				auto left_count = ref_node->end - ref_node->start - crightcount;
+				auto cost = cbins[i - 1].getSurfaceArea() * left_count + crightbin.getSurfaceArea() * crightcount;
+				if (cost < min_cost && left_count && crightcount)
+				{
+					min_cost = cost;
+					right_count = crightcount;
+					left_bbox = cbins[i - 1];
+					right_bbox = crightbin;
+				}
+			}
+
+			if (min_cost == std::numeric_limits<float>::max())
+			{
+				return;
+			}
+
+			std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->end - right_count), ref_objects.begin() + ref_node->end,
+				[axis](const Primitive& a, const Primitive& b)
+			{
+				auto a_bbox = a.getBBoxOnAxis(axis);
+				auto b_bbox = b.getBBoxOnAxis(axis);
+				return a_bbox.x + a_bbox.y < b_bbox.x + b_bbox.y;
+			});
+
+			ref_node->right.reset(new BVHNode(right_bbox, ref_node->end - right_count, ref_node->end));
+			ref_node->left.reset(new BVHNode(left_bbox, ref_node->start, ref_node->end - right_count));
+
+			if (work > 1.5f)
+			{
+				auto right_work = work * (static_cast<float>(right_count) / (ref_node->end - ref_node->start));
+				std::thread th1(buildWithSAHSplitWork<Primitive>, objects, &ref_node->right, right_work);
+				std::thread th2(buildWithSAHSplitWork<Primitive>, objects, &ref_node->left, work - right_work);
+				th2.join();
+				th1.join();
+			}
+			else
+			{
+				buildWithSAHSplitWork(objects, &ref_node->right, 0.0f);
+				buildWithSAHSplitWork(objects, &ref_node->left, 0.0f);
+			}
+		}
+
+		template<typename Primitive>
+		void BVH::buildWithSAHSplit(std::vector<Primitive>& objects)
+		{
+			int size = objects.size();
+			BBox temp;
+			for (int i = 0; i < size; ++i)
+			{
+				temp.extend(objects[i].getBBox());
+			}
+			m_root.reset(new BVHNode(temp, 0, size));
+			buildWithSAHSplitWork(&objects, &m_root, 32.0f);
 		}
 
 		template<typename Primitive>

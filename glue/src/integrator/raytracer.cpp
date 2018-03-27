@@ -16,7 +16,7 @@ namespace glue
 
 			if (result)
 			{
-				return glm::dot(intersection.normal, ray.get_direction()) * glm::vec3(255.0f);
+				return (1.0f - glm::dot(intersection.normal, ray.get_direction())) * glm::vec3(255.0f);
 			}
 			else
 			{

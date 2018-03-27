@@ -1,15 +1,15 @@
-#include <iostream>
-
 #include "core\scene.h"
 #include "core\timer.h"
 #include "integrator\raytracer.h"
+
+#include <iostream>
 
 int main()
 {
 	glue::core::Scene scene;
 	glue::core::Timer timer;
 	timer.start();
-	scene.loadFromXML("../sample_input/test.xml");
+	scene.loadFromXML("../sample_input/buddha.xml");
 	std::cout << "BVH build and input read time: " << timer.getTime() << std::endl;
 
 	glue::integrator::Raytracer rt;
