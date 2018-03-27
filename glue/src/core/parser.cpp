@@ -80,6 +80,41 @@ namespace glue
 
 				return triangles;
 			}
+			geometry::Transformation parseTransformation(tinyxml2::XMLElement* transformation_element)
+			{
+				std::stringstream stream;
+				geometry::Transformation transformation;
+				if (transformation_element)
+				{
+					auto scaling_element = transformation_element->FirstChildElement("Scaling");
+					if (scaling_element)
+					{
+						glm::vec3 scaling;
+						stream << scaling_element->GetText() << std::endl;
+						stream >> scaling.x >> scaling.y >> scaling.z;
+						transformation.scale(scaling);
+					}
+					auto rotation_element = transformation_element->FirstChildElement("Rotation");
+					if (rotation_element)
+					{
+						glm::vec3 axis;
+						float angle;
+						stream << rotation_element->GetText() << std::endl;
+						stream >> axis.x >> axis.y >> axis.z >> angle;
+						transformation.rotate(glm::normalize(axis), angle);
+					}
+					auto translation_element = transformation_element->FirstChildElement("Translation");
+					if (translation_element)
+					{
+						glm::vec3 translation;
+						stream << translation_element->GetText() << std::endl;
+						stream >> translation.x >> translation.y >> translation.z;
+						transformation.translate(translation);
+					}
+				}
+
+				return transformation;
+			}
 		}
 	}
 }

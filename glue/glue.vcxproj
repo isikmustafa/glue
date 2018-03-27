@@ -145,6 +145,7 @@
     <ClCompile Include="src\geometry\bbox.cpp" />
     <ClCompile Include="src\geometry\mesh.cpp" />
     <ClCompile Include="src\geometry\ray.cpp" />
+    <ClCompile Include="src\geometry\transformation.cpp" />
     <ClCompile Include="src\geometry\triangle.cpp" />
     <ClCompile Include="src\integrator\raytracer.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -159,6 +160,7 @@
     <ClInclude Include="src\geometry\intersection.h" />
     <ClInclude Include="src\geometry\mesh.h" />
     <ClInclude Include="src\geometry\ray.h" />
+    <ClInclude Include="src\geometry\transformation.h" />
     <ClInclude Include="src\geometry\triangle.h" />
     <ClInclude Include="src\integrator\raytracer.h" />
   </ItemGroup>

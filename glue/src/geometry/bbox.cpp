@@ -35,7 +35,7 @@ namespace glue
 			return 2 * (edges.x * edges.y + edges.x * edges.z + edges.y * edges.z);
 		}
 
-		float BBox::intersect(const glm::vec3& origin, const glm::vec3& inv_dir) const
+		glm::vec2 BBox::intersect(const glm::vec3& origin, const glm::vec3& inv_dir) const
 		{
 			auto t0 = (m_min - origin) * inv_dir;
 			auto t1 = (m_max - origin) * inv_dir;
@@ -51,10 +51,12 @@ namespace glue
 
 			if (tm_max < tm_min)
 			{
-				return -1.0f;
+				return glm::vec2(-1.0f, -1.0f);
 			}
 
-			return tm_min > 0.0f ? tm_min : tm_max;
+			//Return both the result and parameter of the closest intersection point which is tm_min.
+			//The reason why tm_min is also returned is to reject traversing a node whose tm_min is greater than min_distance of that traversal.
+			return tm_min > 0.0f ? glm::vec2(tm_min, tm_min) : glm::vec2(tm_max, tm_min);
 		}
 	}
 }

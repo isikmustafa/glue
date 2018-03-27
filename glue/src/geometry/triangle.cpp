@@ -31,6 +31,11 @@ namespace glue
 			return glm::vec2(glm::min(glm::min(v1[axis], v2[axis]), m_v0[axis]), glm::max(glm::max(v1[axis], v2[axis]), m_v0[axis]));
 		}
 
+		std::array<glm::vec3, 3> Triangle::getVertices() const
+		{
+			return { m_v0, m_edge1 + m_v0, m_edge2 + m_v0 };
+		}
+
 		bool Triangle::intersect(const Ray& ray, Intersection& intersection, float max_distance) const
 		{
 			auto pvec = glm::cross(ray.get_direction(), m_edge2);

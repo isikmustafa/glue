@@ -1,6 +1,8 @@
 #include "scene.h"
 #include "parser.h"
 #include "..\geometry\triangle.h"
+#include "..\geometry\transformation.h"
+#include "..\geometry\bbox.h"
 #include "timer.h"
 
 #include <sstream>
@@ -89,7 +91,21 @@ namespace glue
 						path_to_bvh.insert({ datapath_text, std::make_shared<geometry::BVH>(std::move(bvh)) });
 					}
 
-					meshes.emplace_back(geometry::Mesh(path_to_bvh[datapath_text]->get_root()->bbox, path_to_triangles[datapath_text], path_to_bvh[datapath_text]));
+					//Compute transformation.
+					auto transformation_element = child->FirstChildElement("Transformation");
+					auto transformation = parser::parseTransformation(transformation_element);
+
+					//Compute bbox.
+					geometry::BBox bbox;
+					for (const auto& triangle : *path_to_triangles[datapath_text])
+					{
+						auto vertices = triangle.getVertices();
+						bbox.extend(transformation.pointToWorldSpace(vertices[0]));
+						bbox.extend(transformation.pointToWorldSpace(vertices[1]));
+						bbox.extend(transformation.pointToWorldSpace(vertices[2]));
+					}
+
+					meshes.emplace_back(geometry::Mesh(transformation, bbox, path_to_triangles[datapath_text], path_to_bvh[datapath_text]));
 
 					child = child->NextSiblingElement("Mesh");
 				}

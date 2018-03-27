@@ -20,7 +20,7 @@ namespace glue
 				ref_node->bbox.extend(ref_objects[i].getBBox());
 			}
 
-			if (ref_node->end - ref_node->start <= 5)
+			if (ref_node->end - ref_node->start <= 1)
 			{
 				return;
 			}
@@ -176,7 +176,7 @@ namespace glue
 				auto top = stack[--stack_size];
 
 				auto result = top->bbox.intersect(ray.get_origin(), inv_dir);
-				if (result > 0.0f && result < min_distance)
+				if (result.x > 0.0f && result.y < min_distance)
 				{
 					if (top->left)
 					{
@@ -214,7 +214,7 @@ namespace glue
 				auto top = stack[--stack_size];
 
 				auto result = top->bbox.intersect(ray.get_origin(), inv_dir);
-				if (result > 0.0f && result < max_distance)
+				if (result.x > 0.0f && result.y < max_distance)
 				{
 					if (top->left)
 					{

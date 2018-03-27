@@ -3,6 +3,7 @@
 
 #include "camera.h"
 #include "..\geometry\triangle.h"
+#include "..\geometry\transformation.h"
 
 #include <tinyxml2.h>
 #include <vector>
@@ -15,6 +16,7 @@ namespace glue
 		{
 			Camera parseCamera(tinyxml2::XMLElement* camera_element);
 			std::vector<geometry::Triangle> parseTriangles(tinyxml2::XMLElement* mesh_element);
+			geometry::Transformation parseTransformation(tinyxml2::XMLElement* transformation_element);
 		}
 	}
 }

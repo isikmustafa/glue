@@ -5,6 +5,7 @@
 
 #include <glm\vec2.hpp>
 #include <glm\vec3.hpp>
+#include <array>
 
 namespace glue
 {
@@ -19,6 +20,7 @@ namespace glue
 
 			BBox getBBox() const;
 			glm::vec2 getBBoxOnAxis(int axis) const;
+			std::array<glm::vec3, 3> getVertices() const;
 			bool intersect(const Ray& ray, Intersection& intersection, float max_distance) const;
 			bool intersectShadowRay(const Ray& ray, float max_distance) const;
 

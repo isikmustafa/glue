@@ -46,6 +46,9 @@
     <ClCompile Include="src\core\parser.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="src\geometry\transformation.cpp">
+      <Filter>Source Files\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\geometry\triangle.h">
@@ -79,6 +82,9 @@
       <Filter>Source Files\core</Filter>
     </ClInclude>
     <ClInclude Include="src\geometry\intersection.h">
+      <Filter>Source Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\geometry\transformation.h">
       <Filter>Source Files\geometry</Filter>
     </ClInclude>
   </ItemGroup>

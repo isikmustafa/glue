@@ -2,6 +2,7 @@
 #define __GLUE__GEOMETRY__MESH__
 
 #include "bbox.h"
+#include "transformation.h"
 
 #include <memory>
 #include <vector>
@@ -17,7 +18,7 @@ namespace glue
 		class Mesh
 		{
 		public:
-			Mesh(const BBox& bbox, const std::shared_ptr<std::vector<Triangle>>& triangles, const std::shared_ptr<BVH>& bvh);
+			Mesh(const Transformation& transformation, const BBox& bbox, const std::shared_ptr<std::vector<Triangle>>& triangles, const std::shared_ptr<BVH>& bvh);
 
 			BBox getBBox() const;
 			glm::vec2 getBBoxOnAxis(int axis) const;
@@ -25,7 +26,8 @@ namespace glue
 			bool intersectShadowRay(const Ray& ray, float max_distance) const;
 
 		private:
-			BBox m_bbox; //will be useful when transformations are implemented.
+			Transformation m_transformation;
+			BBox m_bbox;
 			std::shared_ptr<std::vector<Triangle>> m_triangles;
 			std::shared_ptr<BVH> m_bvh;
 		};
