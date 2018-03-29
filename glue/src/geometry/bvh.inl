@@ -120,11 +120,6 @@ namespace glue
 				}
 			}
 
-			if (min_cost == std::numeric_limits<float>::max())
-			{
-				return;
-			}
-
 			std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->end - right_count), ref_objects.begin() + ref_node->end,
 				[cut_axis](const Primitive& a, const Primitive& b)
 			{
