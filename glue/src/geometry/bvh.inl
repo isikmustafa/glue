@@ -71,50 +71,52 @@ namespace glue
 				return;
 			}
 
-			auto edges = ref_node->bbox.get_max() - ref_node->bbox.get_min();
-			int axis = edges.z > edges.y && edges.z > edges.x ? 2 : (edges.y > edges.x);
-
-			//Fill the bins and count the objects inside them.
-			constexpr int cBinSize = 128;
-			BBox bins[cBinSize];
-			int counts[cBinSize] = { 0 };
-			auto constant_term = cBinSize * (1 - std::numeric_limits<float>::epsilon()) / (ref_node->bbox.get_max()[axis] - ref_node->bbox.get_min()[axis]);
-			for (int i = ref_node->start; i < ref_node->end; ++i)
-			{
-				auto object_bbox = ref_objects[i].getBBox();
-				auto bin_index = static_cast<int>(((object_bbox.get_min()[axis] + object_bbox.get_max()[axis]) * 0.5f - ref_node->bbox.get_min()[axis]) * constant_term);
-				bins[bin_index].extend(object_bbox);
-				++counts[bin_index];
-			}
-
-			//Compute all the cumulative bboxes by sweeping from left to right.
-			BBox cbins[cBinSize];
-			cbins[0] = bins[0];
-			for (int i = 1; i < cBinSize; ++i)
-			{
-				cbins[i] = cbins[i - 1];
-				cbins[i].extend(bins[i]);
-			}
-
-			//Compute all the possible costs by sweeping from right to left and find the optimal one.
+			auto min_cost = std::numeric_limits<float>::max();
 			int right_count;
 			BBox left_bbox, right_bbox;
-			auto min_cost = std::numeric_limits<float>::max();
-			BBox crightbin;
-			int crightcount = 0;
-			for (int i = cBinSize - 1; i >= 1; --i)
+			int cut_axis;
+			for (int axis = 0; axis < 3; ++axis)
 			{
-				crightbin.extend(bins[i]);
-				crightcount += counts[i];
-
-				auto left_count = ref_node->end - ref_node->start - crightcount;
-				auto cost = cbins[i - 1].getSurfaceArea() * left_count + crightbin.getSurfaceArea() * crightcount;
-				if (cost < min_cost && left_count && crightcount)
+				//Fill the bins and count the objects inside them.
+				constexpr int cBinSize = 128;
+				BBox bins[cBinSize];
+				int counts[cBinSize] = { 0 };
+				auto constant_term = cBinSize * (1 - std::numeric_limits<float>::epsilon()) / (ref_node->bbox.get_max()[axis] - ref_node->bbox.get_min()[axis]);
+				for (int i = ref_node->start; i < ref_node->end; ++i)
 				{
-					min_cost = cost;
-					right_count = crightcount;
-					left_bbox = cbins[i - 1];
-					right_bbox = crightbin;
+					auto object_bbox = ref_objects[i].getBBox();
+					auto bin_index = static_cast<int>(((object_bbox.get_min()[axis] + object_bbox.get_max()[axis]) * 0.5f - ref_node->bbox.get_min()[axis]) * constant_term);
+					bins[bin_index].extend(object_bbox);
+					++counts[bin_index];
+				}
+
+				//Compute all the cumulative bboxes by sweeping from left to right.
+				BBox cbins[cBinSize];
+				cbins[0] = bins[0];
+				for (int i = 1; i < cBinSize; ++i)
+				{
+					cbins[i] = cbins[i - 1];
+					cbins[i].extend(bins[i]);
+				}
+
+				//Compute all the possible costs by sweeping from right to left and find the optimal one.
+				BBox crightbin;
+				int crightcount = 0;
+				for (int i = cBinSize - 1; i >= 1; --i)
+				{
+					crightbin.extend(bins[i]);
+					crightcount += counts[i];
+
+					auto left_count = ref_node->end - ref_node->start - crightcount;
+					auto cost = cbins[i - 1].getSurfaceArea() * left_count + crightbin.getSurfaceArea() * crightcount;
+					if (cost < min_cost && left_count && crightcount)
+					{
+						min_cost = cost;
+						right_count = crightcount;
+						left_bbox = cbins[i - 1];
+						right_bbox = crightbin;
+						cut_axis = axis;
+					}
 				}
 			}
 
@@ -124,10 +126,10 @@ namespace glue
 			}
 
 			std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->end - right_count), ref_objects.begin() + ref_node->end,
-				[axis](const Primitive& a, const Primitive& b)
+				[cut_axis](const Primitive& a, const Primitive& b)
 			{
-				auto a_bbox = a.getBBoxOnAxis(axis);
-				auto b_bbox = b.getBBoxOnAxis(axis);
+				auto a_bbox = a.getBBoxOnAxis(cut_axis);
+				auto b_bbox = b.getBBoxOnAxis(cut_axis);
 				return a_bbox.x + a_bbox.y < b_bbox.x + b_bbox.y;
 			});
 
