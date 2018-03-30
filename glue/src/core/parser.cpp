@@ -75,7 +75,7 @@ namespace glue
 						const aiVector3D& position = mesh->mVertices[face.mIndices[k]];
 						face_vertices[k] = glm::vec3(position.x, position.y, position.z);
 					}
-					triangles.emplace_back(geometry::Triangle(face_vertices[0], face_vertices[1] - face_vertices[0], face_vertices[2] - face_vertices[0]));
+					triangles.emplace_back(face_vertices[0], face_vertices[1] - face_vertices[0], face_vertices[2] - face_vertices[0]);
 				}
 
 				return triangles;

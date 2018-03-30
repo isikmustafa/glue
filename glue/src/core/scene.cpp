@@ -105,7 +105,7 @@ namespace glue
 						bbox.extend(transformation.pointToWorldSpace(vertices[2]));
 					}
 
-					meshes.emplace_back(geometry::Mesh(transformation, bbox, path_to_triangles[datapath_text], path_to_bvh[datapath_text]));
+					meshes.emplace_back(transformation, bbox, path_to_triangles[datapath_text], path_to_bvh[datapath_text]);
 
 					child = child->NextSiblingElement("Mesh");
 				}
