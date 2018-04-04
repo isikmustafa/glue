@@ -131,7 +131,7 @@ namespace glue
 			ref_node->right.reset(new BVHNode(right_bbox, ref_node->end - right_count, ref_node->end));
 			ref_node->left.reset(new BVHNode(left_bbox, ref_node->start, ref_node->end - right_count));
 
-			if (work > 1.0f)
+			if (work > 0.5f)
 			{
 				auto right_work = work * (static_cast<float>(right_count) / (ref_node->end - ref_node->start));
 				std::thread th1(buildWithSAHSplitWork<Primitive>, objects, &ref_node->right, right_work);
