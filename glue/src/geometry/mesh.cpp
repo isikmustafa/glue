@@ -29,7 +29,7 @@ namespace glue
 		{
 			if (m_bvh->intersect(*m_triangles, m_transformation.rayToObjectSpace(ray), intersection, max_distance))
 			{
-				intersection.normal = m_transformation.normalToWorldSpace(intersection.normal);
+				intersection.normal = glm::normalize(m_transformation.normalToWorldSpace(intersection.normal));
 				return true;
 			}
 			return false;

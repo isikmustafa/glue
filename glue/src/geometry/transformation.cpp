@@ -22,9 +22,9 @@ namespace glue
 			m_inverse_transformation = glm::inverse(m_transformation);
 		}
 
-		void Transformation::rotate(const glm::vec3& rotation_axis, float angle_in_degree)
+		void Transformation::rotate(const glm::vec3& rotation_axis, float angle_in_degrees)
 		{
-			m_transformation = glm::rotate(glm::radians(angle_in_degree), rotation_axis) * m_transformation;
+			m_transformation = glm::rotate(glm::radians(angle_in_degrees), rotation_axis) * m_transformation;
 			m_inverse_transformation = glm::inverse(m_transformation);
 		}
 
@@ -41,12 +41,12 @@ namespace glue
 
 		glm::vec3 Transformation::pointToWorldSpace(const glm::vec3& point) const
 		{
-			return glm::vec3(m_transformation * glm::vec4(point, 1.0f));
+			return m_transformation * glm::vec4(point, 1.0f);
 		}
 
 		glm::vec3 Transformation::normalToWorldSpace(const glm::vec3& normal) const
 		{
-			return glm::normalize(glm::vec3(glm::transpose(m_inverse_transformation) * glm::vec4(normal, 0.0f)));
+			return glm::transpose(m_inverse_transformation) * glm::vec4(normal, 0.0f);
 		}
 	}
 }
