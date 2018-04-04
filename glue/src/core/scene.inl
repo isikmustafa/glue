@@ -1,17 +1,20 @@
 #include <png.hpp>
 #include <ctpl_stl.h>
+#include <thread>
 
 namespace glue
 {
 	namespace core
 	{
+		const int gNumberOfHardwareThreads = std::thread::hardware_concurrency();
+
 		template<typename Integrator>
 		void Scene::render(const Integrator& integrator)
 		{
 			constexpr int cPatchSize = 32;
 			auto resolution = camera.get_screen_resolution();
 			png::image<png::rgb_pixel> image(resolution.x, resolution.y);
-			ctpl::thread_pool pool(8);
+			ctpl::thread_pool pool(gNumberOfHardwareThreads);
 			for (int x = 0; x < resolution.x; x += cPatchSize)
 			{
 				for (int y = 0; y < resolution.y; y += cPatchSize)

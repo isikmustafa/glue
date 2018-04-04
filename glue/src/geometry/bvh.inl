@@ -10,7 +10,7 @@ namespace glue
 	namespace geometry
 	{
 		template<typename Primitive>
-		void buildWithMedianSplitWork(std::vector<Primitive>* objects, std::unique_ptr<BVHNode>* node, int depth)
+		void buildWithMedianSplitWork(std::vector<Primitive>* objects, std::unique_ptr<BVHNode>* node, int work)
 		{
 			auto& ref_node = *node;
 			auto& ref_objects = *objects;
@@ -39,17 +39,17 @@ namespace glue
 			ref_node->right.reset(new BVHNode((ref_node->start + ref_node->end) / 2, ref_node->end));
 			ref_node->left.reset(new BVHNode(ref_node->start, (ref_node->start + ref_node->end) / 2));
 
-			if (depth <= 2)
+			if (work > 1)
 			{
-				std::thread th1(buildWithMedianSplitWork<Primitive>, objects, &ref_node->right, depth + 1);
-				std::thread th2(buildWithMedianSplitWork<Primitive>, objects, &ref_node->left, depth + 1);
+				std::thread th1(buildWithMedianSplitWork<Primitive>, objects, &ref_node->right, work >> 1);
+				std::thread th2(buildWithMedianSplitWork<Primitive>, objects, &ref_node->left, work >> 1);
 				th2.join();
 				th1.join();
 			}
 			else
 			{
-				buildWithMedianSplitWork(objects, &ref_node->right, depth + 1);
-				buildWithMedianSplitWork(objects, &ref_node->left, depth + 1);
+				buildWithMedianSplitWork(objects, &ref_node->right, 0);
+				buildWithMedianSplitWork(objects, &ref_node->left, 0);
 			}
 		}
 
@@ -57,7 +57,7 @@ namespace glue
 		void BVH::buildWithMedianSplit(std::vector<Primitive>& objects)
 		{
 			m_root.reset(new BVHNode(0, objects.size()));
-			buildWithMedianSplitWork(&objects, &m_root, 0);
+			buildWithMedianSplitWork(&objects, &m_root, glue::core::gNumberOfHardwareThreads);
 		}
 
 		template<typename Primitive>
@@ -131,7 +131,7 @@ namespace glue
 			ref_node->right.reset(new BVHNode(right_bbox, ref_node->end - right_count, ref_node->end));
 			ref_node->left.reset(new BVHNode(left_bbox, ref_node->start, ref_node->end - right_count));
 
-			if (work > 1.5f)
+			if (work > 1.0f)
 			{
 				auto right_work = work * (static_cast<float>(right_count) / (ref_node->end - ref_node->start));
 				std::thread th1(buildWithSAHSplitWork<Primitive>, objects, &ref_node->right, right_work);
@@ -156,7 +156,7 @@ namespace glue
 				temp.extend(objects[i].getBBox());
 			}
 			m_root.reset(new BVHNode(temp, 0, size));
-			buildWithSAHSplitWork(&objects, &m_root, 32.0f);
+			buildWithSAHSplitWork(&objects, &m_root, static_cast<float>(glue::core::gNumberOfHardwareThreads));
 		}
 
 		template<typename Primitive>
