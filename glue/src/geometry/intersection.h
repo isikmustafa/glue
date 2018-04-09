@@ -7,10 +7,12 @@ namespace glue
 {
 	namespace geometry
 	{
+		class Mesh;
 		struct Intersection
 		{
 			glm::vec3 normal;
 			float distance;
+			const Mesh* mesh;
 		};
 	}
 }

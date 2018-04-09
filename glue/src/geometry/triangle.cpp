@@ -15,6 +15,23 @@ namespace glue
 			, m_normal(glm::normalize(glm::cross(edge1, edge2)))
 		{}
 
+		glm::vec3 Triangle::samplePoint(core::UniformSampler& sampler) const
+		{
+			auto v1 = m_edge1 + m_v0;
+			auto v2 = m_edge2 + m_v0;
+
+			auto sqrt_rand = glm::sqrt(sampler.sample());
+			auto u = 1.0f - sqrt_rand;
+			auto v = sampler.sample() * sqrt_rand;
+
+			return m_v0 * u + v1 * v + v2 * (1.0f - u - v);
+		}
+
+		float Triangle::getSurfaceArea() const
+		{
+			return glm::length(glm::cross(m_edge1, m_edge2)) * 0.5f;
+		}
+
 		BBox Triangle::getBBox() const
 		{
 			auto v1 = m_edge1 + m_v0;

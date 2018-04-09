@@ -3,7 +3,6 @@
 #include "..\geometry\triangle.h"
 #include "..\geometry\transformation.h"
 #include "..\geometry\bbox.h"
-#include "timer.h"
 
 #include <sstream>
 #include <utility>
@@ -62,12 +61,26 @@ namespace glue
 			element = root->FirstChildElement("PixelFilter");
 			if (element)
 			{
+				std::string filter_str;
 				stream << element->GetText() << std::endl;
-				stream >> pixel_filter;
+				stream >> filter_str;
+
+				if (filter_str == "BOX")
+				{
+					pixel_filter = Filter::BOX;
+				}
+				else if (filter_str == "GAUSSIAN")
+				{
+					pixel_filter = Filter::GAUSSIAN;
+				}
+				else
+				{
+					throw std::runtime_error("Error: Unknown filter type for pixel!");
+				}
 			}
 			else
 			{
-				pixel_filter = "BOX";
+				pixel_filter = Filter::BOX;
 			}
 
 			//SampleCount
@@ -107,9 +120,7 @@ namespace glue
 						auto triangles = parser::parseTriangles(datapath);
 						geometry::BVH bvh;
 
-						glue::core::Timer timer; // delete include timer.h as well
 						bvh.buildWithSAHSplit(triangles);
-						std::cout << "BVH build time: " << timer.getTime() << std::endl;
 
 						path_to_triangles.insert({ datapath_text, std::make_shared<std::vector<geometry::Triangle>>(std::move(triangles)) });
 						path_to_bvh.insert({ datapath_text, std::make_shared<geometry::BVH>(std::move(bvh)) });
@@ -121,15 +132,22 @@ namespace glue
 
 					//Compute bbox.
 					geometry::BBox bbox;
+					float area = 0.0f;
+					std::vector<float> cdf;
 					for (const auto& triangle : *path_to_triangles[datapath_text])
 					{
 						auto vertices = triangle.getVertices();
-						bbox.extend(transformation.pointToWorldSpace(vertices[0]));
-						bbox.extend(transformation.pointToWorldSpace(vertices[1]));
-						bbox.extend(transformation.pointToWorldSpace(vertices[2]));
+						auto v0 = transformation.pointToWorldSpace(vertices[0]);
+						auto v1 = transformation.pointToWorldSpace(vertices[1]);
+						auto v2 = transformation.pointToWorldSpace(vertices[2]);
+						bbox.extend(v0);
+						bbox.extend(v1);
+						bbox.extend(v2);
+						area += geometry::Triangle(v0, v1 - v0, v2 - v0).getSurfaceArea();
+						cdf.push_back(area);
 					}
 
-					meshes.emplace_back(transformation, bbox, path_to_triangles[datapath_text], path_to_bvh[datapath_text]);
+					meshes.emplace_back(transformation, bbox, std::move(cdf), area, path_to_triangles[datapath_text], path_to_bvh[datapath_text]);
 
 					child = child->NextSiblingElement("Mesh");
 				}

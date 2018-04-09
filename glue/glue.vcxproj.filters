@@ -14,6 +14,9 @@
     <Filter Include="Source Files\integrator">
       <UniqueIdentifier>{c86076b2-ccb0-4540-80d8-d3553a5b1174}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\light">
+      <UniqueIdentifier>{21481c0c-db85-40ff-a89e-0c2e55ce4853}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -54,6 +57,12 @@
     </ClCompile>
     <ClCompile Include="src\core\uniform_sampler.cpp">
       <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\integrator\pathtracer.cpp">
+      <Filter>Source Files\integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="src\light\diffuse_arealight.cpp">
+      <Filter>Source Files\light</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -101,6 +110,15 @@
     </ClInclude>
     <ClInclude Include="src\core\uniform_sampler.h">
       <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\integrator\pathtracer.h">
+      <Filter>Source Files\integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\light\diffuse_arealight.h">
+      <Filter>Source Files\light</Filter>
+    </ClInclude>
+    <ClInclude Include="src\light\light.h">
+      <Filter>Source Files\light</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

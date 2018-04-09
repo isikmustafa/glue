@@ -12,7 +12,7 @@ namespace glue
 		class UniformSampler : public Sampler
 		{
 		public:
-			UniformSampler(float min, float max);
+			UniformSampler(float min = 0.0f, float max = 1.0f);
 
 			float sample() override;
 

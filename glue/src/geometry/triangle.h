@@ -2,6 +2,7 @@
 #define __GLUE__GEOMETRY__TRIANGLE__
 
 #include "bbox.h"
+#include "..\core\uniform_sampler.h"
 
 #include <glm\vec2.hpp>
 #include <glm\vec3.hpp>
@@ -18,6 +19,8 @@ namespace glue
 		public:
 			Triangle(const glm::vec3& v0, const glm::vec3& edge1, const glm::vec3& edge2);
 
+			glm::vec3 samplePoint(core::UniformSampler& sampler) const;
+			float getSurfaceArea() const;
 			BBox getBBox() const;
 			glm::vec2 getBBoxOnAxis(int axis) const;
 			std::array<glm::vec3, 3> getVertices() const;

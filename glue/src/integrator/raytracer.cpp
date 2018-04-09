@@ -12,20 +12,20 @@ namespace glue
 	{
 		glm::vec3 Raytracer::integratePixel(const core::Scene& scene, int x, int y) const
 		{
-			std::unique_ptr<core::Sampler> sampler;
-			if (scene.pixel_filter == "BOX")
+			std::unique_ptr<core::Sampler> offset_sampler;
+			if (scene.pixel_filter == core::Filter::BOX)
 			{
-				sampler.reset(new core::UniformSampler(0.0f, 1.0f));
+				offset_sampler.reset(new core::UniformSampler(0.0f, 1.0f));
 			}
-			else if (scene.pixel_filter == "GAUSSIAN")
+			else if (scene.pixel_filter == core::Filter::GAUSSIAN)
 			{
-				sampler.reset(new core::GaussianSampler(0.5f, 0.5f));
+				offset_sampler.reset(new core::GaussianSampler(0.5f, 0.5f));
 			}
 
 			glm::vec3 pixel_acc;
 			for (int i = 0; i < scene.sample_count; ++i)
 			{
-				auto ray = scene.camera.castPrimayRay(x, y, sampler->sample(), sampler->sample());
+				auto ray = scene.camera.castPrimayRay(x, y, offset_sampler->sample(), offset_sampler->sample());
 				geometry::Intersection intersection;
 				auto result = scene.bvh.intersect(scene.meshes, ray, intersection, std::numeric_limits<float>::max());
 

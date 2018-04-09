@@ -15,7 +15,7 @@ namespace glue
 			//Although no sample will be taken beyond the radius,
 			//beware that gaussian function does not integrate to exactly 1.0 between (mean - radius) and (mean + radius).
 			//However, the error in the integration is negligible.
-			GaussianSampler(float mean, float radius);
+			GaussianSampler(float mean = 0.5f, float radius = 0.5f);
 
 			float sample() override;
 			
