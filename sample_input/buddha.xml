@@ -1,6 +1,8 @@
 <Scene>
 	<ImageName>../sample_output/buddha.png</ImageName>
     <BackgroundColor>128 128 128</BackgroundColor>
+	<PixelFilter>GAUSSIAN</PixelFilter>
+	<SampleCount>250</SampleCount>
 	
     <Camera>
         <ScreenCoordinates>-1 1 -1 1</ScreenCoordinates>

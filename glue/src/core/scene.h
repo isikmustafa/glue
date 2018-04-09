@@ -21,6 +21,8 @@ namespace glue
 			Camera camera;
 			std::string image_name;
 			glm::vec3 background_color;
+			std::string pixel_filter;
+			int sample_count;
 
 			//Functions
 			void loadFromXML(const std::string& filepath);

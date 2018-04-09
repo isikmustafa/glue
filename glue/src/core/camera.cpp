@@ -23,10 +23,10 @@ namespace glue
 			m_coeff.y = (m_screen_coordinates.w - m_screen_coordinates.z) / m_screen_resolution.y;
 		}
 
-		geometry::Ray Camera::castPrimayRay(int x, int y) const
+		geometry::Ray Camera::castPrimayRay(int x, int y, float offset_x, float offset_y) const
 		{
 			auto dir = -m_near_distance * m_gaze +
-				(m_screen_coordinates.x + m_coeff.x * (static_cast<float>(x) + 0.5f)) * m_right + (m_screen_coordinates.w - m_coeff.y * (static_cast<float>(y) + 0.5f)) * m_up;
+				(m_screen_coordinates.x + m_coeff.x * (static_cast<float>(x) + offset_x)) * m_right + (m_screen_coordinates.w - m_coeff.y * (static_cast<float>(y) + offset_y)) * m_up;
 
 			return geometry::Ray(m_position, glm::normalize(dir));
 		}

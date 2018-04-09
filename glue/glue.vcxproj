@@ -139,9 +139,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\core\camera.cpp" />
+    <ClCompile Include="src\core\gaussian_sampler.cpp" />
     <ClCompile Include="src\core\parser.cpp" />
     <ClCompile Include="src\core\scene.cpp" />
     <ClCompile Include="src\core\timer.cpp" />
+    <ClCompile Include="src\core\uniform_sampler.cpp" />
     <ClCompile Include="src\geometry\bbox.cpp" />
     <ClCompile Include="src\geometry\mesh.cpp" />
     <ClCompile Include="src\geometry\ray.cpp" />
@@ -152,9 +154,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\core\camera.h" />
+    <ClInclude Include="src\core\gaussian_sampler.h" />
     <ClInclude Include="src\core\parser.h" />
+    <ClInclude Include="src\core\sampler.h" />
     <ClInclude Include="src\core\scene.h" />
     <ClInclude Include="src\core\timer.h" />
+    <ClInclude Include="src\core\uniform_sampler.h" />
     <ClInclude Include="src\geometry\bbox.h" />
     <ClInclude Include="src\geometry\bvh.h" />
     <ClInclude Include="src\geometry\intersection.h" />

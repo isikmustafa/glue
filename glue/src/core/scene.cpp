@@ -58,6 +58,30 @@ namespace glue
 				background_color = glm::vec3(0.0f, 0.0f, 0.0f);
 			}
 
+			//Filter
+			element = root->FirstChildElement("PixelFilter");
+			if (element)
+			{
+				stream << element->GetText() << std::endl;
+				stream >> pixel_filter;
+			}
+			else
+			{
+				pixel_filter = "BOX";
+			}
+
+			//SampleCount
+			element = root->FirstChildElement("SampleCount");
+			if (element)
+			{
+				stream << element->GetText() << std::endl;
+				stream >> sample_count;
+			}
+			else
+			{
+				sample_count = 1;
+			}
+
 			//Get camera
 			element = root->FirstChildElement("Camera");
 			camera = parser::parseCamera(element);

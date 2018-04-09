@@ -18,7 +18,7 @@ namespace glue
 			Camera(const glm::vec4& screen_coordinates, const glm::vec3& position, const glm::vec3& direction,
 				const glm::vec3& up, const glm::ivec2& screen_resolution, float near_distance);
 
-			geometry::Ray castPrimayRay(int x, int y) const;
+			geometry::Ray castPrimayRay(int x, int y, float offset_x = 0.5f, float offset_y = 0.5f) const;
 
 			const glm::ivec2& get_screen_resolution() const { return m_screen_resolution; }
 
