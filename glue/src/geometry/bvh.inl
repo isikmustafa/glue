@@ -4,6 +4,17 @@
 #include <algorithm>
 #include <array>
 #include <thread>
+#include <type_traits>
+
+//A trick to check if the type has operator->
+//Slightly modified version of https://stackoverflow.com/a/15394527/5091304
+template<typename T, typename = void>
+struct isDereferenceable : std::is_function<T> {};
+
+template<typename T>
+struct isDereferenceable<T, typename std::enable_if<
+	std::is_same<decltype(void(&T::operator->)), void>::value
+>::type> : std::true_type {};
 
 namespace glue
 {
@@ -17,7 +28,14 @@ namespace glue
 
 			for (int i = ref_node->start; i < ref_node->end; ++i)
 			{
-				ref_node->bbox.extend(ref_objects[i].getBBox());
+				if constexpr (isDereferenceable<Primitive>::value)
+				{
+					ref_node->bbox.extend(ref_objects[i]->getBBox());
+				}
+				else
+				{
+					ref_node->bbox.extend(ref_objects[i].getBBox());
+				}
 			}
 
 			if (ref_node->end - ref_node->start <= 1)
@@ -28,13 +46,26 @@ namespace glue
 			auto edges = ref_node->bbox.get_max() - ref_node->bbox.get_min();
 			int axis = edges.z > edges.y && edges.z > edges.x ? 2 : (edges.y > edges.x);
 
-			std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->start + ref_node->end) / 2, ref_objects.begin() + ref_node->end,
-				[axis](const Primitive& a, const Primitive& b)
+			if constexpr (isDereferenceable<Primitive>::value)
 			{
-				auto a_bbox = a.getBBoxOnAxis(axis);
-				auto b_bbox = b.getBBoxOnAxis(axis);
-				return a_bbox.x + a_bbox.y < b_bbox.x + b_bbox.y;
-			});
+				std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->start + ref_node->end) / 2, ref_objects.begin() + ref_node->end,
+					[axis](const Primitive& a, const Primitive& b)
+				{
+					auto a_bbox = a->getBBoxOnAxis(axis);
+					auto b_bbox = b->getBBoxOnAxis(axis);
+					return a_bbox.x + a_bbox.y < b_bbox.x + b_bbox.y;
+				});
+			}
+			else
+			{
+				std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->start + ref_node->end) / 2, ref_objects.begin() + ref_node->end,
+					[axis](const Primitive& a, const Primitive& b)
+				{
+					auto a_bbox = a.getBBoxOnAxis(axis);
+					auto b_bbox = b.getBBoxOnAxis(axis);
+					return a_bbox.x + a_bbox.y < b_bbox.x + b_bbox.y;
+				});
+			}
 
 			ref_node->right.reset(new BVHNode((ref_node->start + ref_node->end) / 2, ref_node->end));
 			ref_node->left.reset(new BVHNode(ref_node->start, (ref_node->start + ref_node->end) / 2));
@@ -57,7 +88,7 @@ namespace glue
 		void BVH::buildWithMedianSplit(std::vector<Primitive>& objects)
 		{
 			m_root.reset(new BVHNode(0, objects.size()));
-			buildWithMedianSplitWork(&objects, &m_root, glue::core::gNumberOfHardwareThreads);
+			buildWithMedianSplitWork(&objects, &m_root, std::thread::hardware_concurrency());
 		}
 
 		template<typename Primitive>
@@ -84,7 +115,15 @@ namespace glue
 				auto constant_term = cBinSize * (1 - std::numeric_limits<float>::epsilon()) / (ref_node->bbox.get_max()[axis] - ref_node->bbox.get_min()[axis]);
 				for (int i = ref_node->start; i < ref_node->end; ++i)
 				{
-					auto object_bbox = ref_objects[i].getBBox();
+					BBox object_bbox;
+					if constexpr (isDereferenceable<Primitive>::value)
+					{
+						object_bbox = ref_objects[i]->getBBox();
+					}
+					else
+					{
+						object_bbox = ref_objects[i].getBBox();
+					}
 					auto bin_index = static_cast<int>(((object_bbox.get_min()[axis] + object_bbox.get_max()[axis]) * 0.5f - ref_node->bbox.get_min()[axis]) * constant_term);
 					bins[bin_index].extend(object_bbox);
 					++counts[bin_index];
@@ -120,13 +159,26 @@ namespace glue
 				}
 			}
 
-			std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->end - right_count), ref_objects.begin() + ref_node->end,
-				[cut_axis](const Primitive& a, const Primitive& b)
+			if constexpr (isDereferenceable<Primitive>::value)
 			{
-				auto a_bbox = a.getBBoxOnAxis(cut_axis);
-				auto b_bbox = b.getBBoxOnAxis(cut_axis);
-				return a_bbox.x + a_bbox.y < b_bbox.x + b_bbox.y;
-			});
+				std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->end - right_count), ref_objects.begin() + ref_node->end,
+					[cut_axis](const Primitive& a, const Primitive& b)
+				{
+					auto a_bbox = a->getBBoxOnAxis(cut_axis);
+					auto b_bbox = b->getBBoxOnAxis(cut_axis);
+					return a_bbox.x + a_bbox.y < b_bbox.x + b_bbox.y;
+				});
+			}
+			else
+			{
+				std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->end - right_count), ref_objects.begin() + ref_node->end,
+					[cut_axis](const Primitive& a, const Primitive& b)
+				{
+					auto a_bbox = a.getBBoxOnAxis(cut_axis);
+					auto b_bbox = b.getBBoxOnAxis(cut_axis);
+					return a_bbox.x + a_bbox.y < b_bbox.x + b_bbox.y;
+				});
+			}
 
 			ref_node->right.reset(new BVHNode(right_bbox, ref_node->end - right_count, ref_node->end));
 			ref_node->left.reset(new BVHNode(left_bbox, ref_node->start, ref_node->end - right_count));
@@ -153,10 +205,17 @@ namespace glue
 			BBox temp;
 			for (int i = 0; i < size; ++i)
 			{
-				temp.extend(objects[i].getBBox());
+				if constexpr (isDereferenceable<Primitive>::value)
+				{
+					temp.extend(objects[i]->getBBox());
+				}
+				else
+				{
+					temp.extend(objects[i].getBBox());
+				}
 			}
 			m_root.reset(new BVHNode(temp, 0, size));
-			buildWithSAHSplitWork(&objects, &m_root, static_cast<float>(glue::core::gNumberOfHardwareThreads));
+			buildWithSAHSplitWork(&objects, &m_root, static_cast<float>(std::thread::hardware_concurrency()));
 		}
 
 		template<typename Primitive>
@@ -184,11 +243,23 @@ namespace glue
 					{
 						for (int i = top->start; i < top->end; ++i)
 						{
-							Intersection temp;
-							if (objects[i].intersect(ray, temp, min_distance))
+							if constexpr (isDereferenceable<Primitive>::value)
 							{
-								min_distance = temp.distance;
-								intersection = temp;
+								Intersection temp;
+								if (objects[i]->intersect(ray, temp, min_distance))
+								{
+									min_distance = temp.distance;
+									intersection = temp;
+								}
+							}
+							else
+							{
+								Intersection temp;
+								if (objects[i].intersect(ray, temp, min_distance))
+								{
+									min_distance = temp.distance;
+									intersection = temp;
+								}
 							}
 						}
 					}
@@ -222,9 +293,19 @@ namespace glue
 					{
 						for (int i = top->start; i < top->end; ++i)
 						{
-							if (objects[i].intersectShadowRay(ray, max_distance))
+							if constexpr (isDereferenceable<Primitive>::value)
 							{
-								return true;
+								if (objects[i]->intersectShadowRay(ray, max_distance))
+								{
+									return true;
+								}
+							}
+							else
+							{
+								if (objects[i].intersectShadowRay(ray, max_distance))
+								{
+									return true;
+								}
 							}
 						}
 
