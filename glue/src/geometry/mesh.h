@@ -4,6 +4,7 @@
 #include "bbox.h"
 #include "transformation.h"
 #include "..\core\uniform_sampler.h"
+#include "..\core\discrete_1d_sampler.h"
 
 #include <memory>
 #include <vector>
@@ -19,10 +20,10 @@ namespace glue
 		class Mesh
 		{
 		public:
-			Mesh(const Transformation& transformation, const BBox& bbox, std::vector<float> cdf, float area,
+			Mesh(const Transformation& transformation, const BBox& bbox, const std::vector<float>& triangle_areas, float area,
 				const std::shared_ptr<std::vector<Triangle>>& triangles, const std::shared_ptr<BVH>& bvh);
 
-			glm::vec3 samplePoint(core::UniformSampler& sampler) const;
+			glm::vec3 samplePoint(core::UniformSampler& sampler);
 			float getSurfaceArea() const;
 			BBox getBBox() const;
 			glm::vec2 getBBoxOnAxis(int axis) const;
@@ -32,8 +33,8 @@ namespace glue
 		private:
 			Transformation m_transformation;
 			BBox m_bbox;
-			std::vector<float> m_cdf; //A CDF to uniformly sample points on the mesh.
-			float m_area; //Surface area of the mesh.
+			core::Discrete1DSampler m_triangle_sampler;
+			float m_area;
 			std::shared_ptr<std::vector<Triangle>> m_triangles;
 			std::shared_ptr<BVH> m_bvh;
 		};

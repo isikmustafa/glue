@@ -19,7 +19,7 @@ namespace glue
 		public:
 			Triangle(const glm::vec3& v0, const glm::vec3& edge1, const glm::vec3& edge2);
 
-			glm::vec3 samplePoint(core::UniformSampler& sampler) const;
+			glm::vec3 samplePoint(core::UniformSampler& sampler);
 			float getSurfaceArea() const;
 			BBox getBBox() const;
 			glm::vec2 getBBoxOnAxis(int axis) const;

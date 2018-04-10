@@ -1,7 +1,7 @@
 #ifndef __GLUE__CORE__GAUSSIANSAMPLER__
 #define __GLUE__CORE__GAUSSIANSAMPLER__
 
-#include "sampler.h"
+#include "real_sampler.h"
 
 #include <random>
 
@@ -9,7 +9,7 @@ namespace glue
 {
 	namespace core
 	{
-		class GaussianSampler : public Sampler
+		class GaussianSampler : public RealSampler
 		{
 		public:
 			//Although no sample will be taken beyond the radius,

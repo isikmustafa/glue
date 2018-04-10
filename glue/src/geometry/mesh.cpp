@@ -10,23 +10,19 @@ namespace glue
 	{
 		//cdf is not a reference argument in order to prevent copying.
 		//It is moved along the way but not copied.
-		Mesh::Mesh(const Transformation& transformation, const BBox& bbox, std::vector<float> cdf, float area,
+		Mesh::Mesh(const Transformation& transformation, const BBox& bbox, const std::vector<float>& triangle_areas, float area,
 			const std::shared_ptr<std::vector<Triangle>>& triangles, const std::shared_ptr<BVH>& bvh)
 			: m_transformation(transformation)
 			, m_bbox(bbox)
-			, m_cdf(std::move(cdf))
+			, m_triangle_sampler(triangle_areas)
 			, m_area(area)
 			, m_triangles(triangles)
 			, m_bvh(bvh)
 		{}
 
-		glm::vec3 Mesh::samplePoint(core::UniformSampler& sampler) const
+		glm::vec3 Mesh::samplePoint(core::UniformSampler& sampler)
 		{
-			auto x = sampler.sample() * m_area;
-			auto itr = std::upper_bound(m_cdf.begin(), m_cdf.end(), x);
-			auto index = std::distance(m_cdf.begin(), itr);
-
-			auto vertices = (*m_triangles)[index].getVertices();
+			auto vertices = (*m_triangles)[m_triangle_sampler.sample()].getVertices();
 			auto v0 = m_transformation.pointToWorldSpace(vertices[0]);
 			auto v1 = m_transformation.pointToWorldSpace(vertices[1]);
 			auto v2 = m_transformation.pointToWorldSpace(vertices[2]);

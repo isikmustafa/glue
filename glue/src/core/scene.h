@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "..\geometry\mesh.h"
 #include "..\geometry\bvh.h"
+#include "..\geometry\debug_sphere.h"
 #include "..\light\light.h"
 
 #include <glm\vec3.hpp>
@@ -29,6 +30,8 @@ namespace glue
 			geometry::BVH bvh;
 			std::vector<std::shared_ptr<light::Light>> lights;
 			std::unordered_map<const geometry::Mesh*, const light::Light*> light_meshes;
+			std::vector<geometry::DebugSphere> debug_spheres;
+			geometry::BVH debug_bvh;
 			Camera camera;
 			std::string image_name;
 			glm::vec3 background_color;

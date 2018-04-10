@@ -81,6 +81,7 @@ namespace glue
 
 				return triangles;
 			}
+
 			geometry::Transformation parseTransformation(tinyxml2::XMLElement* transformation_element)
 			{
 				std::stringstream stream;
@@ -116,6 +117,7 @@ namespace glue
 
 				return transformation;
 			}
+
 			geometry::Mesh parseMesh(tinyxml2::XMLElement* mesh_element,
 				std::unordered_map<std::string, std::shared_ptr<std::vector<geometry::Triangle>>>& path_to_triangles,
 				std::unordered_map<std::string, std::shared_ptr<geometry::BVH>>& path_to_bvh)
@@ -144,8 +146,8 @@ namespace glue
 
 				//Compute bbox.
 				geometry::BBox bbox;
-				float area = 0.0f;
-				std::vector<float> cdf;
+				std::vector<float> triangle_areas;
+				auto total_area = 0.0f;
 				for (const auto& triangle : *path_to_triangles[datapath_text])
 				{
 					auto vertices = triangle.getVertices();
@@ -155,11 +157,12 @@ namespace glue
 					bbox.extend(v0);
 					bbox.extend(v1);
 					bbox.extend(v2);
-					area += geometry::Triangle(v0, v1 - v0, v2 - v0).getSurfaceArea();
-					cdf.push_back(area);
+					auto area = geometry::Triangle(v0, v1 - v0, v2 - v0).getSurfaceArea();
+					triangle_areas.push_back(area);
+					total_area += area;
 				}
 
-				return geometry::Mesh(transformation, bbox, std::move(cdf), area, path_to_triangles[datapath_text], path_to_bvh[datapath_text]);
+				return geometry::Mesh(transformation, bbox, triangle_areas, total_area, path_to_triangles[datapath_text], path_to_bvh[datapath_text]);
 			}
 		}
 	}

@@ -4,6 +4,8 @@
 #include "..\geometry\transformation.h"
 #include "..\geometry\bbox.h"
 #include "..\light\diffuse_arealight.h"
+#include "..\core\uniform_sampler.h"
+#include "..\core\timer.h"
 
 #include <sstream>
 #include <utility>
@@ -101,6 +103,7 @@ namespace glue
 			camera = parser::parseCamera(element);
 
 			//Get objects
+			UniformSampler sampler;
 			std::unordered_map<std::string, std::shared_ptr<std::vector<geometry::Triangle>>> path_to_triangles;
 			std::unordered_map<std::string, std::shared_ptr<geometry::BVH>> path_to_bvh;
 			element = root->FirstChildElement("Objects");
@@ -110,6 +113,20 @@ namespace glue
 				while (child)
 				{
 					meshes.push_back(std::make_shared<geometry::Mesh>(parser::parseMesh(child, path_to_triangles, path_to_bvh)));
+					const auto& mesh = meshes[meshes.size() - 1];
+
+					auto att = child->Attribute("displayRandomSamples");
+					if (att)
+					{
+						auto num_of_samples = std::atoi(att);
+						Timer timer;
+						for (int i = 0; i < num_of_samples; ++i)
+						{
+							debug_spheres.emplace_back(mesh->samplePoint(sampler), glm::sqrt(mesh->getSurfaceArea() / num_of_samples) / 5.0f);
+						}
+						std::cout << timer.getTime() << std::endl;
+					}
+
 					child = child->NextSiblingElement("Mesh");
 				}
 			}
@@ -122,18 +139,32 @@ namespace glue
 				while (child)
 				{
 					meshes.push_back(std::make_shared<geometry::Mesh>(parser::parseMesh(child, path_to_triangles, path_to_bvh)));
+					const auto& mesh = meshes[meshes.size() - 1];
+
+					auto att = child->Attribute("displayRandomSamples");
+					if (att)
+					{
+						auto num_of_samples = std::atoi(att);
+						for (int i = 0; i < num_of_samples; ++i)
+						{
+							debug_spheres.emplace_back(mesh->samplePoint(sampler), 0.01f);
+						}
+					}
 
 					glm::vec3 flux;
 					stream << child->FirstChildElement("Flux")->GetText() << std::endl;
 					stream >> flux.x >> flux.y >> flux.z;
 
-					lights.push_back(std::make_shared<light::DiffuseArealight>(meshes[meshes.size() - 1], flux));
-					light_meshes[meshes[meshes.size() - 1].get()] = lights[lights.size() - 1].get();
+					lights.push_back(std::make_shared<light::DiffuseArealight>(mesh, flux));
+					const auto& light = lights[lights.size() - 1];
+
+					light_meshes[mesh.get()] = light.get();
 
 					child = child->NextSiblingElement("DiffuseArealight");
 				}
 			}
 
+			debug_bvh.buildWithSAHSplit(debug_spheres);
 			bvh.buildWithMedianSplit(meshes);
 		}
 	}

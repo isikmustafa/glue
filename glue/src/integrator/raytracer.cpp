@@ -12,7 +12,7 @@ namespace glue
 	{
 		glm::vec3 Raytracer::integratePixel(const core::Scene& scene, int x, int y) const
 		{
-			std::unique_ptr<core::Sampler> offset_sampler;
+			std::unique_ptr<core::RealSampler> offset_sampler;
 			if (scene.pixel_filter == core::Filter::BOX)
 			{
 				offset_sampler.reset(new core::UniformSampler(0.0f, 1.0f));
@@ -29,7 +29,11 @@ namespace glue
 				geometry::Intersection intersection;
 				auto result = scene.bvh.intersect(scene.meshes, ray, intersection, std::numeric_limits<float>::max());
 
-				if (result)
+				if (scene.debug_bvh.intersectShadowRay(scene.debug_spheres, ray, intersection.distance))
+				{
+					pixel_acc +=  glm::vec3(255.0f, 0.0f, 0.0f);
+				}
+				else if (result)
 				{
 					pixel_acc += glm::clamp(glm::dot(intersection.normal, -ray.get_direction()), 0.0f, 1.0f) * glm::vec3(255.0f);
 				}

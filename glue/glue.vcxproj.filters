@@ -64,6 +64,12 @@
     <ClCompile Include="src\light\diffuse_arealight.cpp">
       <Filter>Source Files\light</Filter>
     </ClCompile>
+    <ClCompile Include="src\geometry\debug_sphere.cpp">
+      <Filter>Source Files\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\discrete_1d_sampler.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\geometry\triangle.h">
@@ -102,9 +108,6 @@
     <ClInclude Include="src\geometry\transformation.h">
       <Filter>Source Files\geometry</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\sampler.h">
-      <Filter>Source Files\core</Filter>
-    </ClInclude>
     <ClInclude Include="src\core\gaussian_sampler.h">
       <Filter>Source Files\core</Filter>
     </ClInclude>
@@ -119,6 +122,15 @@
     </ClInclude>
     <ClInclude Include="src\light\light.h">
       <Filter>Source Files\light</Filter>
+    </ClInclude>
+    <ClInclude Include="src\geometry\debug_sphere.h">
+      <Filter>Source Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\discrete_1d_sampler.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\real_sampler.h">
+      <Filter>Source Files\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

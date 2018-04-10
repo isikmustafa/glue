@@ -1,0 +1,91 @@
+<Scene>
+	<ImageName>../sample_output/cornell-buddha-new.png</ImageName>
+    <BackgroundColor>255 0 0</BackgroundColor>
+	<PixelFilter>GAUSSIAN</PixelFilter>
+	<SampleCount>1</SampleCount>
+	
+    <Camera>
+        <ScreenCoordinates>-1 1 -1 1</ScreenCoordinates>
+        <Position>0 1 0.95</Position>
+        <Direction>0 0 -1</Direction>
+        <Up>0 1 0</Up>
+		<Resolution>800 800</Resolution>
+        <NearDistance>1</NearDistance>
+    </Camera>
+	
+    <Objects>
+        <Mesh displayRandomSamples="100000">
+            <Datapath>../sample_input/buddha.obj</Datapath>
+			<Transformation>
+				<Scaling>1.5 1.5 1.5</Scaling>
+				<Rotation>0 1 0 180</Rotation>
+				<Translation>0 0.7 -0.5</Translation>
+			</Transformation>
+        </Mesh>
+		<!-- Front -->
+        <Mesh displayRandomSamples="1000">
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Translation>0 1 -1</Translation>
+			</Transformation>
+        </Mesh>
+		<!-- Back -->
+        <Mesh>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Rotation>0 1 0 180</Rotation>
+				<Translation>0 1 1</Translation>
+			</Transformation>
+        </Mesh>
+		<!-- Right -->
+        <Mesh>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Rotation>0 1 0 270</Rotation>
+				<Translation>1 1 0</Translation>
+			</Transformation>
+        </Mesh>
+		<!-- Left -->
+        <Mesh>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Rotation>0 1 0 90</Rotation>
+				<Translation>-1 1 0</Translation>
+			</Transformation>
+        </Mesh>
+		<!-- Ceil -->
+        <Mesh>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Rotation>1 0 0 90</Rotation>
+				<Translation>0 2 0</Translation>
+			</Transformation>
+        </Mesh>
+		<!-- Floor -->
+        <Mesh>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Rotation>-1 0 0 90</Rotation>
+				<Translation>0 0 0</Translation>
+			</Transformation>
+        </Mesh>
+    </Objects>
+	
+    <Lights>
+        <DiffuseArealight>
+			<Flux>100</Flux>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>0.2 0.2 0.2</Scaling>
+				<Rotation>1 0 0 90</Rotation>
+				<Translation>0 1.99 -0.2</Translation>
+			</Transformation>
+        </DiffuseArealight>
+    </Lights>
+</Scene>

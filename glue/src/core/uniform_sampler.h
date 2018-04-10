@@ -1,7 +1,7 @@
 #ifndef __GLUE__CORE__UNIFORMSAMPLER__
 #define __GLUE__CORE__UNIFORMSAMPLER__
 
-#include "sampler.h"
+#include "real_sampler.h"
 
 #include <random>
 
@@ -9,7 +9,7 @@ namespace glue
 {
 	namespace core
 	{
-		class UniformSampler : public Sampler
+		class UniformSampler : public RealSampler
 		{
 		public:
 			UniformSampler(float min = 0.0f, float max = 1.0f);

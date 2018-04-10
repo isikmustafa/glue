@@ -15,7 +15,7 @@ namespace glue
 			, m_normal(glm::normalize(glm::cross(edge1, edge2)))
 		{}
 
-		glm::vec3 Triangle::samplePoint(core::UniformSampler& sampler) const
+		glm::vec3 Triangle::samplePoint(core::UniformSampler& sampler)
 		{
 			auto v1 = m_edge1 + m_v0;
 			auto v2 = m_edge2 + m_v0;
