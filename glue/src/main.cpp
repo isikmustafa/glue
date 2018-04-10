@@ -9,7 +9,7 @@ int main()
 	glue::core::Scene scene;
 	glue::core::Timer timer;
 	timer.start();
-	scene.loadFromXML("../sample_input/buddha.xml");
+	scene.loadFromXML("../sample_input/cornell-buddha-new.xml");
 	std::cout << "BVH build and input read time: " << timer.getTime() << std::endl;
 
 	glue::integrator::Raytracer rt;

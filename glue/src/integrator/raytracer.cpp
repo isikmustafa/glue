@@ -31,7 +31,7 @@ namespace glue
 
 				if (result)
 				{
-					pixel_acc += glm::dot(intersection.normal, -ray.get_direction()) * glm::vec3(255.0f);
+					pixel_acc += glm::clamp(glm::dot(intersection.normal, -ray.get_direction()), 0.0f, 1.0f) * glm::vec3(255.0f);
 				}
 				else
 				{

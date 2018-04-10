@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "..\geometry\bvh.h"
 
 #include <sstream>
 #include <assimp/Importer.hpp>
@@ -114,6 +115,51 @@ namespace glue
 				}
 
 				return transformation;
+			}
+			geometry::Mesh parseMesh(tinyxml2::XMLElement* mesh_element,
+				std::unordered_map<std::string, std::shared_ptr<std::vector<geometry::Triangle>>>& path_to_triangles,
+				std::unordered_map<std::string, std::shared_ptr<geometry::BVH>>& path_to_bvh)
+			{
+				auto datapath = mesh_element->FirstChildElement("Datapath");
+				if (!datapath)
+				{
+					throw std::runtime_error("Error: Datapath is not found for the mesh!");
+				}
+
+				auto datapath_text = datapath->GetText();
+				if (path_to_triangles.find(datapath_text) == path_to_triangles.end())
+				{
+					auto triangles = parser::parseTriangles(datapath);
+					geometry::BVH bvh;
+
+					bvh.buildWithSAHSplit(triangles);
+
+					path_to_triangles.insert({ datapath_text, std::make_shared<std::vector<geometry::Triangle>>(std::move(triangles)) });
+					path_to_bvh.insert({ datapath_text, std::make_shared<geometry::BVH>(std::move(bvh)) });
+				}
+
+				//Compute transformation.
+				auto transformation_element = mesh_element->FirstChildElement("Transformation");
+				auto transformation = parser::parseTransformation(transformation_element);
+
+				//Compute bbox.
+				geometry::BBox bbox;
+				float area = 0.0f;
+				std::vector<float> cdf;
+				for (const auto& triangle : *path_to_triangles[datapath_text])
+				{
+					auto vertices = triangle.getVertices();
+					auto v0 = transformation.pointToWorldSpace(vertices[0]);
+					auto v1 = transformation.pointToWorldSpace(vertices[1]);
+					auto v2 = transformation.pointToWorldSpace(vertices[2]);
+					bbox.extend(v0);
+					bbox.extend(v1);
+					bbox.extend(v2);
+					area += geometry::Triangle(v0, v1 - v0, v2 - v0).getSurfaceArea();
+					cdf.push_back(area);
+				}
+
+				return geometry::Mesh(transformation, bbox, std::move(cdf), area, path_to_triangles[datapath_text], path_to_bvh[datapath_text]);
 			}
 		}
 	}

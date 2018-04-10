@@ -8,8 +8,9 @@
 
 #include <glm\vec3.hpp>
 #include <vector>
-#include <unordered_map>
+#include <memory>
 #include <string>
+#include <unordered_map>
 
 namespace glue
 {
@@ -24,10 +25,10 @@ namespace glue
 		struct Scene
 		{
 			//Data
-			std::vector<geometry::Mesh> meshes;
-			std::vector<light::Light> lights;
-			std::unordered_map<geometry::Mesh*, light::Light*> mesh_to_light;
+			std::vector<std::shared_ptr<geometry::Mesh>> meshes;
 			geometry::BVH bvh;
+			std::vector<std::shared_ptr<light::Light>> lights;
+			std::unordered_map<const geometry::Mesh*, const light::Light*> light_meshes;
 			Camera camera;
 			std::string image_name;
 			glm::vec3 background_color;

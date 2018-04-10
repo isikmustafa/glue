@@ -17,8 +17,8 @@ namespace glue
 		public:
 			virtual ~Light() {}
 
-			virtual glm::vec3 getLe() const = 0;
 			virtual glm::vec3 samplePoint(core::UniformSampler& sampler) const = 0;
+			virtual glm::vec3 getLe() const = 0;
 			virtual float getPdf() const = 0;
 		};
 	}

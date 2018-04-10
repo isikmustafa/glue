@@ -3,6 +3,7 @@
 #include "..\geometry\triangle.h"
 #include "..\geometry\transformation.h"
 #include "..\geometry\bbox.h"
+#include "..\light\diffuse_arealight.h"
 
 #include <sstream>
 #include <utility>
@@ -108,48 +109,28 @@ namespace glue
 				auto child = element->FirstChildElement("Mesh");
 				while (child)
 				{
-					auto datapath = child->FirstChildElement("Datapath");
-					if (!datapath)
-					{
-						throw std::runtime_error("Error: Datapath is not found for the mesh!");
-					}
-
-					auto datapath_text = datapath->GetText();
-					if (path_to_triangles.find(datapath_text) == path_to_triangles.end())
-					{
-						auto triangles = parser::parseTriangles(datapath);
-						geometry::BVH bvh;
-
-						bvh.buildWithSAHSplit(triangles);
-
-						path_to_triangles.insert({ datapath_text, std::make_shared<std::vector<geometry::Triangle>>(std::move(triangles)) });
-						path_to_bvh.insert({ datapath_text, std::make_shared<geometry::BVH>(std::move(bvh)) });
-					}
-
-					//Compute transformation.
-					auto transformation_element = child->FirstChildElement("Transformation");
-					auto transformation = parser::parseTransformation(transformation_element);
-
-					//Compute bbox.
-					geometry::BBox bbox;
-					float area = 0.0f;
-					std::vector<float> cdf;
-					for (const auto& triangle : *path_to_triangles[datapath_text])
-					{
-						auto vertices = triangle.getVertices();
-						auto v0 = transformation.pointToWorldSpace(vertices[0]);
-						auto v1 = transformation.pointToWorldSpace(vertices[1]);
-						auto v2 = transformation.pointToWorldSpace(vertices[2]);
-						bbox.extend(v0);
-						bbox.extend(v1);
-						bbox.extend(v2);
-						area += geometry::Triangle(v0, v1 - v0, v2 - v0).getSurfaceArea();
-						cdf.push_back(area);
-					}
-
-					meshes.emplace_back(transformation, bbox, std::move(cdf), area, path_to_triangles[datapath_text], path_to_bvh[datapath_text]);
-
+					meshes.push_back(std::make_shared<geometry::Mesh>(parser::parseMesh(child, path_to_triangles, path_to_bvh)));
 					child = child->NextSiblingElement("Mesh");
+				}
+			}
+
+			//Get Lights
+			element = root->FirstChildElement("Lights");
+			if (element)
+			{
+				auto child = element->FirstChildElement("DiffuseArealight");
+				while (child)
+				{
+					meshes.push_back(std::make_shared<geometry::Mesh>(parser::parseMesh(child, path_to_triangles, path_to_bvh)));
+
+					glm::vec3 flux;
+					stream << child->FirstChildElement("Flux")->GetText() << std::endl;
+					stream >> flux.x >> flux.y >> flux.z;
+
+					lights.push_back(std::make_shared<light::DiffuseArealight>(meshes[meshes.size() - 1], flux));
+					light_meshes[meshes[meshes.size() - 1].get()] = lights[lights.size() - 1].get();
+
+					child = child->NextSiblingElement("DiffuseArealight");
 				}
 			}
 
