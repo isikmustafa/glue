@@ -98,6 +98,9 @@ namespace glue
 				sample_count = 1;
 			}
 
+			//SecondaryRayEpsilon
+			secondary_ray_epsilon = 0.001f;
+
 			//Get camera
 			element = root->FirstChildElement("Camera");
 			camera = parser::parseCamera(element);

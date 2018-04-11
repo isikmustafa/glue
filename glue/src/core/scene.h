@@ -37,6 +37,7 @@ namespace glue
 			glm::vec3 background_color;
 			Filter pixel_filter;
 			int sample_count;
+			float secondary_ray_epsilon;
 
 			//Functions
 			void loadFromXML(const std::string& filepath);

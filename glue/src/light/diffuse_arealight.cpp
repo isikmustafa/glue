@@ -1,4 +1,5 @@
 #include "diffuse_arealight.h"
+
 #include <glm\gtc\constants.hpp>
 
 namespace glue
@@ -7,7 +8,7 @@ namespace glue
 	{
 		DiffuseArealight::DiffuseArealight(const std::shared_ptr<geometry::Mesh>& light_mesh, const glm::vec3& flux)
 			: m_light_mesh(light_mesh)
-			, m_pdf(1 / light_mesh->getSurfaceArea())
+			, m_pdf(1.0f / light_mesh->getSurfaceArea())
 			, m_le(flux * glm::one_over_pi<float>() * m_pdf)
 		{}
 
