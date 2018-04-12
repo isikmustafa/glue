@@ -17,11 +17,12 @@ namespace glue
 		namespace parser
 		{
 			Camera parseCamera(tinyxml2::XMLElement* camera_element);
-			std::vector<geometry::Triangle> parseTriangles(tinyxml2::XMLElement* mesh_element);
+			std::vector<geometry::Triangle> parseTriangles(tinyxml2::XMLElement* datapath_element);
 			geometry::Transformation parseTransformation(tinyxml2::XMLElement* transformation_element);
 			geometry::Mesh parseMesh(tinyxml2::XMLElement* mesh_element
 				, std::unordered_map<std::string, std::shared_ptr<std::vector<geometry::Triangle>>>& path_to_triangles
 				, std::unordered_map<std::string, std::shared_ptr<geometry::BVH>>& path_to_bvh);
+			std::unique_ptr<material::BsdfMaterial> parseBsdfMaterial(tinyxml2::XMLElement* bsdf_material_element);
 		}
 	}
 }

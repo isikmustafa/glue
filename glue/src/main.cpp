@@ -1,6 +1,7 @@
 #include "core\scene.h"
 #include "core\timer.h"
 #include "integrator\raytracer.h"
+#include "integrator\pathtracer.h"
 
 #include <iostream>
 
@@ -12,9 +13,9 @@ int main()
 	scene.loadFromXML("../sample_input/cornell-buddha-new.xml");
 	std::cout << "BVH build and input read time: " << timer.getTime() << std::endl;
 
-	glue::integrator::Raytracer rt;
+	glue::integrator::Pathtracer pt;
 	timer.start();
-	scene.render(rt);
+	scene.render(pt);
 	std::cout << "Render time: " << timer.getTime() << std::endl;
 
 	system("PAUSE");

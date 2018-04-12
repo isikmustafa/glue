@@ -17,6 +17,9 @@
     <Filter Include="Source Files\light">
       <UniqueIdentifier>{21481c0c-db85-40ff-a89e-0c2e55ce4853}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\material">
+      <UniqueIdentifier>{c11a97d8-2833-4b4e-bea4-0339eab06b5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -69,6 +72,12 @@
     </ClCompile>
     <ClCompile Include="src\core\discrete_1d_sampler.cpp">
       <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\material\lambertian.cpp">
+      <Filter>Source Files\material</Filter>
+    </ClCompile>
+    <ClCompile Include="src\geometry\spherical_coordinate.cpp">
+      <Filter>Source Files\geometry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -131,6 +140,21 @@
     </ClInclude>
     <ClInclude Include="src\core\real_sampler.h">
       <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\material\bsdf_material.h">
+      <Filter>Source Files\material</Filter>
+    </ClInclude>
+    <ClInclude Include="src\material\lambertian.h">
+      <Filter>Source Files\material</Filter>
+    </ClInclude>
+    <ClInclude Include="src\geometry\spherical_coordinate.h">
+      <Filter>Source Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\geometry\orthonormal_basis.h">
+      <Filter>Source Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\geometry\plane.h">
+      <Filter>Source Files\geometry</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

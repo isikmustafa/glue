@@ -3,8 +3,10 @@
 
 #include "bbox.h"
 #include "transformation.h"
+#include "plane.h"
 #include "..\core\uniform_sampler.h"
 #include "..\core\discrete_1d_sampler.h"
+#include "..\material\bsdf_material.h"
 
 #include <memory>
 #include <vector>
@@ -21,9 +23,9 @@ namespace glue
 		{
 		public:
 			Mesh(const Transformation& transformation, const BBox& bbox, const std::vector<float>& triangle_areas, float area,
-				const std::shared_ptr<std::vector<Triangle>>& triangles, const std::shared_ptr<BVH>& bvh);
+				const std::shared_ptr<std::vector<Triangle>>& triangles, const std::shared_ptr<BVH>& bvh, std::unique_ptr<material::BsdfMaterial> bsdf_material);
 
-			glm::vec3 samplePoint(core::UniformSampler& sampler);
+			geometry::Plane samplePlane(core::UniformSampler& sampler);
 			float getSurfaceArea() const;
 			BBox getBBox() const;
 			glm::vec2 getBBoxOnAxis(int axis) const;
@@ -37,6 +39,7 @@ namespace glue
 			float m_area;
 			std::shared_ptr<std::vector<Triangle>> m_triangles;
 			std::shared_ptr<BVH> m_bvh;
+			std::unique_ptr<material::BsdfMaterial> m_bsdf_material;
 		};
 	}
 }

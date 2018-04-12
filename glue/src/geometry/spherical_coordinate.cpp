@@ -7,18 +7,6 @@ namespace glue
 {
 	namespace geometry
 	{
-		OrthonormalBasis::OrthonormalBasis(const glm::vec3& p_w)
-			: u(glm::normalize(glm::cross(glm::abs(p_w.x) > 0.1f ? glm::vec3(0.0f, 1.0f, 0.0f) : glm::vec3(1.0f, 0.0f, 0.0f), p_w)))
-			, v(glm::cross(p_w, u))
-			, w(p_w)
-		{}
-
-		OrthonormalBasis::OrthonormalBasis(const glm::vec3& p_u, const glm::vec3& p_v, const glm::vec3& p_w)
-			: u(p_u)
-			, v(p_v)
-			, w(p_w)
-		{}
-
 		SphericalCoordinate::SphericalCoordinate(const glm::vec3& direction, const OrthonormalBasis& basis)
 		{
 			glm::vec3 uvw_coordinate(glm::dot(direction, basis.u), glm::dot(direction, basis.v), glm::dot(direction, basis.w));

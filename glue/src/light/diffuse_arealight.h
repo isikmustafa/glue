@@ -17,9 +17,10 @@ namespace glue
 		public:
 			DiffuseArealight(const std::shared_ptr<geometry::Mesh>& light_mesh, const glm::vec3& flux);
 
-			glm::vec3 samplePoint(core::UniformSampler& sampler) const override;
+			geometry::Plane samplePlane(core::UniformSampler& sampler) const override;
 			glm::vec3 getLe() const override;
 			float getPdf() const override;
+			bool hasDeltaDistribution() const override;
 
 		private:
 			std::shared_ptr<geometry::Mesh> m_light_mesh;

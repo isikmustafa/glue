@@ -15,7 +15,7 @@ namespace glue
 			, m_normal(glm::normalize(glm::cross(edge1, edge2)))
 		{}
 
-		glm::vec3 Triangle::samplePoint(core::UniformSampler& sampler)
+		geometry::Plane Triangle::samplePlane(core::UniformSampler& sampler)
 		{
 			auto v1 = m_edge1 + m_v0;
 			auto v2 = m_edge2 + m_v0;
@@ -24,7 +24,7 @@ namespace glue
 			auto u = 1.0f - sqrt_rand;
 			auto v = sampler.sample() * sqrt_rand;
 
-			return m_v0 * u + v1 * v + v2 * (1.0f - u - v);
+			return geometry::Plane(m_v0 * u + v1 * v + v2 * (1.0f - u - v), m_normal);
 		}
 
 		float Triangle::getSurfaceArea() const

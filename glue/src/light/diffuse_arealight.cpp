@@ -12,9 +12,9 @@ namespace glue
 			, m_le(flux * glm::one_over_pi<float>() * m_pdf)
 		{}
 
-		glm::vec3 DiffuseArealight::samplePoint(core::UniformSampler& sampler) const
+		geometry::Plane DiffuseArealight::samplePlane(core::UniformSampler& sampler) const
 		{
-			return m_light_mesh->samplePoint(sampler);
+			return m_light_mesh->samplePlane(sampler);
 		}
 
 		glm::vec3 DiffuseArealight::getLe() const
@@ -25,6 +25,11 @@ namespace glue
 		float DiffuseArealight::getPdf() const
 		{
 			return m_pdf;
+		}
+
+		bool DiffuseArealight::hasDeltaDistribution() const
+		{
+			return false;
 		}
 	}
 }

@@ -1,5 +1,6 @@
 #include "parser.h"
 #include "..\geometry\bvh.h"
+#include "..\material\lambertian.h"
 
 #include <sstream>
 #include <assimp/Importer.hpp>
@@ -14,43 +15,50 @@ namespace glue
 		{
 			Camera parseCamera(tinyxml2::XMLElement* camera_element)
 			{
-				std::stringstream stream;
-				auto child = camera_element->FirstChildElement("ScreenCoordinates");
-				stream << child->GetText() << std::endl;
-				child = camera_element->FirstChildElement("Position");
-				stream << child->GetText() << std::endl;
-				child = camera_element->FirstChildElement("Direction");
-				stream << child->GetText() << std::endl;
-				child = camera_element->FirstChildElement("Up");
-				stream << child->GetText() << std::endl;
-				child = camera_element->FirstChildElement("Resolution");
-				stream << child->GetText() << std::endl;
-				child = camera_element->FirstChildElement("NearDistance");
-				stream << child->GetText() << std::endl;
+				if (camera_element)
+				{
+					std::stringstream stream;
+					auto child = camera_element->FirstChildElement("ScreenCoordinates");
+					stream << child->GetText() << std::endl;
+					child = camera_element->FirstChildElement("Position");
+					stream << child->GetText() << std::endl;
+					child = camera_element->FirstChildElement("Direction");
+					stream << child->GetText() << std::endl;
+					child = camera_element->FirstChildElement("Up");
+					stream << child->GetText() << std::endl;
+					child = camera_element->FirstChildElement("Resolution");
+					stream << child->GetText() << std::endl;
+					child = camera_element->FirstChildElement("NearDistance");
+					stream << child->GetText() << std::endl;
 
-				glm::vec4 screen_coordinates;
-				glm::vec3 position;
-				glm::vec3 direction;
-				glm::vec3 up;
-				glm::ivec2 screen_resolution;
-				float near_distance;
+					glm::vec4 screen_coordinates;
+					glm::vec3 position;
+					glm::vec3 direction;
+					glm::vec3 up;
+					glm::ivec2 screen_resolution;
+					float near_distance;
 
-				stream >> screen_coordinates.x >> screen_coordinates.y >> screen_coordinates.z >> screen_coordinates.w;
-				stream >> position.x >> position.y >> position.z;
-				stream >> direction.x >> direction.y >> direction.z;
-				stream >> up.x >> up.y >> up.z;
-				stream >> screen_resolution.x >> screen_resolution.y;
-				stream >> near_distance;
+					stream >> screen_coordinates.x >> screen_coordinates.y >> screen_coordinates.z >> screen_coordinates.w;
+					stream >> position.x >> position.y >> position.z;
+					stream >> direction.x >> direction.y >> direction.z;
+					stream >> up.x >> up.y >> up.z;
+					stream >> screen_resolution.x >> screen_resolution.y;
+					stream >> near_distance;
 
-				return Camera(screen_coordinates, position, direction, up, screen_resolution, near_distance);
+					return Camera(screen_coordinates, position, direction, up, screen_resolution, near_distance);
+				}
+				else
+				{
+					throw std::runtime_error("Error: Camera is not found!");
+				}
 			}
 
-			std::vector<geometry::Triangle> parseTriangles(tinyxml2::XMLElement* mesh_element)
+			std::vector<geometry::Triangle> parseTriangles(tinyxml2::XMLElement* datapath_element)
 			{
 				std::vector<geometry::Triangle> triangles;
 
 				Assimp::Importer importer;
-				const aiScene* scene = importer.ReadFile(mesh_element->GetText(),
+				const aiScene* scene = importer.ReadFile(datapath_element->GetText(),
 					aiProcess_Triangulate |
 					aiProcess_JoinIdenticalVertices |
 					aiProcess_GenSmoothNormals);
@@ -141,8 +149,7 @@ namespace glue
 				}
 
 				//Compute transformation.
-				auto transformation_element = mesh_element->FirstChildElement("Transformation");
-				auto transformation = parser::parseTransformation(transformation_element);
+				auto transformation = parser::parseTransformation(mesh_element->FirstChildElement("Transformation"));
 
 				//Compute bbox.
 				geometry::BBox bbox;
@@ -162,7 +169,35 @@ namespace glue
 					total_area += area;
 				}
 
-				return geometry::Mesh(transformation, bbox, triangle_areas, total_area, path_to_triangles[datapath_text], path_to_bvh[datapath_text]);
+				return geometry::Mesh(transformation, bbox, triangle_areas, total_area, path_to_triangles[datapath_text], path_to_bvh[datapath_text],
+					parseBsdfMaterial(mesh_element->FirstChildElement("BsdfMaterial")));
+			}
+
+			std::unique_ptr<material::BsdfMaterial> parseBsdfMaterial(tinyxml2::XMLElement* bsdf_material_element)
+			{
+				if (bsdf_material_element)
+				{
+					std::stringstream stream;
+					auto bsdf_material = bsdf_material_element->FirstChildElement();
+					auto element_value = bsdf_material->Value();
+
+					if (element_value == std::string("Lambertian"))
+					{
+						glm::vec3 kd;
+						stream << bsdf_material->FirstChildElement("kd")->GetText();
+						stream >> kd.x >> kd.y >> kd.z;
+
+						return std::make_unique<material::Lambertian>(kd);
+					}
+					else
+					{
+						throw std::runtime_error("Error: Unknown BsdfMaterial type");
+					}
+				}
+				else
+				{
+					return nullptr;
+				}
 			}
 		}
 	}

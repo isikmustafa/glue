@@ -11,23 +11,24 @@ namespace glue
 		//cdf is not a reference argument in order to prevent copying.
 		//It is moved along the way but not copied.
 		Mesh::Mesh(const Transformation& transformation, const BBox& bbox, const std::vector<float>& triangle_areas, float area,
-			const std::shared_ptr<std::vector<Triangle>>& triangles, const std::shared_ptr<BVH>& bvh)
+			const std::shared_ptr<std::vector<Triangle>>& triangles, const std::shared_ptr<BVH>& bvh, std::unique_ptr<material::BsdfMaterial> bsdf_material)
 			: m_transformation(transformation)
 			, m_bbox(bbox)
 			, m_triangle_sampler(triangle_areas)
 			, m_area(area)
 			, m_triangles(triangles)
 			, m_bvh(bvh)
+			, m_bsdf_material(std::move(bsdf_material))
 		{}
 
-		glm::vec3 Mesh::samplePoint(core::UniformSampler& sampler)
+		geometry::Plane Mesh::samplePlane(core::UniformSampler& sampler)
 		{
 			auto vertices = (*m_triangles)[m_triangle_sampler.sample()].getVertices();
 			auto v0 = m_transformation.pointToWorldSpace(vertices[0]);
 			auto v1 = m_transformation.pointToWorldSpace(vertices[1]);
 			auto v2 = m_transformation.pointToWorldSpace(vertices[2]);
 
-			return Triangle(v0, v1 - v0, v2 - v0).samplePoint(sampler);
+			return Triangle(v0, v1 - v0, v2 - v0).samplePlane(sampler);
 		}
 
 		//This function practically serves as a getter.
@@ -55,6 +56,7 @@ namespace glue
 			{
 				intersection.normal = glm::normalize(m_transformation.normalToWorldSpace(intersection.normal));
 				intersection.mesh = this;
+				intersection.bsdf_material = m_bsdf_material.get();
 				return true;
 			}
 			return false;

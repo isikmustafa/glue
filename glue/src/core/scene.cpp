@@ -5,7 +5,6 @@
 #include "..\geometry\bbox.h"
 #include "..\light\diffuse_arealight.h"
 #include "..\core\uniform_sampler.h"
-#include "..\core\timer.h"
 
 #include <sstream>
 #include <utility>
@@ -99,11 +98,10 @@ namespace glue
 			}
 
 			//SecondaryRayEpsilon
-			secondary_ray_epsilon = 0.001f;
+			secondary_ray_epsilon = 0.0001f;
 
 			//Get camera
-			element = root->FirstChildElement("Camera");
-			camera = parser::parseCamera(element);
+			camera = parser::parseCamera(root->FirstChildElement("Camera"));
 
 			//Get objects
 			UniformSampler sampler;
@@ -122,12 +120,10 @@ namespace glue
 					if (att)
 					{
 						auto num_of_samples = std::atoi(att);
-						Timer timer;
 						for (int i = 0; i < num_of_samples; ++i)
 						{
-							debug_spheres.emplace_back(mesh->samplePoint(sampler), glm::sqrt(mesh->getSurfaceArea() / num_of_samples) / 5.0f);
+							debug_spheres.emplace_back(mesh->samplePlane(sampler).point, glm::sqrt(mesh->getSurfaceArea() / num_of_samples) / 5.0f);
 						}
-						std::cout << timer.getTime() << std::endl;
 					}
 
 					child = child->NextSiblingElement("Mesh");
@@ -150,7 +146,7 @@ namespace glue
 						auto num_of_samples = std::atoi(att);
 						for (int i = 0; i < num_of_samples; ++i)
 						{
-							debug_spheres.emplace_back(mesh->samplePoint(sampler), 0.01f);
+							debug_spheres.emplace_back(mesh->samplePlane(sampler).point, glm::sqrt(mesh->getSurfaceArea() / num_of_samples) / 5.0f);
 						}
 					}
 
