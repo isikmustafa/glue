@@ -1,0 +1,125 @@
+<Scene>
+	<ImageName>../sample_output/cornell-dragon.png</ImageName>
+    <BackgroundColor>0 0 0</BackgroundColor>
+	<PixelFilter>GAUSSIAN</PixelFilter>
+	<SampleCount>100</SampleCount>
+	
+    <Camera>
+        <ScreenCoordinates>-1 1 -1 1</ScreenCoordinates>
+        <Position>0 1 0.99</Position>
+        <Direction>0 0 -1</Direction>
+        <Up>0 1 0</Up>
+		<Resolution>800 800</Resolution>
+        <NearDistance>0.9</NearDistance>
+    </Camera>
+	
+    <Objects>
+        <Mesh>
+            <Datapath>../sample_input/dragon.obj</Datapath>
+			<Transformation>
+				<Scaling>0.1 0.1 0.1</Scaling>
+				<Translation>0 0 -0.4</Translation>
+			</Transformation>
+			<BsdfMaterial>
+				<Lambertian>
+					<kd>0.8 0.8 0.8</kd>
+				</Lambertian>
+			</BsdfMaterial>
+        </Mesh>
+		<!-- Front -->
+        <Mesh>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Translation>0 1 -1</Translation>
+			</Transformation>
+			<BsdfMaterial>
+				<Lambertian>
+					<kd>0.8 0.8 0.8</kd>
+				</Lambertian>
+			</BsdfMaterial>
+        </Mesh>
+		<!-- Back -->
+        <Mesh>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Rotation>0 1 0 180</Rotation>
+				<Translation>0 1 1</Translation>
+			</Transformation>
+			<BsdfMaterial>
+				<Lambertian>
+					<kd>0.8 0.8 0.8</kd>
+				</Lambertian>
+			</BsdfMaterial>
+        </Mesh>
+		<!-- Right -->
+        <Mesh>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Rotation>0 1 0 270</Rotation>
+				<Translation>1 1 0</Translation>
+			</Transformation>
+			<BsdfMaterial>
+				<Lambertian>
+					<kd>0.25 0.33 0.05</kd>
+				</Lambertian>
+			</BsdfMaterial>
+        </Mesh>
+		<!-- Left -->
+        <Mesh>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Rotation>0 1 0 90</Rotation>
+				<Translation>-1 1 0</Translation>
+			</Transformation>
+			<BsdfMaterial>
+				<Lambertian>
+					<kd>0.72 0.13 0.04</kd>
+				</Lambertian>
+			</BsdfMaterial>
+        </Mesh>
+		<!-- Ceil -->
+        <Mesh>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Rotation>1 0 0 90</Rotation>
+				<Translation>0 2 0</Translation>
+			</Transformation>
+			<BsdfMaterial>
+				<Lambertian>
+					<kd>0.8 0.8 0.8</kd>
+				</Lambertian>
+			</BsdfMaterial>
+        </Mesh>
+		<!-- Floor -->
+        <Mesh>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Rotation>-1 0 0 90</Rotation>
+				<Translation>0 0 0</Translation>
+			</Transformation>
+			<BsdfMaterial>
+				<Lambertian>
+					<kd>0.8 0.8 0.8</kd>
+				</Lambertian>
+			</BsdfMaterial>
+        </Mesh>
+    </Objects>
+	
+    <Lights>
+        <DiffuseArealight>
+			<Flux>18 15 12</Flux>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>0.3 0.15 0.3</Scaling>
+				<Rotation>1 0 0 90</Rotation>
+				<Translation>0 1.999 0</Translation>
+			</Transformation>
+        </DiffuseArealight>
+    </Lights>
+</Scene>

@@ -67,8 +67,8 @@ namespace glue
 				});
 			}
 
-			ref_node->right.reset(new BVHNode((ref_node->start + ref_node->end) / 2, ref_node->end));
-			ref_node->left.reset(new BVHNode(ref_node->start, (ref_node->start + ref_node->end) / 2));
+			ref_node->right = std::make_unique<BVHNode>((ref_node->start + ref_node->end) / 2, ref_node->end);
+			ref_node->left = std::make_unique<BVHNode>(ref_node->start, (ref_node->start + ref_node->end) / 2);
 
 			if (work > 1)
 			{
@@ -87,7 +87,7 @@ namespace glue
 		template<typename Primitive>
 		void BVH::buildWithMedianSplit(std::vector<Primitive>& objects)
 		{
-			m_root.reset(new BVHNode(0, objects.size()));
+			m_root = std::make_unique<BVHNode>(0, objects.size());
 			buildWithMedianSplitWork(&objects, &m_root, std::thread::hardware_concurrency());
 		}
 
@@ -180,8 +180,8 @@ namespace glue
 				});
 			}
 
-			ref_node->right.reset(new BVHNode(right_bbox, ref_node->end - right_count, ref_node->end));
-			ref_node->left.reset(new BVHNode(left_bbox, ref_node->start, ref_node->end - right_count));
+			ref_node->right = std::make_unique<BVHNode>(right_bbox, ref_node->end - right_count, ref_node->end);
+			ref_node->left = std::make_unique<BVHNode>(left_bbox, ref_node->start, ref_node->end - right_count);
 
 			if (work > 0.5f)
 			{
@@ -214,7 +214,7 @@ namespace glue
 					temp.extend(objects[i].getBBox());
 				}
 			}
-			m_root.reset(new BVHNode(temp, 0, size));
+			m_root = std::make_unique<BVHNode>(temp, 0, size);
 			buildWithSAHSplitWork(&objects, &m_root, static_cast<float>(std::thread::hardware_concurrency()));
 		}
 

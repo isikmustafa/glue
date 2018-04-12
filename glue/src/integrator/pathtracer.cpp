@@ -15,11 +15,11 @@ namespace glue
 			std::unique_ptr<core::RealSampler> offset_sampler;
 			if (scene.pixel_filter == core::Filter::BOX)
 			{
-				offset_sampler.reset(new core::UniformSampler(0.0f, 1.0f));
+				offset_sampler = std::make_unique<core::UniformSampler>(0.0f, 1.0f);
 			}
 			else if (scene.pixel_filter == core::Filter::GAUSSIAN)
 			{
-				offset_sampler.reset(new core::GaussianSampler(0.5f, 0.5f));
+				offset_sampler = std::make_unique<core::GaussianSampler>(0.5f, 0.5f);
 			}
 
 			glm::vec3 pixel_acc;
@@ -72,8 +72,7 @@ namespace glue
 
 			//DIRECT LIGHTING//
 			glm::vec3 direct_lo(0.0f);
-			//Check if the material has a delta distribution.
-			//If it does not have a delta pdf, then estimate light directly.
+			//If the material does not have a delta pdf, then estimate light directly.
 			if (!intersection.bsdf_material->hasDeltaDistribution())
 			{
 				int size = scene.lights.size();
