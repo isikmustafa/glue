@@ -39,7 +39,7 @@ namespace glue
 			//Russian roulette.
 			if (importance < 0.2f)
 			{
-				if (uniform_sampler.sample() > importance)
+				if (uniform_sampler.sample() > 0.5f)
 				{
 					return glm::vec3(0.0f);
 				}
@@ -134,7 +134,7 @@ namespace glue
 			auto f = bsdf * cos / pdf;
 			auto indirect_lo = f * estimateLi(scene, wi_ray, uniform_sampler, importance * glm::max(glm::max(f.x, f.y), f.z), light_explicitly_sampled);
 
-			return importance < 0.2f ? (direct_lo + indirect_lo) / importance : direct_lo + indirect_lo;
+			return importance < 0.2f ? (direct_lo + indirect_lo) * 2.0f : direct_lo + indirect_lo;
 		}
 	}
 }
