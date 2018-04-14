@@ -1,7 +1,7 @@
 #ifndef __GLUE__CORE__SCENE__
 #define __GLUE__CORE__SCENE__
 
-#include "camera.h"
+#include "pinhole_camera.h"
 #include "..\geometry\mesh.h"
 #include "..\geometry\bvh.h"
 #include "..\geometry\debug_sphere.h"
@@ -32,7 +32,7 @@ namespace glue
 			std::unordered_map<const geometry::Mesh*, const light::Light*> light_meshes;
 			std::vector<geometry::DebugSphere> debug_spheres;
 			geometry::BVH debug_bvh;
-			Camera camera;
+			std::unique_ptr<PinholeCamera> camera;
 			std::string image_name;
 			glm::vec3 background_color;
 			Filter pixel_filter;

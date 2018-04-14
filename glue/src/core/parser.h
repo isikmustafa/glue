@@ -1,7 +1,7 @@
 #ifndef __GLUE__CORE__PARSER__
 #define __GLUE__CORE__PARSER__
 
-#include "camera.h"
+#include "pinhole_camera.h"
 #include "..\geometry\triangle.h"
 #include "..\geometry\transformation.h"
 #include "..\geometry\mesh.h"
@@ -16,7 +16,7 @@ namespace glue
 	{
 		namespace parser
 		{
-			Camera parseCamera(tinyxml2::XMLElement* camera_element);
+			std::unique_ptr<PinholeCamera> parseCamera(tinyxml2::XMLElement* camera_element);
 			std::vector<geometry::Triangle> parseTriangles(tinyxml2::XMLElement* datapath_element);
 			geometry::Transformation parseTransformation(tinyxml2::XMLElement* transformation_element);
 			geometry::Mesh parseMesh(tinyxml2::XMLElement* mesh_element

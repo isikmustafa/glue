@@ -16,8 +16,10 @@ namespace glue
 			virtual ~BsdfMaterial() {}
 
 			virtual geometry::SphericalCoordinate sampleDirection(core::UniformSampler& sampler) const = 0;
-			virtual glm::vec3 getBsdf(const geometry::SphericalCoordinate& wi, const geometry::SphericalCoordinate& wo) const = 0;
-			virtual float getPdf(const geometry::SphericalCoordinate& wi, const geometry::SphericalCoordinate& wo) const = 0;
+			//wi and wo should be in tangent space for both getBsdf and getPdf.
+			//This makes it easier and efficient to calculate some computations.
+			virtual glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const = 0;
+			virtual float getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const = 0;
 			virtual bool hasDeltaDistribution() const = 0;
 			virtual bool useMultipleImportanceSampling() const = 0;
 		};

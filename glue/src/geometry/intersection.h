@@ -12,6 +12,7 @@ namespace glue
 		class Mesh;
 		struct Intersection
 		{
+			//normal should always be normalized.
 			glm::vec3 normal;
 			float distance;
 			//Pointers will be kept as raw pointers.

@@ -18,7 +18,10 @@ namespace glue
 			void scale(const glm::vec3& scaling);
 			void rotate(const glm::vec3& rotation_axis, float angle_in_degrees);
 			void translate(const glm::vec3& translation);
+			glm::vec3 vectorToObjectSpace(const glm::vec3& vector) const;
+			glm::vec3 pointToObjectSpace(const glm::vec3& point) const;
 			Ray rayToObjectSpace(const Ray& ray) const;
+			glm::vec3 vectorToWorldSpace(const glm::vec3& vector) const;
 			glm::vec3 pointToWorldSpace(const glm::vec3& point) const;
 			glm::vec3 normalToWorldSpace(const glm::vec3& normal) const;
 

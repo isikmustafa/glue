@@ -25,7 +25,7 @@ namespace glue
 			glm::vec3 pixel_acc;
 			for (int i = 0; i < scene.sample_count; ++i)
 			{
-				auto ray = scene.camera.castPrimayRay(x, y, offset_sampler->sample(), offset_sampler->sample());
+				auto ray = scene.camera->castPrimayRay(x, y, offset_sampler->sample(), offset_sampler->sample());
 				geometry::Intersection intersection;
 				auto result = scene.bvh.intersect(scene.meshes, ray, intersection, std::numeric_limits<float>::max());
 

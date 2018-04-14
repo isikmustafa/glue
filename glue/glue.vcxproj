@@ -142,7 +142,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\core\camera.cpp" />
+    <ClCompile Include="src\core\pinhole_camera.cpp" />
+    <ClCompile Include="src\core\coordinate_space.cpp" />
     <ClCompile Include="src\core\discrete_1d_sampler.cpp" />
     <ClCompile Include="src\core\gaussian_sampler.cpp" />
     <ClCompile Include="src\core\parser.cpp" />
@@ -163,7 +164,8 @@
     <ClCompile Include="src\material\lambertian.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\core\camera.h" />
+    <ClInclude Include="src\core\pinhole_camera.h" />
+    <ClInclude Include="src\core\coordinate_space.h" />
     <ClInclude Include="src\core\discrete_1d_sampler.h" />
     <ClInclude Include="src\core\gaussian_sampler.h" />
     <ClInclude Include="src\core\parser.h" />
@@ -176,7 +178,6 @@
     <ClInclude Include="src\geometry\debug_sphere.h" />
     <ClInclude Include="src\geometry\intersection.h" />
     <ClInclude Include="src\geometry\mesh.h" />
-    <ClInclude Include="src\geometry\orthonormal_basis.h" />
     <ClInclude Include="src\geometry\plane.h" />
     <ClInclude Include="src\geometry\ray.h" />
     <ClInclude Include="src\geometry\spherical_coordinate.h" />

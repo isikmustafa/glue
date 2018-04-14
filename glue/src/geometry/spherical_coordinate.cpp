@@ -7,14 +7,11 @@ namespace glue
 {
 	namespace geometry
 	{
-		SphericalCoordinate::SphericalCoordinate(const glm::vec3& direction, const OrthonormalBasis& basis)
-		{
-			glm::vec3 uvw_coordinate(glm::dot(direction, basis.u), glm::dot(direction, basis.v), glm::dot(direction, basis.w));
-
-			radius = glm::length(uvw_coordinate);
-			theta = glm::atan(glm::sqrt(uvw_coordinate.x * uvw_coordinate.x + uvw_coordinate.y * uvw_coordinate.y) / uvw_coordinate.z);
-			phi = glm::atan(uvw_coordinate.y / uvw_coordinate.x);
-		}
+		SphericalCoordinate::SphericalCoordinate(const glm::vec3& cartesian_coordinate)
+			: radius(glm::length(cartesian_coordinate))
+			, theta(glm::atan(glm::sqrt(cartesian_coordinate.x * cartesian_coordinate.x + cartesian_coordinate.y * cartesian_coordinate.y) / cartesian_coordinate.z))
+			, phi(glm::atan(cartesian_coordinate.y / cartesian_coordinate.x))
+		{}
 
 		SphericalCoordinate::SphericalCoordinate(float p_radius, float p_theta, float p_phi)
 			: radius(p_radius)
@@ -22,12 +19,10 @@ namespace glue
 			, phi(p_phi)
 		{}
 
-		glm::vec3 SphericalCoordinate::convertToCartesian(const OrthonormalBasis& basis) const
+		glm::vec3 SphericalCoordinate::toCartesianCoordinate() const
 		{
 			auto sin_theta = glm::sin(theta);
-			auto uvw_coordinate = glm::vec3(glm::cos(phi) * sin_theta, glm::sin(phi) * sin_theta, glm::cos(theta)) * radius;
-
-			return basis.u * uvw_coordinate.x + basis.v * uvw_coordinate.y + basis.w * uvw_coordinate.z;
+			return glm::vec3(glm::cos(phi) * sin_theta, glm::sin(phi) * sin_theta, glm::cos(theta)) * radius;
 		}
 	}
 }

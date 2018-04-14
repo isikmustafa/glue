@@ -13,7 +13,7 @@ namespace glue
 	{
 		namespace parser
 		{
-			Camera parseCamera(tinyxml2::XMLElement* camera_element)
+			std::unique_ptr<PinholeCamera> parseCamera(tinyxml2::XMLElement* camera_element)
 			{
 				if (camera_element)
 				{
@@ -45,7 +45,7 @@ namespace glue
 					stream >> screen_resolution.x >> screen_resolution.y;
 					stream >> near_distance;
 
-					return Camera(screen_coordinates, position, direction, up, screen_resolution, near_distance);
+					return std::make_unique<PinholeCamera>(position, direction, up, screen_coordinates, screen_resolution, near_distance);
 				}
 				else
 				{

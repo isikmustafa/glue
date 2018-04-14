@@ -1,6 +1,7 @@
 #include "pathtracer.h"
 #include "..\geometry\intersection.h"
 #include "..\core\gaussian_sampler.h"
+#include "..\core\coordinate_space.h"
 #include "..\light\diffuse_arealight.h"
 
 #include <limits>
@@ -26,7 +27,7 @@ namespace glue
 			core::UniformSampler uniform_sampler;
 			for (int i = 0; i < scene.sample_count; ++i)
 			{
-				auto ray = scene.camera.castPrimayRay(x, y, offset_sampler->sample(), offset_sampler->sample());
+				auto ray = scene.camera->castPrimayRay(x, y, offset_sampler->sample(), offset_sampler->sample());
 				pixel_acc += estimateLi(scene, ray, uniform_sampler, 1.0f, false);
 			}
 
@@ -65,10 +66,10 @@ namespace glue
 					return glm::vec3(0.0f);
 				}
 			}
-
+			
 			auto intersection_point = ray.getPoint(intersection.distance);
-			auto basis = geometry::OrthonormalBasis(intersection.normal);
-			geometry::SphericalCoordinate wo_spherical(-ray.get_direction(), basis);
+			core::CoordinateSpace tangent_space(intersection_point, intersection.normal);
+			auto wo_tangent = tangent_space.vectorToLocalSpace(-ray.get_direction());
 
 			//DIRECT LIGHTING//
 			glm::vec3 direct_lo(0.0f);
@@ -87,22 +88,22 @@ namespace glue
 					else
 					{
 						auto sampled_plane = light->samplePlane(uniform_sampler);
-						auto wi_cartesian = sampled_plane.point - intersection_point;
-						auto distance = glm::length(wi_cartesian);
-						wi_cartesian /= distance;
+						auto wi_world = sampled_plane.point - intersection_point;
+						auto distance = glm::length(wi_world);
+						wi_world /= distance;
 
-						auto cos_light_surface = glm::dot(-wi_cartesian, sampled_plane.normal);
+						auto cos_light_surface = glm::dot(-wi_world, sampled_plane.normal);
 						if (cos_light_surface <= 0.0f)
 						{
 							continue;
 						}
 
-						geometry::Ray shadow_ray(intersection_point + wi_cartesian * scene.secondary_ray_epsilon, wi_cartesian);
+						geometry::Ray shadow_ray(intersection_point + wi_world * scene.secondary_ray_epsilon, wi_world);
 						if (!scene.bvh.intersectShadowRay(scene.meshes, shadow_ray, distance - 1.1f * scene.secondary_ray_epsilon))
 						{
-							geometry::SphericalCoordinate wi_spherical(wi_cartesian, basis);
-							auto bsdf = intersection.bsdf_material->getBsdf(wi_spherical, wo_spherical);
-							auto cos = glm::max(0.0f, glm::dot(intersection.normal, wi_cartesian)); //can be converted to glm::cos(wi_spherical.theta)
+							auto wi_tangent = tangent_space.vectorToLocalSpace(wi_world);
+							auto bsdf = intersection.bsdf_material->getBsdf(wi_tangent, wo_tangent);
+							auto cos = wi_tangent.z; //glm::dot(normal, wi_tangent) = wi_tangent.z since normal is (0,0,1) in tangent space.
 
 							//Get p(A) and transform it to p(w)
 							auto pdf = light->getPdf();
@@ -121,15 +122,15 @@ namespace glue
 			}
 
 			//INDIRECT LIGHTING//
-			geometry::SphericalCoordinate wi_spherical(intersection.bsdf_material->sampleDirection(uniform_sampler));
+			auto wi_spherical = intersection.bsdf_material->sampleDirection(uniform_sampler);
+			auto wi_tangent = wi_spherical.toCartesianCoordinate();
+			auto wi_world = tangent_space.vectorToWorldSpace(wi_tangent);
 
-			auto bsdf = intersection.bsdf_material->getBsdf(wi_spherical, wo_spherical);
-			auto pdf = intersection.bsdf_material->getPdf(wi_spherical, wo_spherical);
+			auto bsdf = intersection.bsdf_material->getBsdf(wi_tangent, wo_tangent);
+			auto cos = wi_tangent.z; //glm::dot(normal, wi_tangent) = wi_tangent.z since normal is (0,0,1) in tangent space.
+			auto pdf = intersection.bsdf_material->getPdf(wi_tangent, wo_tangent);
 
-			auto wi_cartesian = wi_spherical.convertToCartesian(basis);
-			auto cos = glm::max(0.0f, glm::dot(intersection.normal, wi_cartesian)); //can be converted to glm::cos(wi_spherical.theta)
-
-			geometry::Ray wi_ray(intersection_point + wi_cartesian * scene.secondary_ray_epsilon, wi_cartesian);
+			geometry::Ray wi_ray(intersection_point + wi_world * scene.secondary_ray_epsilon, wi_world);
 
 			auto f = bsdf * cos / pdf;
 			auto indirect_lo = f * estimateLi(scene, wi_ray, uniform_sampler, importance * glm::max(glm::max(f.x, f.y), f.z), light_explicitly_sampled);

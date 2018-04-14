@@ -10,7 +10,7 @@ namespace glue
 		void Scene::render(const Integrator& integrator)
 		{
 			constexpr int cPatchSize = 32;
-			auto resolution = camera.get_screen_resolution();
+			auto resolution = camera->get_screen_resolution();
 			png::image<png::rgb_pixel> image(resolution.x, resolution.y);
 			ctpl::thread_pool pool(std::thread::hardware_concurrency());
 			for (int x = 0; x < resolution.x; x += cPatchSize)

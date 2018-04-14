@@ -13,8 +13,10 @@ namespace glue
 			Lambertian(const glm::vec3& kd);
 
 			geometry::SphericalCoordinate sampleDirection(core::UniformSampler& sampler) const override;
-			glm::vec3 getBsdf(const geometry::SphericalCoordinate& wi, const geometry::SphericalCoordinate& wo) const override;
-			float getPdf(const geometry::SphericalCoordinate& wi, const geometry::SphericalCoordinate& wo) const override;
+			//wi and wo should be in tangent space for both getBsdf and getPdf.
+			//This makes it easier and efficient to calculate some computations.
+			glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const override;
+			float getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const override;
 			bool hasDeltaDistribution() const override;
 			bool useMultipleImportanceSampling() const override;
 

@@ -34,9 +34,24 @@ namespace glue
 			m_inverse_transformation = glm::inverse(m_transformation);
 		}
 
+		glm::vec3 Transformation::vectorToObjectSpace(const glm::vec3& vector) const
+		{
+			return m_inverse_transformation * glm::vec4(vector, 0.0f);
+		}
+
+		glm::vec3 Transformation::pointToObjectSpace(const glm::vec3& point) const
+		{
+			return m_inverse_transformation * glm::vec4(point, 1.0f);
+		}
+
 		Ray Transformation::rayToObjectSpace(const Ray& ray) const
 		{
 			return Ray(m_inverse_transformation * glm::vec4(ray.get_origin(), 1.0f), m_inverse_transformation * glm::vec4(ray.get_direction(), 0.0f));
+		}
+
+		glm::vec3 Transformation::vectorToWorldSpace(const glm::vec3& vector) const
+		{
+			return m_transformation * glm::vec4(vector, 0.0f);
 		}
 
 		glm::vec3 Transformation::pointToWorldSpace(const glm::vec3& point) const
