@@ -82,6 +82,9 @@
     <ClCompile Include="src\core\pinhole_camera.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="src\material\oren_nayar.cpp">
+      <Filter>Source Files\material</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\geometry\triangle.h">
@@ -158,6 +161,9 @@
     </ClInclude>
     <ClInclude Include="src\core\pinhole_camera.h">
       <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\material\oren_nayar.h">
+      <Filter>Source Files\material</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -162,6 +162,7 @@
     <ClCompile Include="src\light\diffuse_arealight.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\material\lambertian.cpp" />
+    <ClCompile Include="src\material\oren_nayar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\core\pinhole_camera.h" />
@@ -189,6 +190,7 @@
     <ClInclude Include="src\light\light.h" />
     <ClInclude Include="src\material\bsdf_material.h" />
     <ClInclude Include="src\material\lambertian.h" />
+    <ClInclude Include="src\material\oren_nayar.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\core\scene.inl" />

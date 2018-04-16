@@ -45,7 +45,7 @@ namespace glue
 			return m_bbox;
 		}
 
-		glm::vec2 Mesh::getBBoxOnAxis(int axis) const
+		glm::vec2 Mesh::getBoundsOnAxis(int axis) const
 		{
 			return glm::vec2(m_bbox.get_min()[axis], m_bbox.get_max()[axis]);
 		}

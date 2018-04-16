@@ -18,7 +18,7 @@ namespace glue
 			return BBox(m_center - glm::vec3(m_radius), m_center + glm::vec3(m_radius));
 		}
 
-		glm::vec2 DebugSphere::getBBoxOnAxis(int axis) const
+		glm::vec2 DebugSphere::getBoundsOnAxis(int axis) const
 		{
 			return glm::vec2(m_center[axis] - m_radius, m_center[axis] + m_radius);
 		}

@@ -12,7 +12,7 @@ namespace glue
 			: m_kd(kd * glm::one_over_pi<float>())
 		{}
 
-		geometry::SphericalCoordinate Lambertian::sampleDirection(core::UniformSampler& sampler) const
+		geometry::SphericalCoordinate Lambertian::sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler) const
 		{
 			//Sample from cosine-weighted distribution.
 			return geometry::SphericalCoordinate(1.0f, glm::acos(glm::sqrt(sampler.sample())), glm::two_pi<float>() * sampler.sample());

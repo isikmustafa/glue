@@ -21,9 +21,13 @@
 				<Translation>0 0 -0.4</Translation>
 			</Transformation>
 			<BsdfMaterial>
-				<Lambertian>
+				<!--<Lambertian>
 					<kd>0.8 0.8 0.8</kd>
-				</Lambertian>
+				</Lambertian>-->
+				<OrenNayar>
+					<kd>0.8 0.8 0.8</kd>
+					<Roughness>20</Roughness>
+				</OrenNayar>
 			</BsdfMaterial>
         </Mesh>
 		<!-- Front -->

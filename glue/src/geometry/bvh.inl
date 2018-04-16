@@ -51,8 +51,8 @@ namespace glue
 				std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->start + ref_node->end) / 2, ref_objects.begin() + ref_node->end,
 					[axis](const Primitive& a, const Primitive& b)
 				{
-					auto a_bbox = a->getBBoxOnAxis(axis);
-					auto b_bbox = b->getBBoxOnAxis(axis);
+					auto a_bbox = a->getBoundsOnAxis(axis);
+					auto b_bbox = b->getBoundsOnAxis(axis);
 					return a_bbox.x + a_bbox.y < b_bbox.x + b_bbox.y;
 				});
 			}
@@ -61,8 +61,8 @@ namespace glue
 				std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->start + ref_node->end) / 2, ref_objects.begin() + ref_node->end,
 					[axis](const Primitive& a, const Primitive& b)
 				{
-					auto a_bbox = a.getBBoxOnAxis(axis);
-					auto b_bbox = b.getBBoxOnAxis(axis);
+					auto a_bbox = a.getBoundsOnAxis(axis);
+					auto b_bbox = b.getBoundsOnAxis(axis);
 					return a_bbox.x + a_bbox.y < b_bbox.x + b_bbox.y;
 				});
 			}
@@ -164,8 +164,8 @@ namespace glue
 				std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->end - right_count), ref_objects.begin() + ref_node->end,
 					[cut_axis](const Primitive& a, const Primitive& b)
 				{
-					auto a_bbox = a->getBBoxOnAxis(cut_axis);
-					auto b_bbox = b->getBBoxOnAxis(cut_axis);
+					auto a_bbox = a->getBoundsOnAxis(cut_axis);
+					auto b_bbox = b->getBoundsOnAxis(cut_axis);
 					return a_bbox.x + a_bbox.y < b_bbox.x + b_bbox.y;
 				});
 			}
@@ -174,8 +174,8 @@ namespace glue
 				std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->end - right_count), ref_objects.begin() + ref_node->end,
 					[cut_axis](const Primitive& a, const Primitive& b)
 				{
-					auto a_bbox = a.getBBoxOnAxis(cut_axis);
-					auto b_bbox = b.getBBoxOnAxis(cut_axis);
+					auto a_bbox = a.getBoundsOnAxis(cut_axis);
+					auto b_bbox = b.getBoundsOnAxis(cut_axis);
 					return a_bbox.x + a_bbox.y < b_bbox.x + b_bbox.y;
 				});
 			}

@@ -18,7 +18,7 @@ namespace glue
 			DebugSphere(const glm::vec3& center, float radius);
 
 			BBox getBBox() const;
-			glm::vec2 getBBoxOnAxis(int axis) const;
+			glm::vec2 getBoundsOnAxis(int axis) const;
 			bool intersect(const Ray& ray, Intersection& intersection, float max_distance) const;
 			bool intersectShadowRay(const Ray& ray, float max_distance) const;
 

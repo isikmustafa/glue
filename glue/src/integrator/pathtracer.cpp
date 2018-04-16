@@ -122,7 +122,7 @@ namespace glue
 			}
 
 			//INDIRECT LIGHTING//
-			auto wi_spherical = intersection.bsdf_material->sampleDirection(uniform_sampler);
+			auto wi_spherical = intersection.bsdf_material->sampleWi(wo_tangent, uniform_sampler);
 			auto wi_tangent = wi_spherical.toCartesianCoordinate();
 			auto wi_world = tangent_space.vectorToWorldSpace(wi_tangent);
 

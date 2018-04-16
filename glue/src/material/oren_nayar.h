@@ -1,5 +1,5 @@
-#ifndef __GLUE__MATERIAL__LAMBERTIAN__
-#define __GLUE__MATERIAL__LAMBERTIAN__
+#ifndef __GLUE__MATERIAL__ORENNAYAR__
+#define __GLUE__MATERIAL__ORENNAYAR__
 
 #include "bsdf_material.h"
 
@@ -7,10 +7,10 @@ namespace glue
 {
 	namespace material
 	{
-		class Lambertian : public BsdfMaterial
+		class OrenNayar : public BsdfMaterial
 		{
 		public:
-			Lambertian(const glm::vec3& kd);
+			OrenNayar(const glm::vec3& kd, float roughness_in_radians);
 
 			//wi, wo should be in tangent space for getBsdf, getPdf and sampleWi
 			//This makes it easier and efficient to calculate some computations.
@@ -22,6 +22,8 @@ namespace glue
 
 		private:
 			glm::vec3 m_kd;
+			float m_A;
+			float m_B;
 		};
 	}
 }

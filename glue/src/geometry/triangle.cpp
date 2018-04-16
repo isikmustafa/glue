@@ -40,7 +40,7 @@ namespace glue
 			return BBox(glm::min(glm::min(v1, v2), m_v0), glm::max(glm::max(v1, v2), m_v0));
 		}
 
-		glm::vec2 Triangle::getBBoxOnAxis(int axis) const
+		glm::vec2 Triangle::getBoundsOnAxis(int axis) const
 		{
 			auto v1 = m_edge1 + m_v0;
 			auto v2 = m_edge2 + m_v0;

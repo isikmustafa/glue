@@ -1,11 +1,13 @@
 #include "parser.h"
 #include "..\geometry\bvh.h"
 #include "..\material\lambertian.h"
+#include "..\material\oren_nayar.h"
 
 #include <sstream>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <glm\trigonometric.hpp>
 
 namespace glue
 {
@@ -188,6 +190,18 @@ namespace glue
 						stream >> kd.x >> kd.y >> kd.z;
 
 						return std::make_unique<material::Lambertian>(kd);
+					}
+					else if (element_value == std::string("OrenNayar"))
+					{
+						glm::vec3 kd;
+						float roughness_in_degrees = 0.0f;
+						stream << bsdf_material->FirstChildElement("kd")->GetText();
+						stream >> kd.x >> kd.y >> kd.z;
+						stream.clear();
+						stream << bsdf_material->FirstChildElement("Roughness")->GetText();
+						stream >> roughness_in_degrees;
+
+						return std::make_unique<material::OrenNayar>(kd, glm::radians(roughness_in_degrees));
 					}
 					else
 					{
