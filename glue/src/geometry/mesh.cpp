@@ -23,7 +23,7 @@ namespace glue
 
 		geometry::Plane Mesh::samplePlane(core::UniformSampler& sampler)
 		{
-			auto vertices = (*m_triangles)[m_triangle_sampler.sample()].getVertices();
+			auto vertices = (*m_triangles)[m_triangle_sampler.sample(sampler)].getVertices();
 			auto v0 = m_transformation.pointToWorldSpace(vertices[0]);
 			auto v1 = m_transformation.pointToWorldSpace(vertices[1]);
 			auto v2 = m_transformation.pointToWorldSpace(vertices[2]);

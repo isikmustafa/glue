@@ -1,6 +1,8 @@
 #ifndef __GLUE__CORE__DISCRETE1DSAMPLER__
 #define __GLUE__CORE__DISCRETE1DSAMPLER__
 
+#include "uniform_sampler.h"
+
 #include <random>
 
 namespace glue
@@ -10,13 +12,13 @@ namespace glue
 		class Discrete1DSampler
 		{
 		public:
-			Discrete1DSampler(const std::vector<float>& weights);
+			Discrete1DSampler(const std::vector<float>& pdf);
 
-			int sample();
+			int sample(UniformSampler& sampler) const;
 
 		private:
-			std::mt19937 m_generator;
-			std::discrete_distribution<int> m_distribution;
+			std::vector<float> m_cdf;
+			float m_sum;
 		};
 	}
 }
