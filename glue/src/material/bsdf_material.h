@@ -2,9 +2,9 @@
 #define __GLUE__MATERIAL__BSDFMATERIAL__
 
 #include "..\core\uniform_sampler.h"
-#include "..\geometry\spherical_coordinate.h"
 
 #include <glm\vec3.hpp>
+#include <glm\geometric.hpp>
 
 namespace glue
 {
@@ -17,12 +17,43 @@ namespace glue
 
 			//wi, wo should be in tangent space for getBsdf, getPdf and sampleWi
 			//This makes it easier and efficient to calculate some computations.
-			virtual geometry::SphericalCoordinate sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler) const = 0;
+			virtual glm::vec3 sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler) const = 0;
 			virtual glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const = 0;
 			virtual float getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const = 0;
 			virtual bool hasDeltaDistribution() const = 0;
 			virtual bool useMultipleImportanceSampling() const = 0;
 		};
+
+		//These functions make use of the tangent plane for efficient computations.
+		inline float cosTheta(const glm::vec3& w_tangent)
+		{
+			return w_tangent.z;
+		}
+
+		inline float cos2Theta(const glm::vec3& w_tangent)
+		{
+			return w_tangent.z * w_tangent.z;
+		}
+
+		inline float sinTheta(const glm::vec3& w_tangent)
+		{
+			return glm::sqrt(1.0f - w_tangent.z * w_tangent.z);
+		}
+
+		inline float sin2Theta(const glm::vec3& w_tangent)
+		{
+			return 1.0f - w_tangent.z * w_tangent.z;
+		}
+
+		inline float tanTheta(const glm::vec3& w_tangent)
+		{
+			return glm::sqrt((1.0f - w_tangent.z * w_tangent.z) / (w_tangent.z * w_tangent.z));
+		}
+
+		inline float tan2Theta(const glm::vec3& w_tangent)
+		{
+			return (1.0f - w_tangent.z * w_tangent.z) / (w_tangent.z * w_tangent.z);
+		}
 	}
 }
 

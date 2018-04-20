@@ -31,7 +31,8 @@ namespace glue
 				pixel_acc += estimateLi(scene, ray, uniform_sampler, 1.0f, false);
 			}
 
-			return glm::clamp(255.0f * pixel_acc / static_cast<float>(scene.sample_count), 0.0f, 255.0f);
+			pixel_acc /= static_cast<float>(scene.sample_count);
+			return glm::clamp(255.0f * glm::vec3(glm::pow(pixel_acc.x, 0.4545f), glm::pow(pixel_acc.y, 0.4545f), glm::pow(pixel_acc.z, 0.4545f)), 0.0f, 255.0f);
 		}
 
 		glm::vec3 Pathtracer::estimateLi(const core::Scene& scene, const geometry::Ray& ray,
@@ -66,7 +67,7 @@ namespace glue
 					return glm::vec3(0.0f);
 				}
 			}
-			
+
 			auto intersection_point = ray.getPoint(intersection.distance);
 			core::CoordinateSpace tangent_space(intersection_point, intersection.normal);
 			auto wo_tangent = tangent_space.vectorToLocalSpace(-ray.get_direction());
@@ -81,36 +82,33 @@ namespace glue
 				{
 					const auto* light = scene.lights[i].get();
 					//TODO: MIS
-					if (intersection.bsdf_material->useMultipleImportanceSampling() && !light->hasDeltaDistribution())
+					/*if (intersection.bsdf_material->useMultipleImportanceSampling() && !light->hasDeltaDistribution())
 					{
 
+					}*/
+					auto sampled_plane = light->samplePlane(uniform_sampler);
+					auto wi_world = sampled_plane.point - intersection_point;
+					auto distance = glm::length(wi_world);
+					wi_world /= distance;
+
+					auto cos_light_surface = glm::dot(-wi_world, sampled_plane.normal);
+					if (cos_light_surface <= 0.0f)
+					{
+						continue;
 					}
-					else
+
+					geometry::Ray shadow_ray(intersection_point + wi_world * scene.secondary_ray_epsilon, wi_world);
+					if (!scene.bvh.intersectShadowRay(scene.meshes, shadow_ray, distance - 1.1f * scene.secondary_ray_epsilon))
 					{
-						auto sampled_plane = light->samplePlane(uniform_sampler);
-						auto wi_world = sampled_plane.point - intersection_point;
-						auto distance = glm::length(wi_world);
-						wi_world /= distance;
+						auto wi_tangent = tangent_space.vectorToLocalSpace(wi_world);
+						auto bsdf = intersection.bsdf_material->getBsdf(wi_tangent, wo_tangent);
+						auto cos = material::cosTheta(wi_tangent);
 
-						auto cos_light_surface = glm::dot(-wi_world, sampled_plane.normal);
-						if (cos_light_surface <= 0.0f)
-						{
-							continue;
-						}
+						//Get p(A) and transform it to p(w)
+						auto pdf = light->getPdf();
+						pdf *= distance * distance / cos_light_surface;
 
-						geometry::Ray shadow_ray(intersection_point + wi_world * scene.secondary_ray_epsilon, wi_world);
-						if (!scene.bvh.intersectShadowRay(scene.meshes, shadow_ray, distance - 1.1f * scene.secondary_ray_epsilon))
-						{
-							auto wi_tangent = tangent_space.vectorToLocalSpace(wi_world);
-							auto bsdf = intersection.bsdf_material->getBsdf(wi_tangent, wo_tangent);
-							auto cos = wi_tangent.z; //glm::dot(normal, wi_tangent) = wi_tangent.z since normal is (0,0,1) in tangent space.
-
-							//Get p(A) and transform it to p(w)
-							auto pdf = light->getPdf();
-							pdf *= distance * distance / cos_light_surface;
-
-							direct_lo += (bsdf * cos / pdf) * light->getLe();
-						}
+						direct_lo += (bsdf * cos / pdf) * light->getLe();
 					}
 				}
 
@@ -122,18 +120,22 @@ namespace glue
 			}
 
 			//INDIRECT LIGHTING//
-			auto wi_spherical = intersection.bsdf_material->sampleWi(wo_tangent, uniform_sampler);
-			auto wi_tangent = wi_spherical.toCartesianCoordinate();
-			auto wi_world = tangent_space.vectorToWorldSpace(wi_tangent);
+			auto wi_tangent = intersection.bsdf_material->sampleWi(wo_tangent, uniform_sampler);
 
 			auto bsdf = intersection.bsdf_material->getBsdf(wi_tangent, wo_tangent);
-			auto cos = wi_tangent.z; //glm::dot(normal, wi_tangent) = wi_tangent.z since normal is (0,0,1) in tangent space.
+			auto cos = material::cosTheta(wi_tangent);
 			auto pdf = intersection.bsdf_material->getPdf(wi_tangent, wo_tangent);
 
-			geometry::Ray wi_ray(intersection_point + wi_world * scene.secondary_ray_epsilon, wi_world);
-
 			auto f = bsdf * cos / pdf;
-			auto indirect_lo = f * estimateLi(scene, wi_ray, uniform_sampler, importance * glm::max(glm::max(f.x, f.y), f.z), light_explicitly_sampled);
+
+			glm::vec3 indirect_lo(0.0f);
+			if (f.x + f.y + f.z > 0.0f)
+			{
+				auto wi_world = tangent_space.vectorToWorldSpace(wi_tangent);
+				geometry::Ray wi_ray(intersection_point + wi_world * scene.secondary_ray_epsilon, wi_world);
+
+				indirect_lo = f * estimateLi(scene, wi_ray, uniform_sampler, importance * glm::max(glm::max(f.x, f.y), f.z), light_explicitly_sampled);
+			}
 
 			return importance < 0.2f ? (direct_lo + indirect_lo) * 2.0f : direct_lo + indirect_lo;
 		}

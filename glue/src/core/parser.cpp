@@ -2,6 +2,7 @@
 #include "..\geometry\bvh.h"
 #include "..\material\lambertian.h"
 #include "..\material\oren_nayar.h"
+#include "..\material\metal.h"
 
 #include <sstream>
 #include <assimp/Importer.hpp>
@@ -62,8 +63,7 @@ namespace glue
 				Assimp::Importer importer;
 				const aiScene* scene = importer.ReadFile(datapath_element->GetText(),
 					aiProcess_Triangulate |
-					aiProcess_JoinIdenticalVertices |
-					aiProcess_GenSmoothNormals);
+					aiProcess_JoinIdenticalVertices);
 
 				if (!scene)
 				{
@@ -194,14 +194,30 @@ namespace glue
 					else if (element_value == std::string("OrenNayar"))
 					{
 						glm::vec3 kd;
-						float roughness_in_degrees = 0.0f;
+						float roughness = 0.2f;
 						stream << bsdf_material->FirstChildElement("kd")->GetText();
 						stream >> kd.x >> kd.y >> kd.z;
 						stream.clear();
 						stream << bsdf_material->FirstChildElement("Roughness")->GetText();
-						stream >> roughness_in_degrees;
+						stream >> roughness;
 
-						return std::make_unique<material::OrenNayar>(kd, glm::radians(roughness_in_degrees));
+						return std::make_unique<material::OrenNayar>(kd, roughness);
+					}
+					else if (element_value == std::string("Metal"))
+					{
+						glm::vec3 n;
+						glm::vec3 k;
+						float roughness = 0.2f;
+						stream << bsdf_material->FirstChildElement("n")->GetText();
+						stream >> n.x >> n.y >> n.z;
+						stream.clear();
+						stream << bsdf_material->FirstChildElement("k")->GetText();
+						stream >> k.x >> k.y >> k.z;
+						stream.clear();
+						stream << bsdf_material->FirstChildElement("Roughness")->GetText();
+						stream >> roughness;
+
+						return std::make_unique<material::Metal>(n, k, roughness);
 					}
 					else
 					{

@@ -1,4 +1,5 @@
 #include "oren_nayar.h"
+#include "..\geometry\spherical_coordinate.h"
 
 #include <glm\gtc\constants.hpp>
 #include <glm\geometric.hpp>
@@ -8,18 +9,18 @@ namespace glue
 {
 	namespace material
 	{
-		OrenNayar::OrenNayar(const glm::vec3& kd, float roughness_in_radians)
+		OrenNayar::OrenNayar(const glm::vec3& kd, float roughness)
 			: m_kd(kd * glm::one_over_pi<float>())
 		{
-			auto r_sqr = roughness_in_radians * roughness_in_radians;
-			m_A = 1.0f - r_sqr / (2.0f * (r_sqr + 0.33f));
-			m_B = 0.45f * r_sqr / (r_sqr + 0.09f);
+			auto r2 = roughness * roughness;
+			m_A = 1.0f - r2 / (2.0f * (r2 + 0.33f));
+			m_B = 0.45f * r2 / (r2 + 0.09f);
 		}
 
-		geometry::SphericalCoordinate OrenNayar::sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler) const
+		glm::vec3 OrenNayar::sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler) const
 		{
 			//Sample from cosine-weighted distribution.
-			return geometry::SphericalCoordinate(1.0f, glm::acos(glm::sqrt(sampler.sample())), glm::two_pi<float>() * sampler.sample());
+			return geometry::SphericalCoordinate(1.0f, glm::acos(glm::sqrt(sampler.sample())), glm::two_pi<float>() * sampler.sample()).toCartesianCoordinate();
 		}
 
 		glm::vec3 OrenNayar::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const
@@ -34,7 +35,7 @@ namespace glue
 		float OrenNayar::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const
 		{
 			//Cosine-weighted pdf.
-			return wi_tangent.z * glm::one_over_pi<float>();
+			return cosTheta(wi_tangent) * glm::one_over_pi<float>();
 		}
 
 		bool OrenNayar::hasDeltaDistribution() const

@@ -20,6 +20,9 @@
     <Filter Include="Source Files\material">
       <UniqueIdentifier>{c11a97d8-2833-4b4e-bea4-0339eab06b5f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\microfacet">
+      <UniqueIdentifier>{8d2532f6-dea2-4b97-9ad8-6cc7f37489c6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -84,6 +87,18 @@
     </ClCompile>
     <ClCompile Include="src\material\oren_nayar.cpp">
       <Filter>Source Files\material</Filter>
+    </ClCompile>
+    <ClCompile Include="src\material\metal.cpp">
+      <Filter>Source Files\material</Filter>
+    </ClCompile>
+    <ClCompile Include="src\microfacet\fresnel.cpp">
+      <Filter>Source Files\microfacet</Filter>
+    </ClCompile>
+    <ClCompile Include="src\microfacet\ggx_distribution.cpp">
+      <Filter>Source Files\microfacet</Filter>
+    </ClCompile>
+    <ClCompile Include="src\microfacet\beckmann_distribution.cpp">
+      <Filter>Source Files\microfacet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +180,21 @@
     <ClInclude Include="src\material\oren_nayar.h">
       <Filter>Source Files\material</Filter>
     </ClInclude>
+    <ClInclude Include="src\material\metal.h">
+      <Filter>Source Files\material</Filter>
+    </ClInclude>
+    <ClInclude Include="src\microfacet\fresnel.h">
+      <Filter>Source Files\microfacet</Filter>
+    </ClInclude>
+    <ClInclude Include="src\microfacet\ggx_distribution.h">
+      <Filter>Source Files\microfacet</Filter>
+    </ClInclude>
+    <ClInclude Include="src\microfacet\microfacet_reflection.h">
+      <Filter>Source Files\microfacet</Filter>
+    </ClInclude>
+    <ClInclude Include="src\microfacet\beckmann_distribution.h">
+      <Filter>Source Files\microfacet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\geometry\bvh.inl">
@@ -172,6 +202,9 @@
     </None>
     <None Include="src\core\scene.inl">
       <Filter>Source Files\core</Filter>
+    </None>
+    <None Include="src\microfacet\microfacet_reflection.inl">
+      <Filter>Source Files\microfacet</Filter>
     </None>
   </ItemGroup>
 </Project>
