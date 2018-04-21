@@ -2,10 +2,9 @@
     <BackgroundColor>0 0 0</BackgroundColor>
 	<PixelFilter>GAUSSIAN</PixelFilter>
 	<SampleCount>10</SampleCount>
-	<SecondaryRayEpsilon>0.0001</SecondaryRayEpsilon>
 	
     <Output>
-        <Image>
+        <!--<Image>
 			<ImageName>../sample_output/cornell-lucy_reinhard-0.18.png</ImageName>
 			<Tonemapper type="GlobalReinhard">
 				<Key>0.18</Key>
@@ -17,10 +16,10 @@
 				<Key>0.36</Key>
 			</Tonemapper>
 		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy_reinhard-0.54.png</ImageName>
+		<Image>
+			<ImageName>../sample_output/cornell-lucy_reinhard-0.45.png</ImageName>
 			<Tonemapper type="GlobalReinhard">
-				<Key>0.54</Key>
+				<Key>0.45</Key>
 			</Tonemapper>
 		</Image>
         <Image>
@@ -35,14 +34,20 @@
 				<Min>0.0</Min>
 				<Max>1.0</Max>
 			</Tonemapper>
+		</Image>-->
+        <Image>
+			<ImageName>../sample_output/cornell-lucy_reinhard-0.54.png</ImageName>
+			<Tonemapper type="GlobalReinhard">
+				<Key>0.54</Key>
+			</Tonemapper>
 		</Image>
     </Output>
 	
     <Camera>
-        <ScreenCoordinates>-0.1 0.1 -0.1 0.1</ScreenCoordinates>
         <Position>0 1.05 0.99</Position>
         <Direction>0 -0.1 -1</Direction>
         <Up>0 1 0</Up>
+        <FovXY>60 60</FovXY>
 		<Resolution>800 800</Resolution>
         <NearDistance>0.17</NearDistance>
     </Camera>
@@ -56,11 +61,9 @@
 				<Rotation>0 1 0 60</Rotation>
 				<Translation>0 0 -0.4</Translation>
 			</Transformation>
-			<!-- Gold -->
-			<BsdfMaterial type="Metal">
-				<n>0.21 0.43 1.38</n>
-				<k>3.272 2.455 1.914</k>
-				<Roughness>0.5</Roughness>
+			<BsdfMaterial type="OrenNayar">
+				<kd>0.8 0.8 0.8</kd>
+				<Roughness>0.3</Roughness>
 			</BsdfMaterial>
         </Mesh>
         <Mesh>

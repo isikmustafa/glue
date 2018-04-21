@@ -21,34 +21,36 @@ namespace glue
 				if (camera_element)
 				{
 					std::stringstream stream;
-					auto child = camera_element->FirstChildElement("ScreenCoordinates");
-					stream << child->GetText() << std::endl;
-					child = camera_element->FirstChildElement("Position");
+					auto child = camera_element->FirstChildElement("Position");
 					stream << child->GetText() << std::endl;
 					child = camera_element->FirstChildElement("Direction");
 					stream << child->GetText() << std::endl;
 					child = camera_element->FirstChildElement("Up");
+					stream << child->GetText() << std::endl;
+					child = camera_element->FirstChildElement("FovXY");
 					stream << child->GetText() << std::endl;
 					child = camera_element->FirstChildElement("Resolution");
 					stream << child->GetText() << std::endl;
 					child = camera_element->FirstChildElement("NearDistance");
 					stream << child->GetText() << std::endl;
 
-					glm::vec4 screen_coordinates;
 					glm::vec3 position;
 					glm::vec3 direction;
 					glm::vec3 up;
+					glm::vec2 fov_xy;
 					glm::ivec2 screen_resolution;
 					float near_distance;
 
-					stream >> screen_coordinates.x >> screen_coordinates.y >> screen_coordinates.z >> screen_coordinates.w;
 					stream >> position.x >> position.y >> position.z;
 					stream >> direction.x >> direction.y >> direction.z;
 					stream >> up.x >> up.y >> up.z;
+					stream >> fov_xy.x >> fov_xy.y;
 					stream >> screen_resolution.x >> screen_resolution.y;
 					stream >> near_distance;
 
-					return std::make_unique<PinholeCamera>(position, direction, up, screen_coordinates, screen_resolution, near_distance);
+					auto s_right = glm::tan(glm::radians(fov_xy.x) * 0.5f) * near_distance;
+					auto s_up = glm::tan(glm::radians(fov_xy.y) * 0.5f) * near_distance;
+					return std::make_unique<PinholeCamera>(position, direction, up, glm::vec4(-s_right, s_right, -s_up, s_up), screen_resolution, near_distance);
 				}
 				else
 				{
