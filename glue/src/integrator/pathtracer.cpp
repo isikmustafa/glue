@@ -90,24 +90,25 @@ namespace glue
 					auto distance = glm::length(wi_world);
 					wi_world /= distance;
 
-					auto cos_light_surface = glm::dot(-wi_world, sampled_plane.normal);
-					if (cos_light_surface <= 0.0f)
+					auto wi_tangent = tangent_space.vectorToLocalSpace(wi_world);
+
+					auto bsdf = intersection.bsdf_material->getBsdf(wi_tangent, wo_tangent);
+					auto cos = material::cosTheta(wi_tangent);
+
+					//Get p(A) and transform it to p(w)
+					auto pdf = light->getPdf();
+					pdf *= distance * distance / glm::dot(-wi_world, sampled_plane.normal);
+
+					auto f = bsdf * cos / pdf;
+
+					//One other important thing about this if check is that it never does a computation for NAN values of f.
+					if (f.x + f.y + f.z > 0.0f)
 					{
-						continue;
-					}
-
-					geometry::Ray shadow_ray(intersection_point + wi_world * scene.secondary_ray_epsilon, wi_world);
-					if (!scene.bvh.intersectShadowRay(scene.meshes, shadow_ray, distance - 1.1f * scene.secondary_ray_epsilon))
-					{
-						auto wi_tangent = tangent_space.vectorToLocalSpace(wi_world);
-						auto bsdf = intersection.bsdf_material->getBsdf(wi_tangent, wo_tangent);
-						auto cos = material::cosTheta(wi_tangent);
-
-						//Get p(A) and transform it to p(w)
-						auto pdf = light->getPdf();
-						pdf *= distance * distance / cos_light_surface;
-
-						direct_lo += (bsdf * cos / pdf) * light->getLe();
+						geometry::Ray shadow_ray(intersection_point + wi_world * scene.secondary_ray_epsilon, wi_world);
+						if (!scene.bvh.intersectShadowRay(scene.meshes, shadow_ray, distance - 1.1f * scene.secondary_ray_epsilon))
+						{
+							direct_lo += f * light->getLe();
+						}
 					}
 				}
 
@@ -128,6 +129,7 @@ namespace glue
 			auto f = bsdf * cos / pdf;
 
 			glm::vec3 indirect_lo(0.0f);
+			//One other important thing about this if check is that it never does a computation for NAN values of f.
 			if (f.x + f.y + f.z > 0.0f)
 			{
 				auto wi_world = tangent_space.vectorToWorldSpace(wi_tangent);

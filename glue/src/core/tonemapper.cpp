@@ -49,8 +49,7 @@ namespace glue
 					geometric_average += glm::log(epsilon + (pixel.x + pixel.y + pixel.z) * 0.3333f);
 				}
 			}
-			geometric_average /= (width * height);
-			geometric_average = glm::exp(geometric_average);
+			geometric_average = glm::exp(geometric_average / (width * height));
 			geometric_average /= m_key;
 
 			for (int i = 0; i < width; ++i)

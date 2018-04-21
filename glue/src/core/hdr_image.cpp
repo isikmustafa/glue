@@ -7,7 +7,7 @@ namespace glue
 	namespace core
 	{
 		HdrImage::HdrImage(int width, int height)
-			: m_pixels(width, std::vector<glm::vec3>(height))
+			: m_pixels(width, std::vector<glm::vec3>(height, glm::vec3(0.0f)))
 		{}
 
 		std::vector<glm::vec3>& HdrImage::operator[](int x)
