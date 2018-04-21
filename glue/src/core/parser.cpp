@@ -180,41 +180,40 @@ namespace glue
 				if (bsdf_material_element)
 				{
 					std::stringstream stream;
-					auto bsdf_material = bsdf_material_element->FirstChildElement();
-					auto element_value = bsdf_material->Value();
+					auto bsdf_type = bsdf_material_element->Attribute("type");
 
-					if (element_value == std::string("Lambertian"))
+					if (bsdf_type == std::string("Lambertian"))
 					{
 						glm::vec3 kd;
-						stream << bsdf_material->FirstChildElement("kd")->GetText();
+						stream << bsdf_material_element->FirstChildElement("kd")->GetText();
 						stream >> kd.x >> kd.y >> kd.z;
 
 						return std::make_unique<material::Lambertian>(kd);
 					}
-					else if (element_value == std::string("OrenNayar"))
+					else if (bsdf_type == std::string("OrenNayar"))
 					{
 						glm::vec3 kd;
-						float roughness = 0.2f;
-						stream << bsdf_material->FirstChildElement("kd")->GetText();
+						float roughness;
+						stream << bsdf_material_element->FirstChildElement("kd")->GetText();
 						stream >> kd.x >> kd.y >> kd.z;
 						stream.clear();
-						stream << bsdf_material->FirstChildElement("Roughness")->GetText();
+						stream << bsdf_material_element->FirstChildElement("Roughness")->GetText();
 						stream >> roughness;
 
 						return std::make_unique<material::OrenNayar>(kd, roughness);
 					}
-					else if (element_value == std::string("Metal"))
+					else if (bsdf_type == std::string("Metal"))
 					{
 						glm::vec3 n;
 						glm::vec3 k;
-						float roughness = 0.2f;
-						stream << bsdf_material->FirstChildElement("n")->GetText();
+						float roughness;
+						stream << bsdf_material_element->FirstChildElement("n")->GetText();
 						stream >> n.x >> n.y >> n.z;
 						stream.clear();
-						stream << bsdf_material->FirstChildElement("k")->GetText();
+						stream << bsdf_material_element->FirstChildElement("k")->GetText();
 						stream >> k.x >> k.y >> k.z;
 						stream.clear();
-						stream << bsdf_material->FirstChildElement("Roughness")->GetText();
+						stream << bsdf_material_element->FirstChildElement("Roughness")->GetText();
 						stream >> roughness;
 
 						return std::make_unique<material::Metal>(n, k, roughness);
@@ -228,6 +227,64 @@ namespace glue
 				{
 					return nullptr;
 				}
+			}
+			std::vector<std::pair<std::unique_ptr<Tonemapper>, std::string>> parseOutput(tinyxml2::XMLElement* output_element)
+			{
+				std::vector<std::pair<std::unique_ptr<Tonemapper>, std::string>> output;
+
+				if (output_element)
+				{
+					std::stringstream stream;
+					auto image_element = output_element->FirstChildElement("Image");
+					while (image_element)
+					{
+						std::string image_name;
+
+						stream << image_element->FirstChildElement("ImageName")->GetText();
+						stream >> image_name;
+						stream.clear();
+
+						auto tonemapper_element = image_element->FirstChildElement("Tonemapper");
+						auto tonemapper_type = tonemapper_element->Attribute("type");
+						if (tonemapper_type == std::string("Clamp"))
+						{
+							float min;
+							float max;
+
+							stream << tonemapper_element->FirstChildElement("Min")->GetText();
+							stream >> min;
+							stream.clear();
+
+							stream << tonemapper_element->FirstChildElement("Max")->GetText();
+							stream >> max;
+							stream.clear();
+
+							output.emplace_back(std::make_pair(std::make_unique<Clamp>(min, max), image_name));
+						}
+						else if (tonemapper_type == std::string("GlobalReinhard"))
+						{
+							float key;
+
+							stream << tonemapper_element->FirstChildElement("Key")->GetText();
+							stream >> key;
+							stream.clear();
+
+							output.emplace_back(std::make_pair(std::make_unique<GlobalReinhard>(key), image_name));
+						}
+						else
+						{
+							throw std::runtime_error("Error: Unknown Tonemapper type");
+						}
+
+						image_element = image_element->NextSiblingElement("Image");
+					}
+				}
+				else
+				{
+					throw std::runtime_error("Error: Output is not found!");
+				}
+
+				return output;
 			}
 		}
 	}

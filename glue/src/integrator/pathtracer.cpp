@@ -31,8 +31,7 @@ namespace glue
 				pixel_acc += estimateLi(scene, ray, uniform_sampler, 1.0f, false);
 			}
 
-			pixel_acc /= static_cast<float>(scene.sample_count);
-			return glm::clamp(255.0f * glm::vec3(glm::pow(pixel_acc.x, 0.4545f), glm::pow(pixel_acc.y, 0.4545f), glm::pow(pixel_acc.z, 0.4545f)), 0.0f, 255.0f);
+			return pixel_acc / static_cast<float>(scene.sample_count);
 		}
 
 		glm::vec3 Pathtracer::estimateLi(const core::Scene& scene, const geometry::Ray& ray,

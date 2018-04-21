@@ -1,5 +1,5 @@
-#ifndef __GLUE__CORE__COORDINATESPACE
-#define __GLUE__CORE__COORDINATESPACE
+#ifndef __GLUE__CORE__COORDINATESPACE__
+#define __GLUE__CORE__COORDINATESPACE__
 
 #include <glm\vec3.hpp>
 #include <glm\mat3x3.hpp>

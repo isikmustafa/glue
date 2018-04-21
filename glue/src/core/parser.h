@@ -5,6 +5,7 @@
 #include "..\geometry\triangle.h"
 #include "..\geometry\transformation.h"
 #include "..\geometry\mesh.h"
+#include "tonemapper.h"
 
 #include <tinyxml2.h>
 #include <vector>
@@ -23,6 +24,7 @@ namespace glue
 				, std::unordered_map<std::string, std::shared_ptr<std::vector<geometry::Triangle>>>& path_to_triangles
 				, std::unordered_map<std::string, std::shared_ptr<geometry::BVH>>& path_to_bvh);
 			std::unique_ptr<material::BsdfMaterial> parseBsdfMaterial(tinyxml2::XMLElement* bsdf_material_element);
+			std::vector<std::pair<std::unique_ptr<Tonemapper>, std::string>> parseOutput(tinyxml2::XMLElement* output_element);
 		}
 	}
 }

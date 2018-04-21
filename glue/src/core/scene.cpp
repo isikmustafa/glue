@@ -35,20 +35,8 @@ namespace glue
 				throw std::runtime_error("Error: Root is not found!");
 			}
 
-			//ImageName
-			auto element = root->FirstChildElement("ImageName");
-			if (element)
-			{
-				stream << element->GetText() << std::endl;
-				stream >> image_name;
-			}
-			else
-			{
-				image_name = "unknown.png";
-			}
-
 			//BackgroundColor
-			element = root->FirstChildElement("BackgroundColor");
+			auto element = root->FirstChildElement("BackgroundColor");
 			if (element)
 			{
 				stream << element->GetText() << std::endl;
@@ -98,10 +86,25 @@ namespace glue
 			}
 
 			//SecondaryRayEpsilon
-			secondary_ray_epsilon = 0.0001f;
+			element = root->FirstChildElement("SecondaryRayEpsilon");
+			if (element)
+			{
+				stream << element->GetText() << std::endl;
+				stream >> secondary_ray_epsilon;
+			}
+			else
+			{
+				secondary_ray_epsilon = 0.0001f;
+			}
+
+			//Get output
+			output = parser::parseOutput(root->FirstChildElement("Output"));
 
 			//Get camera
 			camera = parser::parseCamera(root->FirstChildElement("Camera"));
+
+			//Create the image
+			hdr_image = std::make_unique<HdrImage>(camera->get_screen_resolution().x, camera->get_screen_resolution().y);
 
 			//Get objects
 			UniformSampler sampler;

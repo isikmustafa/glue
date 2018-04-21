@@ -100,6 +100,12 @@
     <ClCompile Include="src\microfacet\beckmann_distribution.cpp">
       <Filter>Source Files\microfacet</Filter>
     </ClCompile>
+    <ClCompile Include="src\core\hdr_image.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\tonemapper.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\geometry\triangle.h">
@@ -194,6 +200,12 @@
     </ClInclude>
     <ClInclude Include="src\microfacet\beckmann_distribution.h">
       <Filter>Source Files\microfacet</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\hdr_image.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\tonemapper.h">
+      <Filter>Source Files\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

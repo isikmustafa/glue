@@ -1,0 +1,149 @@
+<Scene>
+    <BackgroundColor>0 0 0</BackgroundColor>
+	<PixelFilter>GAUSSIAN</PixelFilter>
+	<SampleCount>10</SampleCount>
+	<SecondaryRayEpsilon>0.0001</SecondaryRayEpsilon>
+	
+    <Output>
+        <Image>
+			<ImageName>../sample_output/cornell-lucy_reinhard-0.18.png</ImageName>
+			<Tonemapper type="GlobalReinhard">
+				<Key>0.18</Key>
+			</Tonemapper>
+		</Image>
+        <Image>
+			<ImageName>../sample_output/cornell-lucy_reinhard-0.36.png</ImageName>
+			<Tonemapper type="GlobalReinhard">
+				<Key>0.36</Key>
+			</Tonemapper>
+		</Image>
+        <Image>
+			<ImageName>../sample_output/cornell-lucy_reinhard-0.54.png</ImageName>
+			<Tonemapper type="GlobalReinhard">
+				<Key>0.54</Key>
+			</Tonemapper>
+		</Image>
+        <Image>
+			<ImageName>../sample_output/cornell-lucy_reinhard-0.72.png</ImageName>
+			<Tonemapper type="GlobalReinhard">
+				<Key>0.72</Key>
+			</Tonemapper>
+		</Image>
+        <Image>
+			<ImageName>../sample_output/cornell-lucy_clamp.png</ImageName>
+			<Tonemapper type="Clamp">
+				<Min>0.0</Min>
+				<Max>1.0</Max>
+			</Tonemapper>
+		</Image>
+    </Output>
+	
+    <Camera>
+        <ScreenCoordinates>-0.1 0.1 -0.1 0.1</ScreenCoordinates>
+        <Position>0 1.05 0.99</Position>
+        <Direction>0 -0.1 -1</Direction>
+        <Up>0 1 0</Up>
+		<Resolution>800 800</Resolution>
+        <NearDistance>0.17</NearDistance>
+    </Camera>
+	
+    <Objects>
+		<!-- Front -->
+		<Mesh>
+            <Datapath>../sample_input/lucy.obj</Datapath>
+			<Transformation>
+				<Scaling>0.0018 0.0018 0.0018</Scaling>
+				<Rotation>0 1 0 60</Rotation>
+				<Translation>0 0 -0.4</Translation>
+			</Transformation>
+			<!-- Gold -->
+			<BsdfMaterial type="Metal">
+				<n>0.21 0.43 1.38</n>
+				<k>3.272 2.455 1.914</k>
+				<Roughness>0.5</Roughness>
+			</BsdfMaterial>
+        </Mesh>
+        <Mesh>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Translation>0 1 -1</Translation>
+			</Transformation>
+			<BsdfMaterial type="Lambertian">
+				<kd>0.8 0.8 0.8</kd>
+			</BsdfMaterial>
+        </Mesh>
+		<!-- Back -->
+        <Mesh>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Rotation>0 1 0 180</Rotation>
+				<Translation>0 1 1</Translation>
+			</Transformation>
+			<BsdfMaterial type="Lambertian">
+				<kd>0.8 0.8 0.8</kd>
+			</BsdfMaterial>
+        </Mesh>
+		<!-- Right -->
+        <Mesh>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Rotation>0 1 0 270</Rotation>
+				<Translation>1 1 0</Translation>
+			</Transformation>
+			<BsdfMaterial type="Lambertian">
+				<kd>0.25 0.33 0.05</kd>
+			</BsdfMaterial>
+        </Mesh>
+		<!-- Left -->
+        <Mesh>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Rotation>0 1 0 90</Rotation>
+				<Translation>-1 1 0</Translation>
+			</Transformation>
+			<BsdfMaterial type="Lambertian">
+				<kd>0.72 0.13 0.04</kd>
+			</BsdfMaterial>
+        </Mesh>
+		<!-- Ceil -->
+        <Mesh>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Rotation>1 0 0 90</Rotation>
+				<Translation>0 2 0</Translation>
+			</Transformation>
+			<BsdfMaterial type="Lambertian">
+				<kd>0.8 0.8 0.8</kd>
+			</BsdfMaterial>
+        </Mesh>
+		<!-- Floor -->
+        <Mesh>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>2 2 2</Scaling>
+				<Rotation>-1 0 0 90</Rotation>
+				<Translation>0 0 0</Translation>
+			</Transformation>
+			<BsdfMaterial type="Lambertian">
+				<kd>0.8 0.8 0.8</kd>
+			</BsdfMaterial>
+        </Mesh>
+    </Objects>
+	
+    <Lights>
+        <DiffuseArealight>
+			<Flux>15 15 15</Flux>
+            <Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>0.3 0.3 0.3</Scaling>
+				<Rotation>1 0 0 90</Rotation>
+				<Translation>0.2 1.999 0.3</Translation>
+			</Transformation>
+        </DiffuseArealight>
+    </Lights>
+</Scene>

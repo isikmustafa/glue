@@ -6,6 +6,8 @@
 #include "..\geometry\bvh.h"
 #include "..\geometry\debug_sphere.h"
 #include "..\light\light.h"
+#include "hdr_image.h"
+#include "tonemapper.h"
 
 #include <glm\vec3.hpp>
 #include <vector>
@@ -33,7 +35,8 @@ namespace glue
 			std::vector<geometry::DebugSphere> debug_spheres;
 			geometry::BVH debug_bvh;
 			std::unique_ptr<PinholeCamera> camera;
-			std::string image_name;
+			std::unique_ptr<HdrImage> hdr_image;
+			std::vector<std::pair<std::unique_ptr<Tonemapper>, std::string>> output;
 			glm::vec3 background_color;
 			Filter pixel_filter;
 			int sample_count;
