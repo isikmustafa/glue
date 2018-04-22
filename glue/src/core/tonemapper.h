@@ -32,12 +32,15 @@ namespace glue
 		class GlobalReinhard : public Tonemapper
 		{
 		public:
-			GlobalReinhard(float key);
+			//(maximum luminance of the scene) * max_luminance will be represented as 1.0.
+			//e.g. 0.5 means half of (maximum luminance of the scene) will be mapped to 1.0 and the rest will be burnt out.
+			GlobalReinhard(float key, float max_luminance);
 
 			HdrImage tonemap(const HdrImage& hdr_image) const override;
 
 		private:
 			float m_key;
+			float m_max_luminance;
 		};
 	}
 }

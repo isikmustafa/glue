@@ -1,6 +1,7 @@
 #include "hdr_image.h"
 
 #include <png.hpp>
+#include <glm\geometric.hpp>
 
 namespace glue
 {
@@ -30,7 +31,14 @@ namespace glue
 			{
 				for (int j = 0; j < height; ++j)
 				{
-					auto pixel = m_pixels[i][j] * 255.0f;
+					auto pixel = m_pixels[i][j];
+
+					//Gamma correction, 1/2.22
+					pixel.x = glm::pow(pixel.x, 0.45f);
+					pixel.y = glm::pow(pixel.y, 0.45f);
+					pixel.z = glm::pow(pixel.z, 0.45f);
+
+					pixel *= 255.0f;
 					image[j][i] = png::rgb_pixel(static_cast<png::byte>(pixel.x), static_cast<png::byte>(pixel.y), static_cast<png::byte>(pixel.z));
 				}
 			}

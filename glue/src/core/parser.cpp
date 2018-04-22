@@ -266,12 +266,16 @@ namespace glue
 						else if (tonemapper_type == std::string("GlobalReinhard"))
 						{
 							float key;
+							float max_luminance;
 
 							stream << tonemapper_element->FirstChildElement("Key")->GetText();
 							stream >> key;
 							stream.clear();
+							stream << tonemapper_element->FirstChildElement("MaxLuminance")->GetText();
+							stream >> max_luminance;
+							stream.clear();
 
-							output.emplace_back(std::make_pair(std::make_unique<GlobalReinhard>(key), image_name));
+							output.emplace_back(std::make_pair(std::make_unique<GlobalReinhard>(key, max_luminance), image_name));
 						}
 						else
 						{
