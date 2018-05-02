@@ -12,9 +12,7 @@ namespace glue
 		public:
 			Lambertian(const glm::vec3& kd);
 
-			//wi, wo should be in tangent space for getBsdf, getPdf and sampleWi
-			//This makes it easier and efficient to calculate some computations.
-			glm::vec3 sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler) const override;
+			std::pair<glm::vec3, glm::vec3> sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler) const override;
 			glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const override;
 			float getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const override;
 			bool hasDeltaDistribution() const override;

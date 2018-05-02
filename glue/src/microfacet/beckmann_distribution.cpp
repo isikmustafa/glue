@@ -11,7 +11,7 @@ namespace glue
 	namespace microfacet
 	{
 		BeckmannDistribution::BeckmannDistribution(float roughness)
-			: m_ab(glm::pow(0.01f + 0.99f * roughness, 2.0f))
+			: m_ab(roughness)
 		{}
 
 		glm::vec3 BeckmannDistribution::sampleWh(core::UniformSampler& sampler) const

@@ -11,7 +11,7 @@ namespace glue
 	namespace microfacet
 	{
 		GGXDistribution::GGXDistribution(float roughness)
-			: m_ag(glm::pow(0.01f + 0.99f * roughness, 2.0f))
+			: m_ag(roughness)
 		{}
 
 		glm::vec3 GGXDistribution::sampleWh(core::UniformSampler& sampler) const

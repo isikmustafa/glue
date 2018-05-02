@@ -163,6 +163,7 @@
     <ClCompile Include="src\integrator\raytracer.cpp" />
     <ClCompile Include="src\light\diffuse_arealight.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\material\dielectric.cpp" />
     <ClCompile Include="src\material\lambertian.cpp" />
     <ClCompile Include="src\material\metal.cpp" />
     <ClCompile Include="src\material\oren_nayar.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="src\light\diffuse_arealight.h" />
     <ClInclude Include="src\light\light.h" />
     <ClInclude Include="src\material\bsdf_material.h" />
+    <ClInclude Include="src\material\dielectric.h" />
     <ClInclude Include="src\material\lambertian.h" />
     <ClInclude Include="src\material\metal.h" />
     <ClInclude Include="src\material\oren_nayar.h" />
@@ -204,11 +206,13 @@
     <ClInclude Include="src\microfacet\fresnel.h" />
     <ClInclude Include="src\microfacet\ggx_distribution.h" />
     <ClInclude Include="src\microfacet\microfacet_reflection.h" />
+    <ClInclude Include="src\microfacet\microfacet_scattering.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\core\scene.inl" />
     <None Include="src\geometry\bvh.inl" />
     <None Include="src\microfacet\microfacet_reflection.inl" />
+    <None Include="src\microfacet\microfacet_scattering.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

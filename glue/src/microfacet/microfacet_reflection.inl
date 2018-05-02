@@ -7,37 +7,77 @@ namespace glue
 {
 	namespace microfacet
 	{
-		template<typename FresnelCallable, typename MicrofacetDistribution>
-		MicrofacetReflection<FresnelCallable, MicrofacetDistribution>::MicrofacetReflection(const glm::vec3& n_ratio, const glm::vec3& k_ratio, float roughness)
-			: m_microfacet(roughness)
-			, m_n_ratio(n_ratio)
-			, m_k_ratio(k_ratio)
+		template<typename Fresnel, typename MicrofacetDistribution>
+		MicrofacetReflection<Fresnel, MicrofacetDistribution>::MicrofacetReflection(float roughness)
+			: m_a(roughness)
 		{}
 
-		template<typename FresnelCallable, typename MicrofacetDistribution>
-		glm::vec3 MicrofacetReflection<FresnelCallable, MicrofacetDistribution>::sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler) const
+		template<typename Fresnel, typename MicrofacetDistribution>
+		std::pair<glm::vec3, glm::vec3> MicrofacetReflection<Fresnel, MicrofacetDistribution>::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler,
+			float no_over_ni) const
 		{
-			auto wh = m_microfacet.sampleWh(sampler);
-			return 2.0f * glm::dot(wo_tangent, wh) * wh - wo_tangent;
+			MicrofacetDistribution microfacet(m_a);
+
+			auto wh = microfacet.sampleWh(sampler);
+			auto wo = glm::reflect(-wi_tangent, wh);
+			auto wi_wh = glm::dot(wi_tangent, wh);
+			auto fg = Fresnel()(no_over_ni, glm::abs(wi_wh)) * microfacet.g1(wi_tangent, wh) * microfacet.g1(wo, wh);
+			auto f = fg * glm::abs(wi_wh / (material::cosTheta(wi_tangent) * material::cosTheta(wh)));
+
+			return std::make_pair(wo, glm::vec3(f));
 		}
 
-		template<typename FresnelCallable, typename MicrofacetDistribution>
-		glm::vec3 MicrofacetReflection<FresnelCallable, MicrofacetDistribution>::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const
+		template<typename Fresnel, typename MicrofacetDistribution>
+		std::pair<glm::vec3, glm::vec3> MicrofacetReflection<Fresnel, MicrofacetDistribution>::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler,
+			const glm::vec3& no_over_ni, const glm::vec3& ko_over_ki) const
 		{
-			auto wh = glm::normalize(wi_tangent + wo_tangent);
-			auto f = FresnelCallable()(m_n_ratio, m_k_ratio, glm::abs(glm::dot(wo_tangent, wh)));
-			auto dg = m_microfacet.d(wh) * m_microfacet.g1(wi_tangent, wh) * m_microfacet.g1(wo_tangent, wh);
+			MicrofacetDistribution microfacet(m_a);
 
-			auto brdf = f * dg / (4.0f * glm::abs(material::cosTheta(wi_tangent)) * glm::abs(material::cosTheta(wo_tangent)));
+			auto wh = microfacet.sampleWh(sampler);
+			auto wo = glm::reflect(-wi_tangent, wh);
+			auto wi_wh = glm::dot(wi_tangent, wh);
+			auto fg = Fresnel()(no_over_ni, ko_over_ki, glm::abs(wi_wh)) * microfacet.g1(wi_tangent, wh) * microfacet.g1(wo, wh);
+			auto f = fg * glm::abs(wi_wh / (material::cosTheta(wi_tangent) * material::cosTheta(wh)));
+
+			return std::make_pair(wo, f);
+		}
+
+		template<typename Fresnel, typename MicrofacetDistribution>
+		glm::vec3 MicrofacetReflection<Fresnel, MicrofacetDistribution>::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, float no_over_ni) const
+		{
+			MicrofacetDistribution microfacet(m_a);
+
+			auto wh = glm::normalize(wi_tangent + wo_tangent);
+			auto f = Fresnel()(no_over_ni, glm::abs(glm::dot(wi_tangent, wh)));
+			auto dg = microfacet.d(wh) * microfacet.g1(wi_tangent, wh) * microfacet.g1(wo_tangent, wh);
+
+			auto brdf = f * dg / glm::abs(4.0f * material::cosTheta(wi_tangent) * material::cosTheta(wo_tangent));
 
 			return glm::vec3(brdf);
 		}
 
-		template<typename FresnelCallable, typename MicrofacetDistribution>
-		float MicrofacetReflection<FresnelCallable, MicrofacetDistribution>::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const
+		template<typename Fresnel, typename MicrofacetDistribution>
+		glm::vec3 MicrofacetReflection<Fresnel, MicrofacetDistribution>::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent,
+			const glm::vec3& no_over_ni, const glm::vec3& ko_over_ki) const
 		{
+			MicrofacetDistribution microfacet(m_a);
+
 			auto wh = glm::normalize(wi_tangent + wo_tangent);
-			return m_microfacet.d(wh) * glm::abs(material::cosTheta(wh)) / (4.0f * glm::dot(wo_tangent, wh));
+			auto f = Fresnel()(no_over_ni, ko_over_ki, glm::abs(glm::dot(wi_tangent, wh)));
+			auto dg = microfacet.d(wh) * microfacet.g1(wi_tangent, wh) * microfacet.g1(wo_tangent, wh);
+
+			auto brdf = f * dg / glm::abs(4.0f * material::cosTheta(wi_tangent) * material::cosTheta(wo_tangent));
+
+			return glm::vec3(brdf);
+		}
+
+		template<typename Fresnel, typename MicrofacetDistribution>
+		float MicrofacetReflection<Fresnel, MicrofacetDistribution>::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const
+		{
+			MicrofacetDistribution microfacet(m_a);
+
+			auto wh = glm::normalize(wi_tangent + wo_tangent);
+			return glm::abs(microfacet.d(wh) * material::cosTheta(wh) / (4.0f * glm::dot(wo_tangent, wh)));
 		}
 	}
 }

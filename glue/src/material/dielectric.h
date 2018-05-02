@@ -1,8 +1,8 @@
-#ifndef __GLUE__MATERIAL__METAL__
-#define __GLUE__MATERIAL__METAL__
+#ifndef __GLUE__MATERIAL__DIELECTRIC__
+#define __GLUE__MATERIAL__DIELECTRIC__
 
 #include "bsdf_material.h"
-#include "..\microfacet\microfacet_reflection.h"
+#include "..\microfacet\microfacet_scattering.h"
 #include "..\microfacet\fresnel.h"
 #include "..\microfacet\ggx_distribution.h"
 
@@ -10,13 +10,13 @@ namespace glue
 {
 	namespace material
 	{
-		//Works for Dielectric<->Metal boundary.
-		//Dielectric is assumed to be air and thus IOR of outside is equal to 1.
+		//Works for Dielectric<->Dielectric boundary.
+		//Outside dielectric is assumed to be air and thus IOR is equal to 1.
 		//It can be extended so that other dielectric materials can be used at the boundary.
-		class Metal : public BsdfMaterial
+		class Dielectric : public BsdfMaterial
 		{
 		public:
-			Metal(const glm::vec3& ior_n, const glm::vec3& ior_k, float roughness);
+			Dielectric(float ior_n, float roughness);
 
 			std::pair<glm::vec3, glm::vec3> sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler) const override;
 			glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const override;
@@ -25,9 +25,8 @@ namespace glue
 			bool useMultipleImportanceSampling() const override;
 
 		private:
-			glm::vec3 m_ior_n;
-			glm::vec3 m_ior_k;
-			microfacet::MicrofacetReflection<microfacet::fresnel::Conductor, microfacet::GGXDistribution> m_microfacet;
+			float m_ior_n;
+			microfacet::MicrofacetScattering<microfacet::GGXDistribution> m_microfacet;
 		};
 	}
 }

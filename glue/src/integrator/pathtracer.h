@@ -16,7 +16,7 @@ namespace glue
 			glm::vec3 integratePixel(const core::Scene& scene, int x, int y) const;
 
 		private:
-			glm::vec3 estimateLi(const core::Scene& scene, const geometry::Ray& ray,
+			glm::vec3 estimate(const core::Scene& scene, const geometry::Ray& ray,
 				core::UniformSampler& uniform_sampler, float importance, bool light_explicitly_sampled) const;
 		};
 	}

@@ -3,6 +3,7 @@
 #include "..\material\lambertian.h"
 #include "..\material\oren_nayar.h"
 #include "..\material\metal.h"
+#include "..\material\dielectric.h"
 
 #include <sstream>
 #include <assimp/Importer.hpp>
@@ -206,19 +207,31 @@ namespace glue
 					}
 					else if (bsdf_type == std::string("Metal"))
 					{
-						glm::vec3 n;
-						glm::vec3 k;
+						glm::vec3 ior_n;
+						glm::vec3 ior_k;
 						float roughness;
-						stream << bsdf_material_element->FirstChildElement("n")->GetText();
-						stream >> n.x >> n.y >> n.z;
+						stream << bsdf_material_element->FirstChildElement("IorN")->GetText();
+						stream >> ior_n.x >> ior_n.y >> ior_n.z;
 						stream.clear();
-						stream << bsdf_material_element->FirstChildElement("k")->GetText();
-						stream >> k.x >> k.y >> k.z;
+						stream << bsdf_material_element->FirstChildElement("IorK")->GetText();
+						stream >> ior_k.x >> ior_k.y >> ior_k.z;
 						stream.clear();
 						stream << bsdf_material_element->FirstChildElement("Roughness")->GetText();
 						stream >> roughness;
 
-						return std::make_unique<material::Metal>(n, k, roughness);
+						return std::make_unique<material::Metal>(ior_n, ior_k, roughness);
+					}
+					else if (bsdf_type == std::string("Dielectric"))
+					{
+						float ior_n;
+						float roughness;
+						stream << bsdf_material_element->FirstChildElement("IorN")->GetText();
+						stream >> ior_n;
+						stream.clear();
+						stream << bsdf_material_element->FirstChildElement("Roughness")->GetText();
+						stream >> roughness;
+
+						return std::make_unique<material::Dielectric>(ior_n, roughness);
 					}
 					else
 					{

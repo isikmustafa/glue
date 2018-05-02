@@ -1,112 +1,30 @@
 <Scene>
     <BackgroundColor>0 0 0</BackgroundColor>
-	<PixelFilter>GAUSSIAN</PixelFilter>
-	<SampleCount>32</SampleCount>
+	<PixelFilter>BOX</PixelFilter>
+	<SampleCount>128</SampleCount>
+	<SecondaryRayEpsilon>0.0001</SecondaryRayEpsilon>
 	
     <Output>
         <Image>
-			<ImageName>../sample_output/cornell-lucyClamp.png</ImageName>
+			<ImageName>../sample_output/glue-test.png</ImageName>
 			<Tonemapper type="Clamp">
 				<Min>0.0</Min>
 				<Max>1.0</Max>
 			</Tonemapper>
 		</Image>
-        <!--<Image>
-			<ImageName>../sample_output/cornell-lucy0.18_1.0.png</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.18</Key>
-				<MaxLuminance>1.0</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.9.png</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.18</Key>
-				<MaxLuminance>0.9</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.8.png</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.18</Key>
-				<MaxLuminance>0.8</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.7.png</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.18</Key>
-				<MaxLuminance>0.7</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.6.png</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.18</Key>
-				<MaxLuminance>0.6</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.5.png</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.18</Key>
-				<MaxLuminance>0.5</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.36_1.0.png</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.36</Key>
-				<MaxLuminance>1.0</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.36_0.9.png</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.36</Key>
-				<MaxLuminance>0.9</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.36_0.8.png</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.36</Key>
-				<MaxLuminance>0.8</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.36_0.7.png</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.36</Key>
-				<MaxLuminance>0.7</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.36_0.6.png</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.36</Key>
-				<MaxLuminance>0.6</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.36_0.5.png</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.36</Key>
-				<MaxLuminance>0.5</MaxLuminance>
-			</Tonemapper>
-		</Image>-->
     </Output>
 	
     <Camera>
         <Position>0 0.95 1.49</Position>
         <Direction>0 0 -1</Direction>
         <Up>0 1 0</Up>
-        <FovXY>42 56</FovXY>
-		<Resolution>600 800</Resolution>
-        <NearDistance>0.1</NearDistance>
+        <FovXY>40 40</FovXY>
+		<Resolution>600 600</Resolution>
+        <NearDistance>0.01</NearDistance>
     </Camera>
 	
     <Objects>
+		<!-- Lucy -->
 		<Mesh>
             <Datapath>../sample_input/lucy.obj</Datapath>
 			<Transformation>
@@ -117,9 +35,21 @@
 			<BsdfMaterial type="Metal">
 				<IorN>0.1778 0.5308 1.5436</IorN>
 				<IorK>3.1272 2.2774 1.8962</IorK>
-				<Roughness>0.255</Roughness>
+				<Roughness>0.25</Roughness>
 			</BsdfMaterial>
         </Mesh>
+		<!-- Glass 
+		<Mesh>
+            <Datapath>../sample_input/box.obj</Datapath>
+			<Transformation>
+				<Scaling>0.4 0.4 0.01</Scaling>
+				<Translation>0 0.9 0.5</Translation>
+			</Transformation>
+			<BsdfMaterial type="Dielectric">
+				<IorN>1.5</IorN>
+				<Roughness>0.027</Roughness>
+			</BsdfMaterial>
+        </Mesh>-->
 		<!-- Front -->
         <Mesh>
             <Datapath>../sample_input/rectangle.obj</Datapath>

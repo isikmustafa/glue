@@ -15,9 +15,10 @@ namespace glue
 		public:
 			virtual ~BsdfMaterial() {}
 
-			//wi, wo should be in tangent space for getBsdf, getPdf and sampleWi
+			//wi, wo should be in tangent space for sampleWo, getBsdf and getPdf.
 			//This makes it easier and efficient to calculate some computations.
-			virtual glm::vec3 sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler) const = 0;
+			//sampleWo returns <wo, f> pair where f = bsdf * cos / pdf
+			virtual std::pair<glm::vec3, glm::vec3> sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler) const = 0;
 			virtual glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const = 0;
 			virtual float getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const = 0;
 			virtual bool hasDeltaDistribution() const = 0;
