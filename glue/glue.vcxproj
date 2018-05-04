@@ -147,7 +147,6 @@
     <ClCompile Include="src\core\coordinate_space.cpp" />
     <ClCompile Include="src\core\discrete_1d_sampler.cpp" />
     <ClCompile Include="src\core\gaussian_sampler.cpp" />
-    <ClCompile Include="src\core\parser.cpp" />
     <ClCompile Include="src\core\scene.cpp" />
     <ClCompile Include="src\core\timer.cpp" />
     <ClCompile Include="src\core\tonemapper.cpp" />
@@ -177,7 +176,6 @@
     <ClInclude Include="src\core\coordinate_space.h" />
     <ClInclude Include="src\core\discrete_1d_sampler.h" />
     <ClInclude Include="src\core\gaussian_sampler.h" />
-    <ClInclude Include="src\core\parser.h" />
     <ClInclude Include="src\core\real_sampler.h" />
     <ClInclude Include="src\core\scene.h" />
     <ClInclude Include="src\core\timer.h" />
