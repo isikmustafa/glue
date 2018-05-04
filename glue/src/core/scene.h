@@ -60,9 +60,9 @@ namespace glue
 			void parseOutput(tinyxml2::XMLElement* scene_element);
 			void parseMeshes(tinyxml2::XMLElement* scene_element);
 			void parseLights(tinyxml2::XMLElement* scene_element);
+			void parseMesh(tinyxml2::XMLElement* mesh_element);
 			std::vector<geometry::Triangle> parseTriangles(tinyxml2::XMLElement* datapath_element);
 			geometry::Transformation parseTransformation(tinyxml2::XMLElement* transformation_element);
-			geometry::Mesh parseMesh(tinyxml2::XMLElement* mesh_element);
 			std::unique_ptr<material::BsdfMaterial> parseBsdfMaterial(tinyxml2::XMLElement* bsdf_material_element);
 		};
 	}

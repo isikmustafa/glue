@@ -31,8 +31,7 @@ namespace glue
 			tinyxml2::XMLDocument file;
 			std::stringstream stream;
 
-			auto res = file.LoadFile(filepath.c_str());
-			if (res)
+			if (file.LoadFile(filepath.c_str()))
 			{
 				throw std::runtime_error("Error: The xml file cannot be loaded!");
 			}
@@ -40,7 +39,7 @@ namespace glue
 			auto scene_element = file.FirstChildElement("Scene");
 			if (!scene_element)
 			{
-				throw std::runtime_error("Error: Root is not found!");
+				throw std::runtime_error("Error: Scene is not found!");
 			}
 
 			parseMeshes(scene_element);
@@ -227,7 +226,7 @@ namespace glue
 				auto child = element->FirstChildElement("Mesh");
 				while (child)
 				{
-					meshes.push_back(std::make_shared<geometry::Mesh>(parseMesh(child)));
+					parseMesh(child);
 					const auto& mesh = meshes[meshes.size() - 1];
 
 					auto att = child->Attribute("displayRandomSamples");
@@ -255,7 +254,7 @@ namespace glue
 				auto child = element->FirstChildElement("DiffuseArealight");
 				while (child)
 				{
-					meshes.push_back(std::make_shared<geometry::Mesh>(parseMesh(child)));
+					parseMesh(child);
 					const auto& mesh = meshes[meshes.size() - 1];
 
 					auto att = child->Attribute("displayRandomSamples");
@@ -280,6 +279,51 @@ namespace glue
 					child = child->NextSiblingElement("DiffuseArealight");
 				}
 			}
+		}
+
+		void Scene::parseMesh(tinyxml2::XMLElement* mesh_element)
+		{
+			auto datapath = mesh_element->FirstChildElement("Datapath");
+			if (!datapath)
+			{
+				throw std::runtime_error("Error: Datapath is not found for the mesh!");
+			}
+
+			auto datapath_text = datapath->GetText();
+			if (m_path_to_triangles.find(datapath_text) == m_path_to_triangles.end())
+			{
+				auto triangles = parseTriangles(datapath);
+				geometry::BVH bvh;
+
+				bvh.buildWithSAHSplit(triangles);
+
+				m_path_to_triangles.insert({ datapath_text, std::make_shared<std::vector<geometry::Triangle>>(std::move(triangles)) });
+				m_path_to_bvh.insert({ datapath_text, std::make_shared<geometry::BVH>(std::move(bvh)) });
+			}
+
+			//Compute transformation.
+			auto transformation = parseTransformation(mesh_element->FirstChildElement("Transformation"));
+
+			//Compute bbox.
+			geometry::BBox bbox;
+			std::vector<float> triangle_areas;
+			auto total_area = 0.0f;
+			for (const auto& triangle : *m_path_to_triangles[datapath_text])
+			{
+				auto vertices = triangle.getVertices();
+				auto v0 = transformation.pointToWorldSpace(vertices[0]);
+				auto v1 = transformation.pointToWorldSpace(vertices[1]);
+				auto v2 = transformation.pointToWorldSpace(vertices[2]);
+				bbox.extend(v0);
+				bbox.extend(v1);
+				bbox.extend(v2);
+				auto area = geometry::Triangle(v0, v1 - v0, v2 - v0).getSurfaceArea();
+				triangle_areas.push_back(area);
+				total_area += area;
+			}
+
+			meshes.push_back(std::make_shared<geometry::Mesh>(transformation, bbox, triangle_areas, total_area, m_path_to_triangles[datapath_text], m_path_to_bvh[datapath_text],
+				parseBsdfMaterial(mesh_element->FirstChildElement("BsdfMaterial"))));
 		}
 
 		std::vector<geometry::Triangle> Scene::parseTriangles(tinyxml2::XMLElement* datapath_element)
@@ -352,51 +396,6 @@ namespace glue
 			}
 
 			return transformation;
-		}
-
-		geometry::Mesh Scene::parseMesh(tinyxml2::XMLElement* mesh_element)
-		{
-			auto datapath = mesh_element->FirstChildElement("Datapath");
-			if (!datapath)
-			{
-				throw std::runtime_error("Error: Datapath is not found for the mesh!");
-			}
-
-			auto datapath_text = datapath->GetText();
-			if (m_path_to_triangles.find(datapath_text) == m_path_to_triangles.end())
-			{
-				auto triangles = parseTriangles(datapath);
-				geometry::BVH bvh;
-
-				bvh.buildWithSAHSplit(triangles);
-
-				m_path_to_triangles.insert({ datapath_text, std::make_shared<std::vector<geometry::Triangle>>(std::move(triangles)) });
-				m_path_to_bvh.insert({ datapath_text, std::make_shared<geometry::BVH>(std::move(bvh)) });
-			}
-
-			//Compute transformation.
-			auto transformation = parseTransformation(mesh_element->FirstChildElement("Transformation"));
-
-			//Compute bbox.
-			geometry::BBox bbox;
-			std::vector<float> triangle_areas;
-			auto total_area = 0.0f;
-			for (const auto& triangle : *m_path_to_triangles[datapath_text])
-			{
-				auto vertices = triangle.getVertices();
-				auto v0 = transformation.pointToWorldSpace(vertices[0]);
-				auto v1 = transformation.pointToWorldSpace(vertices[1]);
-				auto v2 = transformation.pointToWorldSpace(vertices[2]);
-				bbox.extend(v0);
-				bbox.extend(v1);
-				bbox.extend(v2);
-				auto area = geometry::Triangle(v0, v1 - v0, v2 - v0).getSurfaceArea();
-				triangle_areas.push_back(area);
-				total_area += area;
-			}
-
-			return geometry::Mesh(transformation, bbox, triangle_areas, total_area, m_path_to_triangles[datapath_text], m_path_to_bvh[datapath_text],
-				parseBsdfMaterial(mesh_element->FirstChildElement("BsdfMaterial")));
 		}
 
 		std::unique_ptr<material::BsdfMaterial> Scene::parseBsdfMaterial(tinyxml2::XMLElement* bsdf_material_element)
