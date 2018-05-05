@@ -11,6 +11,7 @@
 
 #include <glm\vec3.hpp>
 #include <vector>
+#include <sstream>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -54,14 +55,39 @@ namespace glue
 		private:
 			std::unordered_map<std::string, std::shared_ptr<std::vector<geometry::Triangle>>> m_path_to_triangles;
 			std::unordered_map<std::string, std::shared_ptr<geometry::BVH>> m_path_to_bvh;
+			std::stringstream m_stream;
 
 		private:
+			//If default values are NOT provided, these two will be called.
+			template<typename T>
+			void parseTag(T* arg);
+			template<typename T, typename... Args>
+			void parseTag(T* arg, Args... args);
+
+			//If default values are provided, these two will be called.
+			template<typename T>
+			void parseTag(T* arg, T default_value);
+			template<typename T, typename... Args>
+			void parseTag(T* arg, T default_value, Args... args);
+
+			//Parses tag content and assigns them to given arguments.
+			template<typename... Args>
+			void parseTagContent(tinyxml2::XMLElement* element, Args... args);
+
+			//Gets first child element and throws if it does not exist.
+			template<typename T>
+			tinyxml2::XMLElement* getFirstChildElementThrow(T element, const std::string& tag_name);
+
+			//Gets attribute and throws if it does not exist.
+			template<typename T>
+			const char* getAttributeThrow(T element, const std::string& att_name);
+
 			void parseCamera(tinyxml2::XMLElement* scene_element);
 			void parseOutput(tinyxml2::XMLElement* scene_element);
 			void parseMeshes(tinyxml2::XMLElement* scene_element);
 			void parseLights(tinyxml2::XMLElement* scene_element);
 			void parseMesh(tinyxml2::XMLElement* mesh_element);
-			std::vector<geometry::Triangle> parseTriangles(tinyxml2::XMLElement* datapath_element);
+			void parseTriangles(tinyxml2::XMLElement* datapath_element);
 			geometry::Transformation parseTransformation(tinyxml2::XMLElement* transformation_element);
 			std::unique_ptr<material::BsdfMaterial> parseBsdfMaterial(tinyxml2::XMLElement* bsdf_material_element);
 		};

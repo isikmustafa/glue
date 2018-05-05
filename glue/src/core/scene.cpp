@@ -13,7 +13,6 @@
 #include "..\material\metal.h"
 #include "..\material\dielectric.h"
 
-#include <sstream>
 #include <utility>
 #include <glm\vec2.hpp>
 #include <glm\vec3.hpp>
@@ -29,18 +28,13 @@ namespace glue
 		void Scene::loadFromXML(const std::string& filepath)
 		{
 			tinyxml2::XMLDocument file;
-			std::stringstream stream;
 
 			if (file.LoadFile(filepath.c_str()))
 			{
 				throw std::runtime_error("Error: The xml file cannot be loaded!");
 			}
 
-			auto scene_element = file.FirstChildElement("Scene");
-			if (!scene_element)
-			{
-				throw std::runtime_error("Error: Scene is not found!");
-			}
+			auto scene_element = getFirstChildElementThrow(&file, "Scene");
 
 			parseMeshes(scene_element);
 			parseLights(scene_element);
@@ -48,67 +42,26 @@ namespace glue
 			parseCamera(scene_element);
 			hdr_image = std::make_unique<HdrImage>(camera->get_screen_resolution().x, camera->get_screen_resolution().y);
 
-			//BackgroundColor
-			auto element = scene_element->FirstChildElement("BackgroundColor");
-			if (element)
-			{
-				stream << element->GetText() << std::endl;
-				stream >> background_color.x >> background_color.y >> background_color.z;
-			}
-			else
-			{
-				background_color = glm::vec3(0.0f, 0.0f, 0.0f);
-			}
+			parseTagContent(scene_element->FirstChildElement("BackgroundColor"), &background_color.x, 0.0f, &background_color.y, 0.0f, &background_color.z, 0.0f);
 
 			//Filter
-			element = scene_element->FirstChildElement("PixelFilter");
-			if (element)
-			{
-				std::string filter_str;
-				stream << element->GetText() << std::endl;
-				stream >> filter_str;
-
-				if (filter_str == "BOX")
-				{
-					pixel_filter = Filter::BOX;
-				}
-				else if (filter_str == "GAUSSIAN")
-				{
-					pixel_filter = Filter::GAUSSIAN;
-				}
-				else
-				{
-					throw std::runtime_error("Error: Unknown filter type for pixel!");
-				}
-			}
-			else
+			std::string filter_str;
+			parseTagContent(scene_element->FirstChildElement("PixelFilter"), &filter_str, std::string("BOX"));
+			if (filter_str == "BOX")
 			{
 				pixel_filter = Filter::BOX;
 			}
-
-			//SampleCount
-			element = scene_element->FirstChildElement("SampleCount");
-			if (element)
+			else if (filter_str == "GAUSSIAN")
 			{
-				stream << element->GetText() << std::endl;
-				stream >> sample_count;
+				pixel_filter = Filter::GAUSSIAN;
 			}
 			else
 			{
-				sample_count = 1;
+				throw std::runtime_error("Error: Unknown filter type!");
 			}
 
-			//SecondaryRayEpsilon
-			element = scene_element->FirstChildElement("SecondaryRayEpsilon");
-			if (element)
-			{
-				stream << element->GetText() << std::endl;
-				stream >> secondary_ray_epsilon;
-			}
-			else
-			{
-				secondary_ray_epsilon = 0.0001f;
-			}
+			parseTagContent(scene_element->FirstChildElement("SampleCount"), &sample_count, 1);
+			parseTagContent(scene_element->FirstChildElement("SecondaryRayEpsilon"), &secondary_ray_epsilon, 0.0001f);
 
 			debug_bvh.buildWithSAHSplit(debug_spheres);
 			bvh.buildWithMedianSplit(meshes);
@@ -116,199 +69,122 @@ namespace glue
 
 		void Scene::parseCamera(tinyxml2::XMLElement* scene_element)
 		{
-			auto camera_element = scene_element->FirstChildElement("Camera");
-			if (camera_element)
-			{
-				std::stringstream stream;
-				auto child = camera_element->FirstChildElement("Position");
-				stream << child->GetText() << std::endl;
-				child = camera_element->FirstChildElement("Direction");
-				stream << child->GetText() << std::endl;
-				child = camera_element->FirstChildElement("Up");
-				stream << child->GetText() << std::endl;
-				child = camera_element->FirstChildElement("FovXY");
-				stream << child->GetText() << std::endl;
-				child = camera_element->FirstChildElement("Resolution");
-				stream << child->GetText() << std::endl;
-				child = camera_element->FirstChildElement("NearDistance");
-				stream << child->GetText() << std::endl;
+			auto camera_element = getFirstChildElementThrow(scene_element, "Camera");
 
-				glm::vec3 position;
-				glm::vec3 direction;
-				glm::vec3 up;
-				glm::vec2 fov_xy;
-				glm::ivec2 screen_resolution;
-				float near_distance;
+			glm::vec3 position;
+			glm::vec3 direction;
+			glm::vec3 up;
+			glm::vec2 fov_xy;
+			glm::ivec2 resolution;
+			float near_distance;
 
-				stream >> position.x >> position.y >> position.z;
-				stream >> direction.x >> direction.y >> direction.z;
-				stream >> up.x >> up.y >> up.z;
-				stream >> fov_xy.x >> fov_xy.y;
-				stream >> screen_resolution.x >> screen_resolution.y;
-				stream >> near_distance;
+			parseTagContent(camera_element->FirstChildElement("Position"), &position.x, &position.y, &position.z);
+			parseTagContent(camera_element->FirstChildElement("Direction"), &direction.x, &direction.y, &direction.z);
+			parseTagContent(camera_element->FirstChildElement("Up"), &up.x, &up.y, &up.z);
+			parseTagContent(camera_element->FirstChildElement("FovXY"), &fov_xy.x, &fov_xy.y);
+			parseTagContent(camera_element->FirstChildElement("Resolution"), &resolution.x, &resolution.y);
+			parseTagContent(camera_element->FirstChildElement("NearDistance"), &near_distance);
 
-				auto s_right = glm::tan(glm::radians(fov_xy.x) * 0.5f) * near_distance;
-				auto s_up = glm::tan(glm::radians(fov_xy.y) * 0.5f) * near_distance;
-				camera = std::make_unique<PinholeCamera>(position, direction, up, glm::vec4(-s_right, s_right, -s_up, s_up), screen_resolution, near_distance);
-			}
-			else
-			{
-				throw std::runtime_error("Error: Camera is not found!");
-			}
+			auto s_right = glm::tan(glm::radians(fov_xy.x) * 0.5f) * near_distance;
+			auto s_up = glm::tan(glm::radians(fov_xy.y) * 0.5f) * near_distance;
+			camera = std::make_unique<PinholeCamera>(position, direction, up, glm::vec4(-s_right, s_right, -s_up, s_up), resolution, near_distance);
 		}
 
 		void Scene::parseOutput(tinyxml2::XMLElement* scene_element)
 		{
-			auto output_element = scene_element->FirstChildElement("Output");
-			if (output_element)
+			auto output_element = getFirstChildElementThrow(scene_element, "Output");
+
+			auto image_element = getFirstChildElementThrow(output_element, "Image");
+			while (image_element)
 			{
-				std::stringstream stream;
-				auto image_element = output_element->FirstChildElement("Image");
-				while (image_element)
+				std::string image_name;
+				parseTagContent(image_element->FirstChildElement("ImageName"), &image_name);
+
+				auto tonemapper_element = getFirstChildElementThrow(image_element, "Tonemapper");
+				auto tonemapper_type = getAttributeThrow(tonemapper_element, "type");
+
+				if (tonemapper_type == std::string("Clamp"))
 				{
-					std::string image_name;
+					float min;
+					float max;
 
-					stream << image_element->FirstChildElement("ImageName")->GetText();
-					stream >> image_name;
-					stream.clear();
+					parseTagContent(tonemapper_element->FirstChildElement("Min"), &min);
+					parseTagContent(tonemapper_element->FirstChildElement("Max"), &max);
 
-					auto tonemapper_element = image_element->FirstChildElement("Tonemapper");
-					auto tonemapper_type = tonemapper_element->Attribute("type");
-					if (tonemapper_type == std::string("Clamp"))
-					{
-						float min;
-						float max;
-
-						stream << tonemapper_element->FirstChildElement("Min")->GetText();
-						stream >> min;
-						stream.clear();
-
-						stream << tonemapper_element->FirstChildElement("Max")->GetText();
-						stream >> max;
-						stream.clear();
-
-						output.emplace_back(std::make_pair(std::make_unique<Clamp>(min, max), image_name));
-					}
-					else if (tonemapper_type == std::string("GlobalReinhard"))
-					{
-						float key;
-						float max_luminance;
-
-						stream << tonemapper_element->FirstChildElement("Key")->GetText();
-						stream >> key;
-						stream.clear();
-						stream << tonemapper_element->FirstChildElement("MaxLuminance")->GetText();
-						stream >> max_luminance;
-						stream.clear();
-
-						output.emplace_back(std::make_pair(std::make_unique<GlobalReinhard>(key, max_luminance), image_name));
-					}
-					else
-					{
-						throw std::runtime_error("Error: Unknown Tonemapper type");
-					}
-
-					image_element = image_element->NextSiblingElement("Image");
+					output.emplace_back(std::make_pair(std::make_unique<Clamp>(min, max), image_name));
 				}
-			}
-			else
-			{
-				throw std::runtime_error("Error: Output is not found!");
+				else if (tonemapper_type == std::string("GlobalReinhard"))
+				{
+					float key;
+					float max_luminance;
+
+					parseTagContent(tonemapper_element->FirstChildElement("Key"), &key);
+					parseTagContent(tonemapper_element->FirstChildElement("MaxLuminance"), &max_luminance);
+
+					output.emplace_back(std::make_pair(std::make_unique<GlobalReinhard>(key, max_luminance), image_name));
+				}
+				else
+				{
+					throw std::runtime_error("Error: Unknown Tonemapper type");
+				}
+
+				image_element = image_element->NextSiblingElement("Image");
 			}
 		}
 
 		void Scene::parseMeshes(tinyxml2::XMLElement* scene_element)
 		{
-			UniformSampler sampler;
-			auto element = scene_element->FirstChildElement("Objects");
-			if (element)
+			auto mesh_element = scene_element->FirstChildElement("Mesh");
+			while (mesh_element)
 			{
-				auto child = element->FirstChildElement("Mesh");
-				while (child)
-				{
-					parseMesh(child);
-					const auto& mesh = meshes[meshes.size() - 1];
+				parseMesh(mesh_element);
 
-					auto att = child->Attribute("displayRandomSamples");
-					if (att)
-					{
-						auto num_of_samples = std::atoi(att);
-						for (int i = 0; i < num_of_samples; ++i)
-						{
-							debug_spheres.emplace_back(mesh->samplePlane(sampler).point, glm::sqrt(mesh->getSurfaceArea() / num_of_samples) / 5.0f);
-						}
-					}
-
-					child = child->NextSiblingElement("Mesh");
-				}
+				mesh_element = mesh_element->NextSiblingElement("Mesh");
 			}
 		}
 
 		void Scene::parseLights(tinyxml2::XMLElement* scene_element)
 		{
-			std::stringstream stream;
-			UniformSampler sampler;
-			auto element = scene_element->FirstChildElement("Lights");
-			if (element)
+			auto light_element = scene_element->FirstChildElement("Light");
+			while (light_element)
 			{
-				auto child = element->FirstChildElement("DiffuseArealight");
-				while (child)
-				{
-					parseMesh(child);
-					const auto& mesh = meshes[meshes.size() - 1];
+				auto light_type = getAttributeThrow(light_element, "type");
 
-					auto att = child->Attribute("displayRandomSamples");
-					if (att)
-					{
-						auto num_of_samples = std::atoi(att);
-						for (int i = 0; i < num_of_samples; ++i)
-						{
-							debug_spheres.emplace_back(mesh->samplePlane(sampler).point, glm::sqrt(mesh->getSurfaceArea() / num_of_samples) / 5.0f);
-						}
-					}
+				if (light_type == std::string("DiffuseArealight"))
+				{
+					parseMesh(light_element);
 
 					glm::vec3 flux;
-					stream << child->FirstChildElement("Flux")->GetText() << std::endl;
-					stream >> flux.x >> flux.y >> flux.z;
+					parseTagContent(light_element->FirstChildElement("Flux"), &flux.x, &flux.y, &flux.z);
 
-					lights.push_back(std::make_shared<light::DiffuseArealight>(mesh, flux));
-					const auto& light = lights[lights.size() - 1];
-
-					light_meshes[mesh.get()] = light.get();
-
-					child = child->NextSiblingElement("DiffuseArealight");
+					lights.push_back(std::make_shared<light::DiffuseArealight>(meshes.back(), flux));
+					light_meshes[meshes.back().get()] = lights.back().get();
 				}
+				else
+				{
+					throw std::runtime_error("Error: Unknown Light type");
+				}
+
+				light_element = light_element->NextSiblingElement("Light");
 			}
 		}
 
 		void Scene::parseMesh(tinyxml2::XMLElement* mesh_element)
 		{
-			auto datapath = mesh_element->FirstChildElement("Datapath");
-			if (!datapath)
+			auto datapath_element = getFirstChildElementThrow(mesh_element, "Datapath");
+
+			auto datapath = datapath_element->GetText();
+			if (m_path_to_triangles.find(datapath) == m_path_to_triangles.end())
 			{
-				throw std::runtime_error("Error: Datapath is not found for the mesh!");
+				parseTriangles(datapath_element);
 			}
 
-			auto datapath_text = datapath->GetText();
-			if (m_path_to_triangles.find(datapath_text) == m_path_to_triangles.end())
-			{
-				auto triangles = parseTriangles(datapath);
-				geometry::BVH bvh;
-
-				bvh.buildWithSAHSplit(triangles);
-
-				m_path_to_triangles.insert({ datapath_text, std::make_shared<std::vector<geometry::Triangle>>(std::move(triangles)) });
-				m_path_to_bvh.insert({ datapath_text, std::make_shared<geometry::BVH>(std::move(bvh)) });
-			}
-
-			//Compute transformation.
 			auto transformation = parseTransformation(mesh_element->FirstChildElement("Transformation"));
 
-			//Compute bbox.
 			geometry::BBox bbox;
 			std::vector<float> triangle_areas;
 			auto total_area = 0.0f;
-			for (const auto& triangle : *m_path_to_triangles[datapath_text])
+			for (const auto& triangle : *m_path_to_triangles[datapath])
 			{
 				auto vertices = triangle.getVertices();
 				auto v0 = transformation.pointToWorldSpace(vertices[0]);
@@ -322,32 +198,46 @@ namespace glue
 				total_area += area;
 			}
 
-			meshes.push_back(std::make_shared<geometry::Mesh>(transformation, bbox, triangle_areas, total_area, m_path_to_triangles[datapath_text], m_path_to_bvh[datapath_text],
+			meshes.push_back(std::make_shared<geometry::Mesh>(transformation, bbox, triangle_areas, total_area, m_path_to_triangles[datapath], m_path_to_bvh[datapath],
 				parseBsdfMaterial(mesh_element->FirstChildElement("BsdfMaterial"))));
+
+			//Create debug spheres on randomly chosen points if 'displayRandomSamples' attribute is specified.
+			auto att = mesh_element->Attribute("displayRandomSamples");
+			if (att)
+			{
+				UniformSampler sampler;
+				const auto& mesh = meshes.back();
+				auto num_of_samples = std::atoi(att);
+				for (int i = 0; i < num_of_samples; ++i)
+				{
+					debug_spheres.emplace_back(mesh->samplePlane(sampler).point, glm::sqrt(mesh->getSurfaceArea() / num_of_samples) / 5.0f);
+				}
+			}
 		}
 
-		std::vector<geometry::Triangle> Scene::parseTriangles(tinyxml2::XMLElement* datapath_element)
+		void Scene::parseTriangles(tinyxml2::XMLElement* datapath_element)
 		{
 			std::vector<geometry::Triangle> triangles;
 
+			auto datapath = datapath_element->GetText();
 			Assimp::Importer importer;
-			const aiScene* scene = importer.ReadFile(datapath_element->GetText(),
+			const aiScene* scene = importer.ReadFile(datapath,
 				aiProcess_Triangulate |
 				aiProcess_JoinIdenticalVertices);
 
 			if (!scene)
 			{
-				throw std::runtime_error("Error: Assimp cannot load the model.");
+				throw std::runtime_error("Error: Assimp cannot load the model!");
 			}
 
 			if (scene->mNumMeshes > 1)
 			{
-				throw std::runtime_error("Unhandled case: More than one mesh to process in the same model.");
+				throw std::runtime_error("Unhandled case: More than one mesh to process in the same model!");
 			}
 
 			aiMesh* mesh = scene->mMeshes[0];
-			int face_count = mesh->mNumFaces;
 			glm::vec3 face_vertices[3];
+			int face_count = mesh->mNumFaces;
 			for (int i = 0; i < face_count; ++i)
 			{
 				const aiFace& face = mesh->mFaces[i];
@@ -359,40 +249,30 @@ namespace glue
 				triangles.emplace_back(face_vertices[0], face_vertices[1] - face_vertices[0], face_vertices[2] - face_vertices[0]);
 			}
 
-			return triangles;
+			geometry::BVH bvh;
+			bvh.buildWithSAHSplit(triangles);
+
+			m_path_to_triangles.insert({ datapath, std::make_shared<std::vector<geometry::Triangle>>(std::move(triangles)) });
+			m_path_to_bvh.insert({ datapath, std::make_shared<geometry::BVH>(std::move(bvh)) });
 		}
 
 		geometry::Transformation Scene::parseTransformation(tinyxml2::XMLElement* transformation_element)
 		{
-			std::stringstream stream;
 			geometry::Transformation transformation;
 			if (transformation_element)
 			{
-				auto scaling_element = transformation_element->FirstChildElement("Scaling");
-				if (scaling_element)
-				{
-					glm::vec3 scaling;
-					stream << scaling_element->GetText() << std::endl;
-					stream >> scaling.x >> scaling.y >> scaling.z;
-					transformation.scale(scaling);
-				}
-				auto rotation_element = transformation_element->FirstChildElement("Rotation");
-				if (rotation_element)
-				{
-					glm::vec3 axis;
-					float angle;
-					stream << rotation_element->GetText() << std::endl;
-					stream >> axis.x >> axis.y >> axis.z >> angle;
-					transformation.rotate(glm::normalize(axis), angle);
-				}
-				auto translation_element = transformation_element->FirstChildElement("Translation");
-				if (translation_element)
-				{
-					glm::vec3 translation;
-					stream << translation_element->GetText() << std::endl;
-					stream >> translation.x >> translation.y >> translation.z;
-					transformation.translate(translation);
-				}
+				glm::vec3 scaling;
+				parseTagContent(transformation_element->FirstChildElement("Scaling"), &scaling.x, 1.0f, &scaling.y, 1.0f, &scaling.z, 1.0f);
+				transformation.scale(scaling);
+
+				glm::vec3 axis;
+				float angle;
+				parseTagContent(transformation_element->FirstChildElement("Rotation"), &axis.x, 1.0f, &axis.y, 1.0f, &axis.z, 1.0f, &angle, 0.0f);
+				transformation.rotate(glm::normalize(axis), angle);
+
+				glm::vec3 translation;
+				parseTagContent(transformation_element->FirstChildElement("Translation"), &translation.x, 0.0f, &translation.y, 0.0f, &translation.z, 0.0f);
+				transformation.translate(translation);
 			}
 
 			return transformation;
@@ -402,14 +282,13 @@ namespace glue
 		{
 			if (bsdf_material_element)
 			{
-				std::stringstream stream;
-				auto bsdf_type = bsdf_material_element->Attribute("type");
+				auto bsdf_type = getAttributeThrow(bsdf_material_element, "type");
 
 				if (bsdf_type == std::string("Lambertian"))
 				{
 					glm::vec3 kd;
-					stream << bsdf_material_element->FirstChildElement("kd")->GetText();
-					stream >> kd.x >> kd.y >> kd.z;
+
+					parseTagContent(bsdf_material_element->FirstChildElement("kd"), &kd.x, &kd.y, &kd.z);
 
 					return std::make_unique<material::Lambertian>(kd);
 				}
@@ -417,11 +296,9 @@ namespace glue
 				{
 					glm::vec3 kd;
 					float roughness;
-					stream << bsdf_material_element->FirstChildElement("kd")->GetText();
-					stream >> kd.x >> kd.y >> kd.z;
-					stream.clear();
-					stream << bsdf_material_element->FirstChildElement("Roughness")->GetText();
-					stream >> roughness;
+
+					parseTagContent(bsdf_material_element->FirstChildElement("kd"), &kd.x, &kd.y, &kd.z);
+					parseTagContent(bsdf_material_element->FirstChildElement("Roughness"), &roughness);
 
 					return std::make_unique<material::OrenNayar>(kd, roughness);
 				}
@@ -430,14 +307,10 @@ namespace glue
 					glm::vec3 ior_n;
 					glm::vec3 ior_k;
 					float roughness;
-					stream << bsdf_material_element->FirstChildElement("IorN")->GetText();
-					stream >> ior_n.x >> ior_n.y >> ior_n.z;
-					stream.clear();
-					stream << bsdf_material_element->FirstChildElement("IorK")->GetText();
-					stream >> ior_k.x >> ior_k.y >> ior_k.z;
-					stream.clear();
-					stream << bsdf_material_element->FirstChildElement("Roughness")->GetText();
-					stream >> roughness;
+
+					parseTagContent(bsdf_material_element->FirstChildElement("IorN"), &ior_n.x, &ior_n.y, &ior_n.z);
+					parseTagContent(bsdf_material_element->FirstChildElement("IorK"), &ior_k.x, &ior_k.y, &ior_k.z);
+					parseTagContent(bsdf_material_element->FirstChildElement("Roughness"), &roughness);
 
 					return std::make_unique<material::Metal>(ior_n, ior_k, roughness);
 				}
@@ -445,11 +318,9 @@ namespace glue
 				{
 					float ior_n;
 					float roughness;
-					stream << bsdf_material_element->FirstChildElement("IorN")->GetText();
-					stream >> ior_n;
-					stream.clear();
-					stream << bsdf_material_element->FirstChildElement("Roughness")->GetText();
-					stream >> roughness;
+
+					parseTagContent(bsdf_material_element->FirstChildElement("IorN"), &ior_n);
+					parseTagContent(bsdf_material_element->FirstChildElement("Roughness"), &roughness);
 
 					return std::make_unique<material::Dielectric>(ior_n, roughness);
 				}
@@ -458,10 +329,8 @@ namespace glue
 					throw std::runtime_error("Error: Unknown BsdfMaterial type");
 				}
 			}
-			else
-			{
-				return nullptr;
-			}
+
+			return nullptr;
 		}
 	}
 }
