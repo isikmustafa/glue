@@ -10,12 +10,11 @@ int main()
 	glue::core::Scene scene;
 	glue::core::Timer timer;
 	timer.start();
-	scene.loadFromXML("../sample_input/cornell-lucy.xml");
+	scene.loadFromXML("../sample_input/glue-test.xml");
 	std::cout << "BVH build and input read time: " << timer.getTime() << std::endl;
 
-	glue::integrator::Pathtracer pt;
 	timer.start();
-	scene.render(pt);
+	scene.render();
 	std::cout << "Render time: " << timer.getTime() << std::endl;
 
 	system("PAUSE");

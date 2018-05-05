@@ -142,6 +142,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\core\filter.cpp" />
     <ClCompile Include="src\core\hdr_image.cpp" />
     <ClCompile Include="src\core\pinhole_camera.cpp" />
     <ClCompile Include="src\core\coordinate_space.cpp" />
@@ -171,6 +172,8 @@
     <ClCompile Include="src\microfacet\ggx_distribution.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\core\filter.h" />
+    <ClInclude Include="src\core\forward_decl.h" />
     <ClInclude Include="src\core\hdr_image.h" />
     <ClInclude Include="src\core\pinhole_camera.h" />
     <ClInclude Include="src\core\coordinate_space.h" />
@@ -191,6 +194,7 @@
     <ClInclude Include="src\geometry\spherical_coordinate.h" />
     <ClInclude Include="src\geometry\transformation.h" />
     <ClInclude Include="src\geometry\triangle.h" />
+    <ClInclude Include="src\integrator\integrator.h" />
     <ClInclude Include="src\integrator\pathtracer.h" />
     <ClInclude Include="src\integrator\raytracer.h" />
     <ClInclude Include="src\light\diffuse_arealight.h" />

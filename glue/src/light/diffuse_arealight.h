@@ -1,8 +1,6 @@
 #ifndef __GLUE__LIGHT__DIFFUSEAREALIGHT__
 #define __GLUE__LIGHT__DIFFUSEAREALIGHT__
 
-#include "..\geometry\ray.h"
-#include "..\geometry\mesh.h"
 #include "light.h"
 
 #include <glm\vec3.hpp>

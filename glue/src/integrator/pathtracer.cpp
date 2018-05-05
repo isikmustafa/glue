@@ -2,6 +2,7 @@
 #include "..\geometry\intersection.h"
 #include "..\core\gaussian_sampler.h"
 #include "..\core\coordinate_space.h"
+#include "..\core\scene.h"
 #include "..\light\diffuse_arealight.h"
 
 #include <limits>
@@ -11,27 +12,24 @@ namespace glue
 {
 	namespace integrator
 	{
+		Pathtracer::Pathtracer(std::unique_ptr<core::Filter> filter, int sample_count)
+			: m_filter(std::move(filter))
+			, m_sample_count(sample_count)
+		{}
+
 		glm::vec3 Pathtracer::integratePixel(const core::Scene& scene, int x, int y) const
 		{
-			std::unique_ptr<core::RealSampler> offset_sampler;
-			if (scene.pixel_filter == core::Filter::BOX)
-			{
-				offset_sampler = std::make_unique<core::UniformSampler>(0.0f, 1.0f);
-			}
-			else if (scene.pixel_filter == core::Filter::GAUSSIAN)
-			{
-				offset_sampler = std::make_unique<core::GaussianSampler>(0.5f, 0.5f);
-			}
+			auto offset_sampler = m_filter->generateSampler();
+			core::UniformSampler uniform_sampler;
 
 			glm::vec3 pixel_acc;
-			core::UniformSampler uniform_sampler;
-			for (int i = 0; i < scene.sample_count; ++i)
+			for (int i = 0; i < m_sample_count; ++i)
 			{
 				auto ray = scene.camera->castPrimayRay(x, y, offset_sampler->sample(), offset_sampler->sample());
 				pixel_acc += estimate(scene, ray, uniform_sampler, 1.0f, false);
 			}
 
-			return pixel_acc / static_cast<float>(scene.sample_count);
+			return pixel_acc / static_cast<float>(m_sample_count);
 		}
 
 		glm::vec3 Pathtracer::estimate(const core::Scene& scene, const geometry::Ray& ray,

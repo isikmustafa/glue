@@ -2,12 +2,15 @@
 #include "pinhole_camera.h"
 #include "tonemapper.h"
 #include "uniform_sampler.h"
+#include "filter.h"
 #include "..\geometry\triangle.h"
 #include "..\geometry\transformation.h"
 #include "..\geometry\bbox.h"
 #include "..\geometry\bvh.h"
 #include "..\geometry\mesh.h"
 #include "..\light\diffuse_arealight.h"
+#include "..\integrator\pathtracer.h"
+#include "..\integrator\raytracer.h"
 #include "..\material\lambertian.h"
 #include "..\material\oren_nayar.h"
 #include "..\material\metal.h"
@@ -36,6 +39,7 @@ namespace glue
 
 			auto scene_element = getFirstChildElementThrow(&file, "Scene");
 
+			parseIntegrator(scene_element);
 			parseMeshes(scene_element);
 			parseLights(scene_element);
 			parseOutput(scene_element);
@@ -43,28 +47,64 @@ namespace glue
 			hdr_image = std::make_unique<HdrImage>(camera->get_screen_resolution().x, camera->get_screen_resolution().y);
 
 			parseTagContent(scene_element->FirstChildElement("BackgroundColor"), &background_color.x, 0.0f, &background_color.y, 0.0f, &background_color.z, 0.0f);
-
-			//Filter
-			std::string filter_str;
-			parseTagContent(scene_element->FirstChildElement("PixelFilter"), &filter_str, std::string("BOX"));
-			if (filter_str == "BOX")
-			{
-				pixel_filter = Filter::BOX;
-			}
-			else if (filter_str == "GAUSSIAN")
-			{
-				pixel_filter = Filter::GAUSSIAN;
-			}
-			else
-			{
-				throw std::runtime_error("Error: Unknown filter type!");
-			}
-
-			parseTagContent(scene_element->FirstChildElement("SampleCount"), &sample_count, 1);
 			parseTagContent(scene_element->FirstChildElement("SecondaryRayEpsilon"), &secondary_ray_epsilon, 0.0001f);
 
 			debug_bvh.buildWithSAHSplit(debug_spheres);
 			bvh.buildWithMedianSplit(meshes);
+		}
+
+		void Scene::render()
+		{
+			constexpr int cPatchSize = 32;
+			auto resolution = camera->get_screen_resolution();
+			ctpl::thread_pool pool(std::thread::hardware_concurrency());
+			for (int x = 0; x < resolution.x; x += cPatchSize)
+			{
+				for (int y = 0; y < resolution.y; y += cPatchSize)
+				{
+					pool.push([x, y, cPatchSize, resolution, this](int id)
+					{
+						for (int i = x; i < x + cPatchSize && i < resolution.x; ++i)
+						{
+							for (int j = y; j < y + cPatchSize && j < resolution.y; ++j)
+							{
+								(*this->hdr_image)[i][j] = this->m_integrator->integratePixel(*this, i, j);
+							}
+						}
+					});
+				}
+			}
+			pool.stop(true);
+
+			for (const auto& image : output)
+			{
+				image.first->tonemap(*hdr_image).save(image.second);
+			}
+		}
+
+		void Scene::parseIntegrator(tinyxml2::XMLElement* scene_element)
+		{
+			auto integrator_element = getFirstChildElementThrow(scene_element, "Integrator");
+			auto integrator_type = getAttributeThrow(integrator_element, "type");
+
+			if (integrator_type == std::string("Raytracer"))
+			{
+				m_integrator = std::make_unique<integrator::Raytracer>();
+			}
+			else if (integrator_type == std::string("Pathtracer"))
+			{
+				auto filter_element = getFirstChildElementThrow(integrator_element, "Filter");
+				auto filter = parseFilter(filter_element);
+
+				int sample_count;
+				parseTagContent(integrator_element->FirstChildElement("SampleCount"), &sample_count, 1);
+
+				m_integrator = std::make_unique<integrator::Pathtracer>(std::move(filter), sample_count);
+			}
+			else
+			{
+				throw std::runtime_error("Error: Unknown Integrator type");
+			}
 		}
 
 		void Scene::parseCamera(tinyxml2::XMLElement* scene_element)
@@ -254,6 +294,28 @@ namespace glue
 
 			m_path_to_triangles.insert({ datapath, std::make_shared<std::vector<geometry::Triangle>>(std::move(triangles)) });
 			m_path_to_bvh.insert({ datapath, std::make_shared<geometry::BVH>(std::move(bvh)) });
+		}
+
+		std::unique_ptr<core::Filter> Scene::parseFilter(tinyxml2::XMLElement* filter_element)
+		{
+			auto filter_type = getAttributeThrow(filter_element, "type");
+
+			if (filter_type == std::string("Box"))
+			{
+				return std::make_unique<BoxFilter>();
+			}
+			else if (filter_type == std::string("Gaussian"))
+			{
+				float sigma;
+
+				parseTagContent(filter_element->FirstChildElement("Sigma"), &sigma, 0.5f);
+
+				return std::make_unique<GaussianFilter>(sigma);
+			}
+			else
+			{
+				throw std::runtime_error("Error: Unknown Filter type");
+			}
 		}
 
 		geometry::Transformation Scene::parseTransformation(tinyxml2::XMLElement* transformation_element)

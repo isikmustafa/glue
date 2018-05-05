@@ -1,9 +1,8 @@
 #ifndef __GLUE__LIGHT__LIGHT__
 #define __GLUE__LIGHT__LIGHT__
 
-#include "..\geometry\ray.h"
 #include "..\geometry\plane.h"
-#include "..\core\uniform_sampler.h"
+#include "..\core\forward_decl.h"
 
 #include <glm\vec3.hpp>
 

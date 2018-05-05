@@ -2,8 +2,9 @@
 #define __GLUE__GEOMETRY__TRIANGLE__
 
 #include "bbox.h"
-#include "..\core\uniform_sampler.h"
 #include "plane.h"
+#include "..\core\forward_decl.h"
+#include "..\core\uniform_sampler.h"
 
 #include <glm\vec2.hpp>
 #include <glm\vec3.hpp>
@@ -13,8 +14,6 @@ namespace glue
 {
 	namespace geometry
 	{
-		class Ray;
-		struct Intersection;
 		class Triangle
 		{
 		public:

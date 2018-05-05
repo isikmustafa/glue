@@ -4,6 +4,7 @@
 #include "bbox.h"
 #include "transformation.h"
 #include "plane.h"
+#include "..\core\forward_decl.h"
 #include "..\core\uniform_sampler.h"
 #include "..\core\discrete_1d_sampler.h"
 #include "..\material\bsdf_material.h"
@@ -15,10 +16,6 @@ namespace glue
 {
 	namespace geometry
 	{
-		class BVH;
-		class Triangle;
-		class Ray;
-		struct Intersection;
 		class Mesh
 		{
 		public:

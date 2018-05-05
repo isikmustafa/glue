@@ -1,4 +1,6 @@
 #include "diffuse_arealight.h"
+#include "..\core\uniform_sampler.h"
+#include "..\geometry\mesh.h"
 
 #include <glm\gtc\constants.hpp>
 

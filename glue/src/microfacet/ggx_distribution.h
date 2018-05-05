@@ -1,7 +1,7 @@
 #ifndef __GLUE__MICROFACET__GGXDISTRIBUTION__
 #define __GLUE__MICROFACET__GGXDISTRIBUTION__
 
-#include "..\core\uniform_sampler.h"
+#include "..\core\forward_decl.h"
 
 #include <glm\vec3.hpp>
 

@@ -1,8 +1,9 @@
 #ifndef __GLUE__MATERIAL__BSDFMATERIAL__
 #define __GLUE__MATERIAL__BSDFMATERIAL__
 
-#include "..\core\uniform_sampler.h"
+#include "..\core\forward_decl.h"
 
+#include <utility>
 #include <glm\vec3.hpp>
 #include <glm\geometric.hpp>
 

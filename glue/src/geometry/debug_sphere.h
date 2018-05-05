@@ -2,6 +2,7 @@
 #define __GLUE__GEOMETRY__DEBUGSPHERE__
 
 #include "bbox.h"
+#include "..\core\forward_decl.h"
 
 #include <glm\vec2.hpp>
 #include <glm\vec3.hpp>
@@ -10,8 +11,6 @@ namespace glue
 {
 	namespace geometry
 	{
-		class Ray;
-		struct Intersection;
 		class DebugSphere
 		{
 		public:

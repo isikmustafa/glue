@@ -2,6 +2,7 @@
 #include "..\geometry\intersection.h"
 #include "..\core\uniform_sampler.h"
 #include "..\core\gaussian_sampler.h"
+#include "..\core\scene.h"
 
 #include <limits>
 #include <glm\geometric.hpp>
@@ -12,38 +13,22 @@ namespace glue
 	{
 		glm::vec3 Raytracer::integratePixel(const core::Scene& scene, int x, int y) const
 		{
-			std::unique_ptr<core::RealSampler> offset_sampler;
-			if (scene.pixel_filter == core::Filter::BOX)
-			{
-				offset_sampler = std::make_unique<core::UniformSampler>(0.0f, 1.0f);
-			}
-			else if (scene.pixel_filter == core::Filter::GAUSSIAN)
-			{
-				offset_sampler = std::make_unique<core::GaussianSampler>(0.5f, 0.5f);
-			}
+			auto ray = scene.camera->castPrimayRay(x, y);
+			geometry::Intersection intersection;
+			auto result = scene.bvh.intersect(scene.meshes, ray, intersection, std::numeric_limits<float>::max());
 
-			glm::vec3 pixel_acc;
-			for (int i = 0; i < scene.sample_count; ++i)
+			if (scene.debug_bvh.intersectShadowRay(scene.debug_spheres, ray, intersection.distance))
 			{
-				auto ray = scene.camera->castPrimayRay(x, y, offset_sampler->sample(), offset_sampler->sample());
-				geometry::Intersection intersection;
-				auto result = scene.bvh.intersect(scene.meshes, ray, intersection, std::numeric_limits<float>::max());
-
-				if (scene.debug_bvh.intersectShadowRay(scene.debug_spheres, ray, intersection.distance))
-				{
-					pixel_acc +=  glm::vec3(255.0f, 0.0f, 0.0f);
-				}
-				else if (result)
-				{
-					pixel_acc += glm::clamp(glm::dot(intersection.normal, -ray.get_direction()), 0.0f, 1.0f) * glm::vec3(255.0f);
-				}
-				else
-				{
-					pixel_acc += scene.background_color;
-				}
+				return glm::vec3(1.0f, 0.0f, 0.0f);
 			}
-
-			return pixel_acc / static_cast<float>(scene.sample_count);
+			else if (result)
+			{
+				return glm::vec3(glm::dot(intersection.normal, -ray.get_direction()));
+			}
+			else
+			{
+				return scene.background_color;
+			}
 		}
 	}
 }

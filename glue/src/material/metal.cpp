@@ -1,4 +1,5 @@
 #include "metal.h"
+#include "..\core\uniform_sampler.h"
 
 namespace glue
 {

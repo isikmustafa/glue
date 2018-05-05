@@ -1,5 +1,6 @@
 #include "oren_nayar.h"
 #include "..\geometry\spherical_coordinate.h"
+#include "..\core\uniform_sampler.h"
 
 #include <glm\gtc\constants.hpp>
 #include <glm\geometric.hpp>

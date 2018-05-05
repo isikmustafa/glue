@@ -2,6 +2,7 @@
 #define __GLUE__GEOMETRY__BVH__
 
 #include "bbox.h"
+#include "..\core\forward_decl.h"
 
 #include <memory>
 #include <vector>
@@ -30,8 +31,6 @@ namespace glue
 			{}
 		};
 
-		class Ray;
-		struct Intersection;
 		class BVH
 		{
 		public:

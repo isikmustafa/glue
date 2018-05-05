@@ -1,7 +1,7 @@
 #ifndef __GLUE__GEOMETRY__INTERSECTION__
 #define __GLUE__GEOMETRY__INTERSECTION__
 
-#include "..\material\bsdf_material.h"
+#include "..\core\forward_decl.h"
 
 #include <glm\vec3.hpp>
 
@@ -9,7 +9,6 @@ namespace glue
 {
 	namespace geometry
 	{
-		class Mesh;
 		struct Intersection
 		{
 			//normal should always be normalized.
