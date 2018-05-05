@@ -4,7 +4,7 @@
 #include "bbox.h"
 #include "plane.h"
 #include "..\core\forward_decl.h"
-#include "..\core\uniform_sampler.h"
+#include "..\core\real_sampler.h"
 
 #include <glm\vec2.hpp>
 #include <glm\vec3.hpp>

@@ -52,12 +52,6 @@
     <ClCompile Include="src\geometry\transformation.cpp">
       <Filter>Source Files\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\gaussian_sampler.cpp">
-      <Filter>Source Files\core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\core\uniform_sampler.cpp">
-      <Filter>Source Files\core</Filter>
-    </ClCompile>
     <ClCompile Include="src\integrator\pathtracer.cpp">
       <Filter>Source Files\integrator</Filter>
     </ClCompile>
@@ -109,6 +103,9 @@
     <ClCompile Include="src\core\filter.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="src\core\real_sampler.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\geometry\triangle.h">
@@ -140,12 +137,6 @@
     </ClInclude>
     <ClInclude Include="src\geometry\transformation.h">
       <Filter>Source Files\geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\gaussian_sampler.h">
-      <Filter>Source Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\uniform_sampler.h">
-      <Filter>Source Files\core</Filter>
     </ClInclude>
     <ClInclude Include="src\integrator\pathtracer.h">
       <Filter>Source Files\integrator</Filter>

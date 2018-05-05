@@ -147,11 +147,10 @@
     <ClCompile Include="src\core\pinhole_camera.cpp" />
     <ClCompile Include="src\core\coordinate_space.cpp" />
     <ClCompile Include="src\core\discrete_1d_sampler.cpp" />
-    <ClCompile Include="src\core\gaussian_sampler.cpp" />
+    <ClCompile Include="src\core\real_sampler.cpp" />
     <ClCompile Include="src\core\scene.cpp" />
     <ClCompile Include="src\core\timer.cpp" />
     <ClCompile Include="src\core\tonemapper.cpp" />
-    <ClCompile Include="src\core\uniform_sampler.cpp" />
     <ClCompile Include="src\geometry\bbox.cpp" />
     <ClCompile Include="src\geometry\debug_sphere.cpp" />
     <ClCompile Include="src\geometry\mesh.cpp" />
@@ -178,12 +177,10 @@
     <ClInclude Include="src\core\pinhole_camera.h" />
     <ClInclude Include="src\core\coordinate_space.h" />
     <ClInclude Include="src\core\discrete_1d_sampler.h" />
-    <ClInclude Include="src\core\gaussian_sampler.h" />
     <ClInclude Include="src\core\real_sampler.h" />
     <ClInclude Include="src\core\scene.h" />
     <ClInclude Include="src\core\timer.h" />
     <ClInclude Include="src\core\tonemapper.h" />
-    <ClInclude Include="src\core\uniform_sampler.h" />
     <ClInclude Include="src\geometry\bbox.h" />
     <ClInclude Include="src\geometry\bvh.h" />
     <ClInclude Include="src\geometry\debug_sphere.h" />

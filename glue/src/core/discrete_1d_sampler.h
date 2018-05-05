@@ -1,7 +1,7 @@
 #ifndef __GLUE__CORE__DISCRETE1DSAMPLER__
 #define __GLUE__CORE__DISCRETE1DSAMPLER__
 
-#include "uniform_sampler.h"
+#include "real_sampler.h"
 
 #include <random>
 

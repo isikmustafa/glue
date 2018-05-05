@@ -5,7 +5,7 @@
 #include "transformation.h"
 #include "plane.h"
 #include "..\core\forward_decl.h"
-#include "..\core\uniform_sampler.h"
+#include "..\core\real_sampler.h"
 #include "..\core\discrete_1d_sampler.h"
 #include "..\material\bsdf_material.h"
 

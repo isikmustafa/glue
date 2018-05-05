@@ -1,7 +1,6 @@
 #include "raytracer.h"
 #include "..\geometry\intersection.h"
-#include "..\core\uniform_sampler.h"
-#include "..\core\gaussian_sampler.h"
+#include "..\core\real_sampler.h"
 #include "..\core\scene.h"
 
 #include <limits>

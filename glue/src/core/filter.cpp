@@ -1,6 +1,5 @@
 #include "filter.h"
-#include "uniform_sampler.h"
-#include "gaussian_sampler.h"
+#include "real_sampler.h"
 
 namespace glue
 {

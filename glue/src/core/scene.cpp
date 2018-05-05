@@ -1,7 +1,7 @@
 #include "scene.h"
 #include "pinhole_camera.h"
 #include "tonemapper.h"
-#include "uniform_sampler.h"
+#include "real_sampler.h"
 #include "filter.h"
 #include "..\geometry\triangle.h"
 #include "..\geometry\transformation.h"
