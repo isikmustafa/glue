@@ -2,8 +2,8 @@
 #define __GLUE__INTEGRATOR__PATHTRACER__
 
 #include "integrator.h"
-#include "..\core\uniform_sampler.h"
 #include "..\core\filter.h"
+#include "..\core\forward_decl.h"
 
 namespace glue
 {

@@ -1,6 +1,6 @@
 #include "pathtracer.h"
 #include "..\geometry\intersection.h"
-#include "..\core\gaussian_sampler.h"
+#include "..\core\uniform_sampler.h"
 #include "..\core\coordinate_space.h"
 #include "..\core\scene.h"
 #include "..\light\diffuse_arealight.h"
