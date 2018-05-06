@@ -6,7 +6,7 @@
 		<Filter type="Gaussian">
 			<Sigma>0.5</Sigma>
 		</Filter>
-		<SampleCount>64</SampleCount>
+		<SampleCount>1</SampleCount>
     </Integrator>
 	
     <Output>
