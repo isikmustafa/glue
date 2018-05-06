@@ -46,8 +46,8 @@ namespace glue
 			parseCamera(scene_element);
 			hdr_image = std::make_unique<HdrImage>(camera->get_screen_resolution().x, camera->get_screen_resolution().y);
 
-			parseTagContent(scene_element->FirstChildElement("BackgroundColor"), &background_color.x, 0.0f, &background_color.y, 0.0f, &background_color.z, 0.0f);
-			parseTagContent(scene_element->FirstChildElement("SecondaryRayEpsilon"), &secondary_ray_epsilon, 0.0001f);
+			parseTagContent(scene_element, "BackgroundColor", &background_color.x, 0.0f, &background_color.y, 0.0f, &background_color.z, 0.0f);
+			parseTagContent(scene_element, "SecondaryRayEpsilon", &secondary_ray_epsilon, 0.0001f);
 
 			debug_bvh.buildWithSAHSplit(debug_spheres);
 			bvh.buildWithMedianSplit(meshes);
@@ -94,12 +94,11 @@ namespace glue
 			else if (integrator_type == std::string("Pathtracer"))
 			{
 				auto filter_element = getFirstChildElementThrow(integrator_element, "Filter");
-				auto filter = parseFilter(filter_element);
 
 				int sample_count;
-				parseTagContent(integrator_element->FirstChildElement("SampleCount"), &sample_count, 1);
+				parseTagContent(integrator_element, "SampleCount", &sample_count, 1);
 
-				m_integrator = std::make_unique<integrator::Pathtracer>(std::move(filter), sample_count);
+				m_integrator = std::make_unique<integrator::Pathtracer>(parseFilter(filter_element), sample_count);
 			}
 			else
 			{
@@ -118,15 +117,16 @@ namespace glue
 			glm::ivec2 resolution;
 			float near_distance;
 
-			parseTagContent(camera_element->FirstChildElement("Position"), &position.x, &position.y, &position.z);
-			parseTagContent(camera_element->FirstChildElement("Direction"), &direction.x, &direction.y, &direction.z);
-			parseTagContent(camera_element->FirstChildElement("Up"), &up.x, &up.y, &up.z);
-			parseTagContent(camera_element->FirstChildElement("FovXY"), &fov_xy.x, &fov_xy.y);
-			parseTagContent(camera_element->FirstChildElement("Resolution"), &resolution.x, &resolution.y);
-			parseTagContent(camera_element->FirstChildElement("NearDistance"), &near_distance);
+			parseTagContent(camera_element, "Position", &position.x, &position.y, &position.z);
+			parseTagContent(camera_element, "Direction", &direction.x, &direction.y, &direction.z);
+			parseTagContent(camera_element, "Up", &up.x, &up.y, &up.z);
+			parseTagContent(camera_element, "FovXY", &fov_xy.x, &fov_xy.y);
+			parseTagContent(camera_element, "Resolution", &resolution.x, &resolution.y);
+			parseTagContent(camera_element, "NearDistance", &near_distance);
 
 			auto s_right = glm::tan(glm::radians(fov_xy.x) * 0.5f) * near_distance;
 			auto s_up = glm::tan(glm::radians(fov_xy.y) * 0.5f) * near_distance;
+
 			camera = std::make_unique<PinholeCamera>(position, direction, up, glm::vec4(-s_right, s_right, -s_up, s_up), resolution, near_distance);
 		}
 
@@ -138,7 +138,7 @@ namespace glue
 			while (image_element)
 			{
 				std::string image_name;
-				parseTagContent(image_element->FirstChildElement("ImageName"), &image_name);
+				parseTagContent(image_element, "ImageName", &image_name);
 
 				auto tonemapper_element = getFirstChildElementThrow(image_element, "Tonemapper");
 				auto tonemapper_type = getAttributeThrow(tonemapper_element, "type");
@@ -148,20 +148,20 @@ namespace glue
 					float min;
 					float max;
 
-					parseTagContent(tonemapper_element->FirstChildElement("Min"), &min);
-					parseTagContent(tonemapper_element->FirstChildElement("Max"), &max);
+					parseTagContent(tonemapper_element, "Min", &min);
+					parseTagContent(tonemapper_element, "Max", &max);
 
-					output.emplace_back(std::make_unique<Clamp>(min, max), image_name);
+					output.emplace_back(std::make_unique<Clamp>(min, max), std::move(image_name));
 				}
 				else if (tonemapper_type == std::string("GlobalReinhard"))
 				{
 					float key;
 					float max_luminance;
 
-					parseTagContent(tonemapper_element->FirstChildElement("Key"), &key);
-					parseTagContent(tonemapper_element->FirstChildElement("MaxLuminance"), &max_luminance);
+					parseTagContent(tonemapper_element, "Key", &key);
+					parseTagContent(tonemapper_element, "MaxLuminance", &max_luminance);
 
-					output.emplace_back(std::make_unique<GlobalReinhard>(key, max_luminance), image_name);
+					output.emplace_back(std::make_unique<GlobalReinhard>(key, max_luminance), std::move(image_name));
 				}
 				else
 				{
@@ -195,7 +195,7 @@ namespace glue
 					parseMesh(light_element);
 
 					glm::vec3 flux;
-					parseTagContent(light_element->FirstChildElement("Flux"), &flux.x, &flux.y, &flux.z);
+					parseTagContent(light_element, "Flux", &flux.x, &flux.y, &flux.z);
 
 					lights.push_back(std::make_shared<light::DiffuseArealight>(meshes.back(), flux));
 					light_meshes[meshes.back().get()] = lights.back().get();
@@ -211,15 +211,19 @@ namespace glue
 
 		void Scene::parseMesh(tinyxml2::XMLElement* mesh_element)
 		{
-			auto datapath_element = getFirstChildElementThrow(mesh_element, "Datapath");
+			std::string datapath;
+			parseTagContent(mesh_element, "Datapath", &datapath);
 
-			auto datapath = datapath_element->GetText();
 			if (m_path_to_triangles.find(datapath) == m_path_to_triangles.end())
 			{
-				parseTriangles(datapath_element);
+				parseTriangles(datapath);
 			}
 
-			auto transformation = parseTransformation(mesh_element->FirstChildElement("Transformation"));
+			geometry::Transformation transformation;
+			if (mesh_element->FirstChildElement("Transformation"))
+			{
+				transformation = parseTransformation(mesh_element->FirstChildElement("Transformation"));
+			}
 
 			geometry::BBox bbox;
 			std::vector<float> triangle_areas;
@@ -238,8 +242,16 @@ namespace glue
 				total_area += area;
 			}
 
+			std::unique_ptr<material::BsdfMaterial> bsdf_material = nullptr;
+
+			if (mesh_element->Value() == std::string("Mesh"))
+			{
+				auto bsdf_material_element = getFirstChildElementThrow(mesh_element, "BsdfMaterial");
+				bsdf_material = parseBsdfMaterial(bsdf_material_element);
+			}
+
 			meshes.push_back(std::make_shared<geometry::Mesh>(transformation, bbox, triangle_areas, total_area, m_path_to_triangles[datapath], m_path_to_bvh[datapath],
-				parseBsdfMaterial(mesh_element->FirstChildElement("BsdfMaterial"))));
+				std::move(bsdf_material)));
 
 			//Create debug spheres on randomly chosen points if 'displayRandomSamples' attribute is specified.
 			auto att = mesh_element->Attribute("displayRandomSamples");
@@ -255,11 +267,10 @@ namespace glue
 			}
 		}
 
-		void Scene::parseTriangles(tinyxml2::XMLElement* datapath_element)
+		void Scene::parseTriangles(const std::string& datapath)
 		{
 			std::vector<geometry::Triangle> triangles;
 
-			auto datapath = datapath_element->GetText();
 			Assimp::Importer importer;
 			const aiScene* scene = importer.ReadFile(datapath,
 				aiProcess_Triangulate |
@@ -308,7 +319,7 @@ namespace glue
 			{
 				float sigma;
 
-				parseTagContent(filter_element->FirstChildElement("Sigma"), &sigma, 0.5f);
+				parseTagContent(filter_element, "Sigma", &sigma, 0.5f);
 
 				return std::make_unique<GaussianFilter>(sigma);
 			}
@@ -321,78 +332,71 @@ namespace glue
 		geometry::Transformation Scene::parseTransformation(tinyxml2::XMLElement* transformation_element)
 		{
 			geometry::Transformation transformation;
-			if (transformation_element)
-			{
-				glm::vec3 scaling;
-				parseTagContent(transformation_element->FirstChildElement("Scaling"), &scaling.x, 1.0f, &scaling.y, 1.0f, &scaling.z, 1.0f);
-				transformation.scale(scaling);
 
-				glm::vec3 axis;
-				float angle;
-				parseTagContent(transformation_element->FirstChildElement("Rotation"), &axis.x, 1.0f, &axis.y, 1.0f, &axis.z, 1.0f, &angle, 0.0f);
-				transformation.rotate(glm::normalize(axis), angle);
+			glm::vec3 scaling;
+			parseTagContent(transformation_element, "Scaling", &scaling.x, 1.0f, &scaling.y, 1.0f, &scaling.z, 1.0f);
+			transformation.scale(scaling);
 
-				glm::vec3 translation;
-				parseTagContent(transformation_element->FirstChildElement("Translation"), &translation.x, 0.0f, &translation.y, 0.0f, &translation.z, 0.0f);
-				transformation.translate(translation);
-			}
+			glm::vec3 axis;
+			float angle;
+			parseTagContent(transformation_element, "Rotation", &axis.x, 1.0f, &axis.y, 1.0f, &axis.z, 1.0f, &angle, 0.0f);
+			transformation.rotate(glm::normalize(axis), angle);
+
+			glm::vec3 translation;
+			parseTagContent(transformation_element, "Translation", &translation.x, 0.0f, &translation.y, 0.0f, &translation.z, 0.0f);
+			transformation.translate(translation);
 
 			return transformation;
 		}
 
 		std::unique_ptr<material::BsdfMaterial> Scene::parseBsdfMaterial(tinyxml2::XMLElement* bsdf_material_element)
 		{
-			if (bsdf_material_element)
+			auto bsdf_type = getAttributeThrow(bsdf_material_element, "type");
+
+			if (bsdf_type == std::string("Lambertian"))
 			{
-				auto bsdf_type = getAttributeThrow(bsdf_material_element, "type");
+				glm::vec3 kd;
 
-				if (bsdf_type == std::string("Lambertian"))
-				{
-					glm::vec3 kd;
+				parseTagContent(bsdf_material_element, "kd", &kd.x, &kd.y, &kd.z);
 
-					parseTagContent(bsdf_material_element->FirstChildElement("kd"), &kd.x, &kd.y, &kd.z);
-
-					return std::make_unique<material::Lambertian>(kd);
-				}
-				else if (bsdf_type == std::string("OrenNayar"))
-				{
-					glm::vec3 kd;
-					float roughness;
-
-					parseTagContent(bsdf_material_element->FirstChildElement("kd"), &kd.x, &kd.y, &kd.z);
-					parseTagContent(bsdf_material_element->FirstChildElement("Roughness"), &roughness);
-
-					return std::make_unique<material::OrenNayar>(kd, roughness);
-				}
-				else if (bsdf_type == std::string("Metal"))
-				{
-					glm::vec3 ior_n;
-					glm::vec3 ior_k;
-					float roughness;
-
-					parseTagContent(bsdf_material_element->FirstChildElement("IorN"), &ior_n.x, &ior_n.y, &ior_n.z);
-					parseTagContent(bsdf_material_element->FirstChildElement("IorK"), &ior_k.x, &ior_k.y, &ior_k.z);
-					parseTagContent(bsdf_material_element->FirstChildElement("Roughness"), &roughness);
-
-					return std::make_unique<material::Metal>(ior_n, ior_k, roughness);
-				}
-				else if (bsdf_type == std::string("Dielectric"))
-				{
-					float ior_n;
-					float roughness;
-
-					parseTagContent(bsdf_material_element->FirstChildElement("IorN"), &ior_n);
-					parseTagContent(bsdf_material_element->FirstChildElement("Roughness"), &roughness);
-
-					return std::make_unique<material::Dielectric>(ior_n, roughness);
-				}
-				else
-				{
-					throw std::runtime_error("Error: Unknown BsdfMaterial type");
-				}
+				return std::make_unique<material::Lambertian>(kd);
 			}
+			else if (bsdf_type == std::string("OrenNayar"))
+			{
+				glm::vec3 kd;
+				float roughness;
 
-			return nullptr;
+				parseTagContent(bsdf_material_element, "kd", &kd.x, &kd.y, &kd.z);
+				parseTagContent(bsdf_material_element, "Roughness", &roughness);
+
+				return std::make_unique<material::OrenNayar>(kd, roughness);
+			}
+			else if (bsdf_type == std::string("Metal"))
+			{
+				glm::vec3 ior_n;
+				glm::vec3 ior_k;
+				float roughness;
+
+				parseTagContent(bsdf_material_element, "IorN", &ior_n.x, &ior_n.y, &ior_n.z);
+				parseTagContent(bsdf_material_element, "IorK", &ior_k.x, &ior_k.y, &ior_k.z);
+				parseTagContent(bsdf_material_element, "Roughness", &roughness);
+
+				return std::make_unique<material::Metal>(ior_n, ior_k, roughness);
+			}
+			else if (bsdf_type == std::string("Dielectric"))
+			{
+				float ior_n;
+				float roughness;
+
+				parseTagContent(bsdf_material_element, "IorN", &ior_n);
+				parseTagContent(bsdf_material_element, "Roughness", &roughness);
+
+				return std::make_unique<material::Dielectric>(ior_n, roughness);
+			}
+			else
+			{
+				throw std::runtime_error("Error: Unknown BsdfMaterial type");
+			}
 		}
 	}
 }

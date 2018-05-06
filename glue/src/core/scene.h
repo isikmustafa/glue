@@ -62,7 +62,7 @@ namespace glue
 
 			//Parses tag content and assigns them to given arguments.
 			template<typename... Args>
-			void parseTagContent(tinyxml2::XMLElement* element, Args... args);
+			void parseTagContent(tinyxml2::XMLElement* element, const std::string& tag, Args... args);
 
 			//Gets first child element and throws if it does not exist.
 			template<typename T>
@@ -72,13 +72,15 @@ namespace glue
 			template<typename T>
 			const char* getAttributeThrow(T element, const std::string& att_name);
 
+			//Caller always make sure that XMLElement pointer is not nullptr.
+			//Callee just uses XMLElement pointer and does not check it. 
 			void parseIntegrator(tinyxml2::XMLElement* scene_element);
 			void parseCamera(tinyxml2::XMLElement* scene_element);
 			void parseOutput(tinyxml2::XMLElement* scene_element);
 			void parseMeshes(tinyxml2::XMLElement* scene_element);
 			void parseLights(tinyxml2::XMLElement* scene_element);
 			void parseMesh(tinyxml2::XMLElement* mesh_element);
-			void parseTriangles(tinyxml2::XMLElement* datapath_element);
+			void parseTriangles(const std::string& datapath);
 			std::unique_ptr<core::Filter> parseFilter(tinyxml2::XMLElement* filter_element);
 			geometry::Transformation parseTransformation(tinyxml2::XMLElement* transformation_element);
 			std::unique_ptr<material::BsdfMaterial> parseBsdfMaterial(tinyxml2::XMLElement* bsdf_material_element);

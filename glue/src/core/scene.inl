@@ -10,7 +10,7 @@ namespace glue
 		{
 			if (!(m_stream >> (*arg)))
 			{
-				throw std::runtime_error("Error: Tag content is not found!");
+				throw std::runtime_error("");
 			}
 		}
 
@@ -19,7 +19,7 @@ namespace glue
 		{
 			if (!(m_stream >> (*arg)))
 			{
-				throw std::runtime_error("Error: Tag content is not found!");
+				throw std::runtime_error("");
 			}
 			parseTag(args...);
 		}
@@ -44,13 +44,23 @@ namespace glue
 		}
 
 		template<typename... Args>
-		void Scene::parseTagContent(tinyxml2::XMLElement* element, Args... args)
+		void Scene::parseTagContent(tinyxml2::XMLElement* element, const std::string& tag, Args... args)
 		{
-			if (element)
+			auto child = element->FirstChildElement(tag.c_str());
+			if (child)
 			{
-				m_stream << element->GetText() << std::endl;
+				m_stream << child->GetText() << std::endl;
 			}
-			parseTag(args...);
+
+			try
+			{
+				parseTag(args...);
+			}
+			catch (const std::runtime_error&)
+			{
+				auto line = std::to_string(element->GetLineNum());
+				throw std::runtime_error("Error near line " + line + ": " + tag + " of " + element->Value() + " is not specified.");
+			}
 
 			m_stream.clear();
 		}
@@ -62,7 +72,8 @@ namespace glue
 
 			if (!child)
 			{
-				throw std::runtime_error("Error: " + tag_name + " of " + element->Value() + " is not found!");
+				auto line = std::to_string(element->GetLineNum());
+				throw std::runtime_error("Error near line " + line + ": " + tag_name + " of " + element->Value() + " is not specified.");
 			}
 
 			return child;
@@ -75,7 +86,8 @@ namespace glue
 
 			if (!att)
 			{
-				throw std::runtime_error("Error: " + std::string(att_name) + " of " + element->Value() + " is not found!");
+				auto line = std::to_string(element->GetLineNum());
+				throw std::runtime_error("Error near line " + line + ": " + att_name + " of " + element->Value() + " is not specified.");
 			}
 
 			return att;
