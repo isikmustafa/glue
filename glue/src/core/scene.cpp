@@ -151,7 +151,7 @@ namespace glue
 					parseTagContent(tonemapper_element->FirstChildElement("Min"), &min);
 					parseTagContent(tonemapper_element->FirstChildElement("Max"), &max);
 
-					output.emplace_back(std::make_pair(std::make_unique<Clamp>(min, max), image_name));
+					output.emplace_back(std::make_unique<Clamp>(min, max), image_name);
 				}
 				else if (tonemapper_type == std::string("GlobalReinhard"))
 				{
@@ -161,7 +161,7 @@ namespace glue
 					parseTagContent(tonemapper_element->FirstChildElement("Key"), &key);
 					parseTagContent(tonemapper_element->FirstChildElement("MaxLuminance"), &max_luminance);
 
-					output.emplace_back(std::make_pair(std::make_unique<GlobalReinhard>(key, max_luminance), image_name));
+					output.emplace_back(std::make_unique<GlobalReinhard>(key, max_luminance), image_name);
 				}
 				else
 				{
