@@ -1,6 +1,3 @@
-#include <ctpl_stl.h>
-#include <thread>
-
 namespace glue
 {
 	namespace core

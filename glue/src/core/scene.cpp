@@ -16,6 +16,7 @@
 #include "..\material\metal.h"
 #include "..\material\dielectric.h"
 
+#include <ctpl_stl.h>
 #include <utility>
 #include <glm\vec2.hpp>
 #include <glm\vec3.hpp>
