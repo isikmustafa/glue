@@ -61,9 +61,13 @@ namespace glue
 	namespace microfacet
 	{
 		class BeckmannDistribution;
-		struct Dielectric;
-		struct Conductor;
 		class GGXDistribution;
+
+		namespace fresnel
+		{
+			struct Dielectric;
+			struct Conductor;
+		}
 	}
 }
 
