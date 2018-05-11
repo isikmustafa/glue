@@ -26,7 +26,7 @@ namespace glue
 			}
 			else
 			{
-				return scene.background_color;
+				return scene.background_radiance;
 			}
 		}
 	}

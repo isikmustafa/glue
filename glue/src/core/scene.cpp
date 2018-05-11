@@ -47,7 +47,7 @@ namespace glue
 			parseCamera(scene_element);
 			hdr_image = std::make_unique<HdrImage>(camera->get_screen_resolution().x, camera->get_screen_resolution().y);
 
-			parseTagContent(scene_element, "BackgroundColor", &background_color.x, 0.0f, &background_color.y, 0.0f, &background_color.z, 0.0f);
+			parseTagContent(scene_element, "BackgroundRadiance", &background_radiance.x, 0.0f, &background_radiance.y, 0.0f, &background_radiance.z, 0.0f);
 			parseTagContent(scene_element, "SecondaryRayEpsilon", &secondary_ray_epsilon, 0.0001f);
 
 			debug_bvh.buildWithSAHSplit(debug_spheres);
@@ -99,7 +99,10 @@ namespace glue
 				int sample_count;
 				parseTagContent(integrator_element, "SampleCount", &sample_count, 1);
 
-				m_integrator = std::make_unique<integrator::Pathtracer>(parseFilter(filter_element), sample_count);
+				float rr_threshold;
+				parseTagContent(integrator_element, "RRThreshold", &rr_threshold, 0.5f);
+
+				m_integrator = std::make_unique<integrator::Pathtracer>(parseFilter(filter_element), sample_count, rr_threshold);
 			}
 			else
 			{

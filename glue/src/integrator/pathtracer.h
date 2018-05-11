@@ -12,13 +12,14 @@ namespace glue
 		class Pathtracer : public Integrator
 		{
 		public:
-			Pathtracer(std::unique_ptr<core::Filter> filter, int sample_count);
+			Pathtracer(std::unique_ptr<core::Filter> filter, int sample_count, float rr_threshold);
 
 			glm::vec3 integratePixel(const core::Scene& scene, int x, int y) const override;
 
 		private:
 			std::unique_ptr<core::Filter> m_filter;
 			int m_sample_count;
+			float m_rr_threshold;
 
 		private:
 			glm::vec3 estimate(const core::Scene& scene, const geometry::Ray& ray,

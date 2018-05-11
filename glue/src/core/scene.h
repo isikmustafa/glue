@@ -33,7 +33,7 @@ namespace glue
 			std::vector<std::pair<std::unique_ptr<Tonemapper>, std::string>> output;
 			std::unique_ptr<PinholeCamera> camera;
 			std::unique_ptr<HdrImage> hdr_image;
-			glm::vec3 background_color;
+			glm::vec3 background_radiance;
 			float secondary_ray_epsilon;
 
 		public:

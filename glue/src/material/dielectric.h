@@ -27,6 +27,7 @@ namespace glue
 		private:
 			float m_ior_n;
 			microfacet::MicrofacetScattering<microfacet::GGXDistribution> m_microfacet;
+			bool m_use_mis;
 		};
 	}
 }

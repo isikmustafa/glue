@@ -12,9 +12,10 @@ namespace glue
 {
 	namespace integrator
 	{
-		Pathtracer::Pathtracer(std::unique_ptr<core::Filter> filter, int sample_count)
+		Pathtracer::Pathtracer(std::unique_ptr<core::Filter> filter, int sample_count, float rr_threshold)
 			: m_filter(std::move(filter))
 			, m_sample_count(sample_count)
+			, m_rr_threshold(rr_threshold)
 		{}
 
 		glm::vec3 Pathtracer::integratePixel(const core::Scene& scene, int x, int y) const
@@ -36,7 +37,7 @@ namespace glue
 			core::UniformSampler& uniform_sampler, float importance, bool light_explicitly_sampled) const
 		{
 			//Russian roulette.
-			if (importance < 0.2f)
+			if (importance < m_rr_threshold)
 			{
 				if (uniform_sampler.sample() > 0.5f)
 				{
@@ -45,10 +46,9 @@ namespace glue
 			}
 
 			geometry::Intersection intersection;
-			auto is_intersected = scene.bvh.intersect(scene.meshes, ray, intersection, std::numeric_limits<float>::max());
-			if (!is_intersected)
+			if (!scene.bvh.intersect(scene.meshes, ray, intersection, std::numeric_limits<float>::max()))
 			{
-				return scene.background_color;
+				return importance < m_rr_threshold ? scene.background_radiance * 2.0f : scene.background_radiance;
 			}
 
 			//Check if the ray hits a light source.
@@ -57,7 +57,7 @@ namespace glue
 			{
 				if (!light_explicitly_sampled && glm::dot(-ray.get_direction(), intersection.normal) > 0.0f)
 				{
-					return itr->second->getLe();
+					return importance < m_rr_threshold ? itr->second->getLe() * 2.0f : itr->second->getLe();
 				}
 				else
 				{
@@ -78,36 +78,81 @@ namespace glue
 				for (int i = 0; i < size; ++i)
 				{
 					const auto* light = scene.lights[i].get();
-					//TODO: MIS
-					/*if (intersection.bsdf_material->useMultipleImportanceSampling() && !light->hasDeltaDistribution())
-					{
 
-					}*/
 					auto sampled_plane = light->samplePlane(uniform_sampler);
 					auto wo_world = sampled_plane.point - intersection_point;
 					auto distance = glm::length(wo_world);
 					wo_world /= distance;
 
-					auto wo_tangent = tangent_space.vectorToLocalSpace(wo_world);
+					auto wo_tangent_light = tangent_space.vectorToLocalSpace(wo_world);
 
-					auto bsdf = intersection.bsdf_material->getBsdf(wi_tangent, wo_tangent);
-					auto cos = glm::abs(material::cosTheta(wo_tangent));
+					auto bsdf = intersection.bsdf_material->getBsdf(wi_tangent, wo_tangent_light);
+					auto cos = glm::abs(material::cosTheta(wo_tangent_light));
 
 					//Get p(A) and transform it to p(w)
-					auto pdf = light->getPdf();
-					pdf *= distance * distance / glm::dot(-wo_world, sampled_plane.normal);
+					auto pdf_light = light->getPdf();
+					pdf_light *= distance * distance / glm::max(glm::dot(-wo_world, sampled_plane.normal), 0.0f);
 
-					auto f = bsdf * cos / pdf;
+					auto f = bsdf * cos / pdf_light;
 
 					//One other important thing about this if check is that it never does a computation for NAN values of f.
+					glm::vec3 direct_lo_light(0.0f);
 					if (f.x + f.y + f.z > 0.0f)
 					{
 						geometry::Ray shadow_ray(intersection_point + wo_world * scene.secondary_ray_epsilon, wo_world);
 						if (!scene.bvh.intersectShadowRay(scene.meshes, shadow_ray, distance - 1.1f * scene.secondary_ray_epsilon))
 						{
-							direct_lo += f * light->getLe();
+							direct_lo_light = f * light->getLe();
 						}
 					}
+
+					//Apply multiple importance sampling if possible.
+					if (intersection.bsdf_material->useMultipleImportanceSampling() && !light->hasDeltaDistribution())
+					{
+						//Compute the weight of the sample from light pdf using power heuristic with beta=2
+						auto pdf_bsdf = intersection.bsdf_material->getPdf(wi_tangent, wo_tangent_light);
+						auto weight_light = pdf_light * pdf_light / (pdf_light * pdf_light + pdf_bsdf * pdf_bsdf);
+
+						if (weight_light > 0.0f)
+						{
+							direct_lo_light *= weight_light;
+						}
+
+						//Generate a sample according to the bsdf.
+						auto w_f = intersection.bsdf_material->sampleWo(wi_tangent, uniform_sampler);
+						const auto& wo_tangent_bsdf = w_f.first;
+						const auto& f = w_f.second;
+
+						//One other important thing about this if check is that it never does a computation for NAN values of f.
+						if (f.x + f.y + f.z > 0.0f)
+						{
+							geometry::Intersection dl_intersection;
+							auto wo_world = tangent_space.vectorToWorldSpace(wo_tangent_bsdf);
+							geometry::Ray wo_ray(intersection_point + wo_world * scene.secondary_ray_epsilon, wo_world);
+							if (scene.bvh.intersect(scene.meshes, wo_ray, dl_intersection, std::numeric_limits<float>::max()))
+							{
+								//If ray through sampled direction hits this light, add its contribution.
+								auto itr = scene.light_meshes.find(dl_intersection.mesh);
+								if (itr != scene.light_meshes.end() && itr->second == light)
+								{
+									//Get p(A) and transform it to p(w)
+									auto pdf_light = light->getPdf();
+									pdf_light *= dl_intersection.distance * dl_intersection.distance / glm::max(glm::dot(-wo_world, dl_intersection.normal), 0.0f);
+
+									//Compute the weight of the sample from bsdf pdf using power heuristic with beta=2
+									auto pdf_bsdf = intersection.bsdf_material->getPdf(wi_tangent, wo_tangent_bsdf);
+									auto weight_bsdf = pdf_bsdf * pdf_bsdf / (pdf_light * pdf_light + pdf_bsdf * pdf_bsdf);
+
+									if (weight_bsdf > 0.0f)
+									{
+										direct_lo += f * light->getLe() * weight_bsdf;
+									}
+								}
+							}
+						}
+					}
+
+					direct_lo += direct_lo_light;
 				}
 
 				light_explicitly_sampled = true;
@@ -133,7 +178,7 @@ namespace glue
 				indirect_lo = f * estimate(scene, wo_ray, uniform_sampler, importance * glm::max(glm::max(f.x, f.y), f.z), light_explicitly_sampled);
 			}
 
-			return importance < 0.2f ? (direct_lo + indirect_lo) * 2.0f : direct_lo + indirect_lo;
+			return importance < m_rr_threshold ? (direct_lo + indirect_lo) * 2.0f : direct_lo + indirect_lo;
 		}
 	}
 }
