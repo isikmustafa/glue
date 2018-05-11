@@ -113,7 +113,7 @@ namespace glue
 						auto pdf_bsdf = intersection.bsdf_material->getPdf(wi_tangent, wo_tangent_light);
 						auto weight_light = pdf_light * pdf_light / (pdf_light * pdf_light + pdf_bsdf * pdf_bsdf);
 
-						if (weight_light > 0.0f)
+						if (!std::isnan(weight_light))
 						{
 							direct_lo_light *= weight_light;
 						}
@@ -143,7 +143,7 @@ namespace glue
 									auto pdf_bsdf = intersection.bsdf_material->getPdf(wi_tangent, wo_tangent_bsdf);
 									auto weight_bsdf = pdf_bsdf * pdf_bsdf / (pdf_light * pdf_light + pdf_bsdf * pdf_bsdf);
 
-									if (weight_bsdf > 0.0f)
+									if (!std::isnan(weight_bsdf))
 									{
 										direct_lo += f * light->getLe() * weight_bsdf;
 									}

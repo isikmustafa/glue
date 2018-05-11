@@ -1,12 +1,13 @@
 <Scene>
-    <BackgroundColor>0 0 0</BackgroundColor>
+    <BackgroundRadiance>0 0 0</BackgroundRadiance>
 	<SecondaryRayEpsilon>0.0001</SecondaryRayEpsilon>
 	
     <Integrator type="Pathtracer">
 		<Filter type="Gaussian">
 			<Sigma>0.5</Sigma>
 		</Filter>
-		<SampleCount>1</SampleCount>
+		<SampleCount>64</SampleCount>
+		<RRThreshold>0.2</RRThreshold>
     </Integrator>
 	
     <Output>
@@ -18,6 +19,13 @@
 			</Tonemapper>
 		</Image>
         <!--<Image>
+			<ImageName>../sample_output/cornell-lucy0.18_1.0.png</ImageName>
+			<Tonemapper type="GlobalReinhard">
+				<Key>0.18</Key>
+				<MaxLuminance>1.0</MaxLuminance>
+			</Tonemapper>
+		</Image>
+        <Image>
 			<ImageName>../sample_output/cornell-lucy0.18_1.0.png</ImageName>
 			<Tonemapper type="GlobalReinhard">
 				<Key>0.18</Key>
@@ -120,8 +128,10 @@
 			<Rotation>0 1 0 60</Rotation>
 			<Translation>0 0 -0.5</Translation>
 		</Transformation>
-		<BsdfMaterial type="Lambertian">
-			<kd>0.73 0.48 0.34</kd>
+		<BsdfMaterial type="Metal">
+			<IorN>0.1778 0.5308 1.5436</IorN>
+			<IorK>3.1272 2.2774 1.8962</IorK>
+			<Roughness>0.255</Roughness>
 		</BsdfMaterial>
 	</Mesh>
 	<!-- Glass 
