@@ -22,21 +22,21 @@ namespace glue
 			auto wh = microfacet.sampleWh(sampler);
 			auto wi_wh = glm::dot(wi_tangent, wh);
 
-			glm::vec3 wo;
+			glm::vec3 wo_tangent;
 
 			//Reflection
 			if (sampler.sample() < fresnel::Dielectric()(no_over_ni, glm::abs(wi_wh)))
 			{
-				wo = glm::reflect(-wi_tangent, wh);
+				wo_tangent = glm::reflect(-wi_tangent, wh);
 			}
 			//Transmission
 			else
 			{
-				wo = glm::refract(-wi_tangent, material::cosTheta(wi_tangent) > 0.0f ? wh : -wh, 1.0f / no_over_ni);
+				wo_tangent = glm::refract(-wi_tangent, material::cosTheta(wi_tangent) > 0.0f ? wh : -wh, 1.0f / no_over_ni);
 			}
 
-			auto f = microfacet.g1(wi_tangent, wh) * microfacet.g1(wo, wh) * glm::abs(wi_wh / (material::cosTheta(wi_tangent) * material::cosTheta(wh)));
-			return std::make_pair(wo, glm::vec3(f));
+			auto f = microfacet.g1(wi_tangent, wh) * microfacet.g1(wo_tangent, wh) * glm::abs(wi_wh / (material::cosTheta(wi_tangent) * material::cosTheta(wh)));
+			return std::make_pair(wo_tangent, glm::vec3(f));
 		}
 
 		template<typename MicrofacetDistribution>
@@ -53,10 +53,10 @@ namespace glue
 			{
 				auto wh = glm::normalize(wi_tangent + wo_tangent);
 				auto wi_wh = glm::dot(wi_tangent, wh);
-				auto f = fresnel::Dielectric()(no_over_ni, glm::abs(wi_wh));
+				auto fresnel = fresnel::Dielectric()(no_over_ni, glm::abs(wi_wh));
 				auto dg = microfacet.d(wh) * microfacet.g1(wi_tangent, wh) * microfacet.g1(wo_tangent, wh);
 
-				auto brdf = f * dg / glm::abs(4.0f * material::cosTheta(wi_tangent) * material::cosTheta(wo_tangent));
+				auto brdf = fresnel * dg / glm::abs(4.0f * material::cosTheta(wi_tangent) * material::cosTheta(wo_tangent));
 
 				bsdf = glm::vec3(brdf);
 			}
@@ -68,11 +68,11 @@ namespace glue
 				auto wo_wh = glm::dot(wo_tangent, wh);
 
 				auto x = glm::abs((wi_wh * wo_wh) / (material::cosTheta(wi_tangent) * material::cosTheta(wo_tangent)));
-				auto f = fresnel::Dielectric()(no_over_ni, glm::abs(wi_wh));
+				auto fresnel = fresnel::Dielectric()(no_over_ni, glm::abs(wi_wh));
 				auto dg = microfacet.d(wh) * microfacet.g1(wi_tangent, wh) * microfacet.g1(wo_tangent, wh);
 				auto denom = wi_wh + no_over_ni * wo_wh;
 
-				auto btdf = x * (1.0f - f) * dg * no_over_ni * no_over_ni / (denom * denom);
+				auto btdf = x * (1.0f - fresnel) * dg * no_over_ni * no_over_ni / (denom * denom);
 
 				bsdf = glm::vec3(btdf);
 			}
@@ -95,9 +95,9 @@ namespace glue
 				auto wh = glm::normalize(wi_tangent + wo_tangent);
 				auto wi_wh = glm::dot(wi_tangent, wh);
 
-				auto f = fresnel::Dielectric()(no_over_ni, glm::abs(wi_wh));
+				auto fresnel = fresnel::Dielectric()(no_over_ni, glm::abs(wi_wh));
 
-				pdf = f * glm::abs(microfacet.d(wh) * material::cosTheta(wh) / (4.0f * glm::dot(wo_tangent, wh)));
+				pdf = fresnel * glm::abs(microfacet.d(wh) * material::cosTheta(wh) / (4.0f * glm::dot(wo_tangent, wh)));
 			}
 			//Transmission
 			else
@@ -106,10 +106,10 @@ namespace glue
 				auto wi_wh = glm::dot(wi_tangent, wh);
 				auto wo_wh = glm::dot(wo_tangent, wh);
 
-				auto f = fresnel::Dielectric()(no_over_ni, glm::abs(wi_wh));
+				auto fresnel = fresnel::Dielectric()(no_over_ni, glm::abs(wi_wh));
 				auto denom = wi_wh + no_over_ni * wo_wh;
 
-				pdf = (1.0f - f) * glm::abs(microfacet.d(wh) * material::cosTheta(wh) * wo_wh * no_over_ni * no_over_ni / (denom * denom));
+				pdf = (1.0f - fresnel) * glm::abs(microfacet.d(wh) * material::cosTheta(wh) * wo_wh * no_over_ni * no_over_ni / (denom * denom));
 			}
 
 			return pdf;
