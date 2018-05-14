@@ -27,7 +27,7 @@ namespace glue
 		private:
 			glm::vec3 m_ior_n;
 			glm::vec3 m_ior_k;
-			microfacet::MicrofacetReflection<microfacet::fresnel::Conductor, microfacet::GGXDistribution> m_microfacet;
+			microfacet::MicrofacetReflection<microfacet::GGXDistribution> m_microfacet;
 			bool m_use_mis;
 		};
 	}

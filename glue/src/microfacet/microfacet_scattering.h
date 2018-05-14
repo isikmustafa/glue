@@ -5,7 +5,7 @@ namespace glue
 {
 	namespace microfacet
 	{
-		template<typename MicrofacetDistribution>
+		template<typename MicrofacetDistribution, bool tSampleVisibleNormals = true>
 		class MicrofacetScattering
 		{
 		public:

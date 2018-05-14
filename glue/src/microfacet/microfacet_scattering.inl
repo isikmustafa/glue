@@ -7,19 +7,31 @@ namespace glue
 {
 	namespace microfacet
 	{
-		template<typename MicrofacetDistribution>
-		MicrofacetScattering<MicrofacetDistribution>::MicrofacetScattering(float roughness)
+		template<typename MicrofacetDistribution, bool tSampleVisibleNormals>
+		MicrofacetScattering<MicrofacetDistribution, tSampleVisibleNormals>::MicrofacetScattering(float roughness)
 			: m_a(roughness)
 		{}
 
-		template<typename MicrofacetDistribution>
-		std::pair<glm::vec3, glm::vec3> MicrofacetScattering<MicrofacetDistribution>::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, float no_over_ni) const
+		template<typename MicrofacetDistribution, bool tSampleVisibleNormals>
+		std::pair<glm::vec3, glm::vec3> MicrofacetScattering<MicrofacetDistribution, tSampleVisibleNormals>::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, float no_over_ni) const
 		{
-			//Walter's trick to reduce sampling weight.
-			auto alpha = (1.2f - 0.2f * glm::sqrt(glm::abs(material::cosTheta(wi_tangent)))) * m_a;
-			MicrofacetDistribution microfacet(alpha);
+			MicrofacetDistribution microfacet(m_a);
+			if constexpr (!tSampleVisibleNormals)
+			{
+				//Walter's trick to reduce sampling weight.
+				auto alpha = (1.2f - 0.2f * glm::sqrt(glm::abs(material::cosTheta(wi_tangent)))) * m_a;
+				microfacet = MicrofacetDistribution(alpha);
+			}
 
-			auto wh = microfacet.sampleWh(sampler);
+			glm::vec3 wh;
+			if constexpr (tSampleVisibleNormals)
+			{
+				wh = microfacet.sampleWhHd14(wi_tangent, sampler);
+			}
+			else
+			{
+				wh = microfacet.sampleWhWmlt07(sampler);
+			}
 			auto wi_wh = glm::dot(wi_tangent, wh);
 
 			glm::vec3 wo_tangent;
@@ -35,16 +47,29 @@ namespace glue
 				wo_tangent = glm::refract(-wi_tangent, material::cosTheta(wi_tangent) > 0.0f ? wh : -wh, 1.0f / no_over_ni);
 			}
 
-			auto f = microfacet.g1(wi_tangent, wh) * microfacet.g1(wo_tangent, wh) * glm::abs(wi_wh / (material::cosTheta(wi_tangent) * material::cosTheta(wh)));
+			float f;
+			if constexpr (tSampleVisibleNormals)
+			{
+				f = microfacet.g1(wo_tangent, wh);
+			}
+			else
+			{
+				f = microfacet.g1(wi_tangent, wh) * microfacet.g1(wo_tangent, wh) * glm::abs(wi_wh / (material::cosTheta(wi_tangent) * material::cosTheta(wh)));
+			}
+
 			return std::make_pair(wo_tangent, glm::vec3(f));
 		}
 
-		template<typename MicrofacetDistribution>
-		glm::vec3 MicrofacetScattering<MicrofacetDistribution>::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, float no_over_ni) const
+		template<typename MicrofacetDistribution, bool tSampleVisibleNormals>
+		glm::vec3 MicrofacetScattering<MicrofacetDistribution, tSampleVisibleNormals>::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, float no_over_ni) const
 		{
-			//Walter's trick to reduce sampling weight.
-			auto alpha = (1.2f - 0.2f * glm::sqrt(glm::abs(material::cosTheta(wi_tangent)))) * m_a;
-			MicrofacetDistribution microfacet(alpha);
+			MicrofacetDistribution microfacet(m_a);
+			if constexpr (!tSampleVisibleNormals)
+			{
+				//Walter's trick to reduce sampling weight.
+				auto alpha = (1.2f - 0.2f * glm::sqrt(glm::abs(material::cosTheta(wi_tangent)))) * m_a;
+				microfacet = MicrofacetDistribution(alpha);
+			}
 
 			glm::vec3 bsdf;
 
@@ -80,12 +105,16 @@ namespace glue
 			return bsdf;
 		}
 
-		template<typename MicrofacetDistribution>
-		float MicrofacetScattering<MicrofacetDistribution>::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, float no_over_ni) const
+		template<typename MicrofacetDistribution, bool tSampleVisibleNormals>
+		float MicrofacetScattering<MicrofacetDistribution, tSampleVisibleNormals>::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, float no_over_ni) const
 		{
-			//Walter's trick to reduce sampling weight.
-			auto alpha = (1.2f - 0.2f * glm::sqrt(glm::abs(material::cosTheta(wi_tangent)))) * m_a;
-			MicrofacetDistribution microfacet(alpha);
+			MicrofacetDistribution microfacet(m_a);
+			if constexpr (!tSampleVisibleNormals)
+			{
+				//Walter's trick to reduce sampling weight.
+				auto alpha = (1.2f - 0.2f * glm::sqrt(glm::abs(material::cosTheta(wi_tangent)))) * m_a;
+				microfacet = MicrofacetDistribution(alpha);
+			}
 
 			float pdf;
 
@@ -97,7 +126,14 @@ namespace glue
 
 				auto fresnel = fresnel::Dielectric()(no_over_ni, glm::abs(wi_wh));
 
-				pdf = fresnel * glm::abs(microfacet.d(wh) * material::cosTheta(wh) / (4.0f * glm::dot(wo_tangent, wh)));
+				if constexpr (tSampleVisibleNormals)
+				{
+					pdf = fresnel * glm::abs(microfacet.pdfHd14(wi_tangent, wh) / (4.0f * glm::dot(wo_tangent, wh)));
+				}
+				else
+				{
+					pdf = fresnel * glm::abs(microfacet.pdfWmlt07(wh) / (4.0f * glm::dot(wo_tangent, wh)));
+				}
 			}
 			//Transmission
 			else
@@ -109,7 +145,14 @@ namespace glue
 				auto fresnel = fresnel::Dielectric()(no_over_ni, glm::abs(wi_wh));
 				auto denom = wi_wh + no_over_ni * wo_wh;
 
-				pdf = (1.0f - fresnel) * glm::abs(microfacet.d(wh) * material::cosTheta(wh) * wo_wh * no_over_ni * no_over_ni / (denom * denom));
+				if constexpr (tSampleVisibleNormals)
+				{
+					pdf = (1.0f - fresnel) * glm::abs(microfacet.pdfHd14(wi_tangent, wh) * wo_wh * no_over_ni * no_over_ni / (denom * denom));
+				}
+				else
+				{
+					pdf = (1.0f - fresnel) * glm::abs(microfacet.pdfWmlt07(wh) * wo_wh * no_over_ni * no_over_ni / (denom * denom));
+				}
 			}
 
 			return pdf;
