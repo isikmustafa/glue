@@ -1,6 +1,7 @@
 #include "lambertian.h"
 #include "..\geometry\spherical_coordinate.h"
 #include "..\core\real_sampler.h"
+#include "..\core\math.h"
 
 #include <glm\gtc\constants.hpp>
 #include <glm\geometric.hpp>
@@ -31,7 +32,7 @@ namespace glue
 		float Lambertian::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const
 		{
 			//Cosine-weighted pdf.
-			return cosTheta(wo_tangent) * glm::one_over_pi<float>();
+			return core::math::cosTheta(wo_tangent) * glm::one_over_pi<float>();
 		}
 
 		bool Lambertian::hasDeltaDistribution() const

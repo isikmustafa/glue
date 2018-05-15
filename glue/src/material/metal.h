@@ -5,6 +5,7 @@
 #include "..\microfacet\microfacet_reflection.h"
 #include "..\microfacet\fresnel.h"
 #include "..\microfacet\ggx_distribution.h"
+#include "..\microfacet\beckmann_distribution.h"
 
 namespace glue
 {

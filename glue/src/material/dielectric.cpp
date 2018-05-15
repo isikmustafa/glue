@@ -1,5 +1,6 @@
 #include "dielectric.h"
 #include "..\core\real_sampler.h"
+#include "..\core\math.h"
 
 namespace glue
 {
@@ -13,17 +14,17 @@ namespace glue
 
 		std::pair<glm::vec3, glm::vec3> Dielectric::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler) const
 		{
-			return m_microfacet.sampleWo(wi_tangent, sampler, material::cosTheta(wi_tangent) > 0.0f ? m_ior_n : 1.0f / m_ior_n);
+			return m_microfacet.sampleWo(wi_tangent, sampler, core::math::cosTheta(wi_tangent) > 0.0f ? m_ior_n : 1.0f / m_ior_n);
 		}
 
 		glm::vec3 Dielectric::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const
 		{
-			return m_microfacet.getBsdf(wi_tangent, wo_tangent, material::cosTheta(wi_tangent) > 0.0f ? m_ior_n : 1.0f / m_ior_n);
+			return m_microfacet.getBsdf(wi_tangent, wo_tangent, core::math::cosTheta(wi_tangent) > 0.0f ? m_ior_n : 1.0f / m_ior_n);
 		}
 
 		float Dielectric::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const
 		{
-			return m_microfacet.getPdf(wi_tangent, wo_tangent, material::cosTheta(wi_tangent) > 0.0f ? m_ior_n : 1.0f / m_ior_n);
+			return m_microfacet.getPdf(wi_tangent, wo_tangent, core::math::cosTheta(wi_tangent) > 0.0f ? m_ior_n : 1.0f / m_ior_n);
 		}
 
 		bool Dielectric::hasDeltaDistribution() const

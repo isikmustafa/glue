@@ -1,4 +1,4 @@
-#include "..\material\bsdf_material.h"
+#include "..\core\math.h"
 
 #include <glm\geometric.hpp>
 #include <glm\trigonometric.hpp>
@@ -39,7 +39,7 @@ namespace glue
 			else
 			{
 				auto fg = fresnel * microfacet.g1(wi_tangent, wh) * microfacet.g1(wo_tangent, wh);
-				f = fg * glm::abs(wi_wh / (material::cosTheta(wi_tangent) * material::cosTheta(wh)));
+				f = fg * glm::abs(wi_wh / (core::math::cosTheta(wi_tangent) * core::math::cosTheta(wh)));
 			}
 
 			return std::make_pair(wo_tangent, glm::vec3(f));
@@ -72,7 +72,7 @@ namespace glue
 			else
 			{
 				auto fg = fresnel * microfacet.g1(wi_tangent, wh) * microfacet.g1(wo_tangent, wh);
-				f = fg * glm::abs(wi_wh / (material::cosTheta(wi_tangent) * material::cosTheta(wh)));
+				f = fg * glm::abs(wi_wh / (core::math::cosTheta(wi_tangent) * core::math::cosTheta(wh)));
 			}
 
 			return std::make_pair(wo_tangent, f);
@@ -87,7 +87,7 @@ namespace glue
 			auto fresnel = fresnel::Dielectric()(no_over_ni, glm::abs(glm::dot(wi_tangent, wh)));
 			auto dg = microfacet.d(wh) * microfacet.g1(wi_tangent, wh) * microfacet.g1(wo_tangent, wh);
 
-			auto brdf = fresnel * dg / glm::abs(4.0f * material::cosTheta(wi_tangent) * material::cosTheta(wo_tangent));
+			auto brdf = fresnel * dg / glm::abs(4.0f * core::math::cosTheta(wi_tangent) * core::math::cosTheta(wo_tangent));
 
 			return glm::vec3(brdf);
 		}
@@ -102,7 +102,7 @@ namespace glue
 			auto fresnel = fresnel::Conductor()(no_over_ni, ko_over_ki, glm::abs(glm::dot(wi_tangent, wh)));
 			auto dg = microfacet.d(wh) * microfacet.g1(wi_tangent, wh) * microfacet.g1(wo_tangent, wh);
 
-			auto brdf = fresnel * dg / glm::abs(4.0f * material::cosTheta(wi_tangent) * material::cosTheta(wo_tangent));
+			auto brdf = fresnel * dg / glm::abs(4.0f * core::math::cosTheta(wi_tangent) * core::math::cosTheta(wo_tangent));
 
 			return brdf;
 		}

@@ -3,6 +3,7 @@
 #include "..\core\real_sampler.h"
 #include "..\core\coordinate_space.h"
 #include "..\core\scene.h"
+#include "..\core\math.h"
 #include "..\light\diffuse_arealight.h"
 
 #include <limits>
@@ -87,7 +88,7 @@ namespace glue
 					auto wo_tangent_light = tangent_space.vectorToLocalSpace(wo_world);
 
 					auto bsdf = intersection.bsdf_material->getBsdf(wi_tangent, wo_tangent_light);
-					auto cos = glm::abs(material::cosTheta(wo_tangent_light));
+					auto cos = glm::abs(core::math::cosTheta(wo_tangent_light));
 
 					//Get p(A) and transform it to p(w)
 					auto pdf_light = light->getPdf();

@@ -174,6 +174,7 @@
     <ClInclude Include="src\core\filter.h" />
     <ClInclude Include="src\core\forward_decl.h" />
     <ClInclude Include="src\core\hdr_image.h" />
+    <ClInclude Include="src\core\math.h" />
     <ClInclude Include="src\core\pinhole_camera.h" />
     <ClInclude Include="src\core\coordinate_space.h" />
     <ClInclude Include="src\core\discrete_1d_sampler.h" />

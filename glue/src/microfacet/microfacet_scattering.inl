@@ -1,4 +1,4 @@
-#include "..\material\bsdf_material.h"
+#include "..\core\math.h"
 
 #include <glm\geometric.hpp>
 #include <glm\trigonometric.hpp>
@@ -19,7 +19,7 @@ namespace glue
 			if constexpr (!tSampleVisibleNormals)
 			{
 				//Walter's trick to reduce sampling weight.
-				auto alpha = (1.2f - 0.2f * glm::sqrt(glm::abs(material::cosTheta(wi_tangent)))) * m_a;
+				auto alpha = (1.2f - 0.2f * glm::sqrt(glm::abs(core::math::cosTheta(wi_tangent)))) * m_a;
 				microfacet = MicrofacetDistribution(alpha);
 			}
 
@@ -44,7 +44,7 @@ namespace glue
 			//Transmission
 			else
 			{
-				wo_tangent = glm::refract(-wi_tangent, material::cosTheta(wi_tangent) > 0.0f ? wh : -wh, 1.0f / no_over_ni);
+				wo_tangent = glm::refract(-wi_tangent, core::math::cosTheta(wi_tangent) > 0.0f ? wh : -wh, 1.0f / no_over_ni);
 			}
 
 			float f;
@@ -54,7 +54,7 @@ namespace glue
 			}
 			else
 			{
-				f = microfacet.g1(wi_tangent, wh) * microfacet.g1(wo_tangent, wh) * glm::abs(wi_wh / (material::cosTheta(wi_tangent) * material::cosTheta(wh)));
+				f = microfacet.g1(wi_tangent, wh) * microfacet.g1(wo_tangent, wh) * glm::abs(wi_wh / (core::math::cosTheta(wi_tangent) * core::math::cosTheta(wh)));
 			}
 
 			return std::make_pair(wo_tangent, glm::vec3(f));
@@ -67,21 +67,21 @@ namespace glue
 			if constexpr (!tSampleVisibleNormals)
 			{
 				//Walter's trick to reduce sampling weight.
-				auto alpha = (1.2f - 0.2f * glm::sqrt(glm::abs(material::cosTheta(wi_tangent)))) * m_a;
+				auto alpha = (1.2f - 0.2f * glm::sqrt(glm::abs(core::math::cosTheta(wi_tangent)))) * m_a;
 				microfacet = MicrofacetDistribution(alpha);
 			}
 
 			glm::vec3 bsdf;
 
 			//Reflection
-			if (material::cosTheta(wi_tangent) * material::cosTheta(wo_tangent) > 0.0f)
+			if (core::math::cosTheta(wi_tangent) * core::math::cosTheta(wo_tangent) > 0.0f)
 			{
 				auto wh = glm::normalize(wi_tangent + wo_tangent);
 				auto wi_wh = glm::dot(wi_tangent, wh);
 				auto fresnel = fresnel::Dielectric()(no_over_ni, glm::abs(wi_wh));
 				auto dg = microfacet.d(wh) * microfacet.g1(wi_tangent, wh) * microfacet.g1(wo_tangent, wh);
 
-				auto brdf = fresnel * dg / glm::abs(4.0f * material::cosTheta(wi_tangent) * material::cosTheta(wo_tangent));
+				auto brdf = fresnel * dg / glm::abs(4.0f * core::math::cosTheta(wi_tangent) * core::math::cosTheta(wo_tangent));
 
 				bsdf = glm::vec3(brdf);
 			}
@@ -92,7 +92,7 @@ namespace glue
 				auto wi_wh = glm::dot(wi_tangent, wh);
 				auto wo_wh = glm::dot(wo_tangent, wh);
 
-				auto x = glm::abs((wi_wh * wo_wh) / (material::cosTheta(wi_tangent) * material::cosTheta(wo_tangent)));
+				auto x = glm::abs((wi_wh * wo_wh) / (core::math::cosTheta(wi_tangent) * core::math::cosTheta(wo_tangent)));
 				auto fresnel = fresnel::Dielectric()(no_over_ni, glm::abs(wi_wh));
 				auto dg = microfacet.d(wh) * microfacet.g1(wi_tangent, wh) * microfacet.g1(wo_tangent, wh);
 				auto denom = wi_wh + no_over_ni * wo_wh;
@@ -112,14 +112,14 @@ namespace glue
 			if constexpr (!tSampleVisibleNormals)
 			{
 				//Walter's trick to reduce sampling weight.
-				auto alpha = (1.2f - 0.2f * glm::sqrt(glm::abs(material::cosTheta(wi_tangent)))) * m_a;
+				auto alpha = (1.2f - 0.2f * glm::sqrt(glm::abs(core::math::cosTheta(wi_tangent)))) * m_a;
 				microfacet = MicrofacetDistribution(alpha);
 			}
 
 			float pdf;
 
 			//Reflection
-			if (material::cosTheta(wi_tangent) * material::cosTheta(wo_tangent) > 0.0f)
+			if (core::math::cosTheta(wi_tangent) * core::math::cosTheta(wo_tangent) > 0.0f)
 			{
 				auto wh = glm::normalize(wi_tangent + wo_tangent);
 				auto wi_wh = glm::dot(wi_tangent, wh);

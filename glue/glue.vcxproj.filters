@@ -213,6 +213,9 @@
     <ClInclude Include="src\core\filter.h">
       <Filter>Source Files\core</Filter>
     </ClInclude>
+    <ClInclude Include="src\core\math.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\geometry\bvh.inl">

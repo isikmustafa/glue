@@ -1,7 +1,7 @@
 #include "ggx_distribution.h"
-#include "..\material\bsdf_material.h"
 #include "..\geometry\spherical_coordinate.h"
 #include "..\core\real_sampler.h"
+#include "..\core\math.h"
 
 #include <glm\gtc\constants.hpp>
 #include <glm\geometric.hpp>
@@ -25,18 +25,18 @@ namespace glue
 
 		float GGXDistribution::pdfWmlt07(const glm::vec3& wh_tangent) const
 		{
-			return glm::abs(d(wh_tangent) * material::cosTheta(wh_tangent));
+			return glm::abs(d(wh_tangent) * core::math::cosTheta(wh_tangent));
 		}
 
 		glm::vec3 GGXDistribution::sampleWhHd14(const glm::vec3& wi_tangent, core::UniformSampler& sampler) const
 		{
-			auto wi = material::cosTheta(wi_tangent) < 0.0f ? -wi_tangent : wi_tangent;
+			auto wi = core::math::cosTheta(wi_tangent) < 0.0f ? -wi_tangent : wi_tangent;
 
 			//1-Stretch
 			auto stretched_wi = glm::normalize(glm::vec3(m_ag * wi.x, m_ag * wi.y, wi.z));
 			geometry::SphericalCoordinate spherical_stretched_wi(1.0f, 0.0f, 0.0f);
 			
-			if (material::cosTheta(stretched_wi) < 0.99999f)
+			if (core::math::cosTheta(stretched_wi) < 0.99999f)
 			{
 				spherical_stretched_wi = geometry::SphericalCoordinate(stretched_wi);
 			}
@@ -88,15 +88,15 @@ namespace glue
 
 		float GGXDistribution::pdfHd14(const glm::vec3& wi_tangent, const glm::vec3& wh_tangent) const
 		{
-			return glm::abs(g1(wi_tangent, wh_tangent) * glm::dot(wi_tangent, wh_tangent) * d(wh_tangent) / material::cosTheta(wi_tangent));
+			return glm::abs(g1(wi_tangent, wh_tangent) * glm::dot(wi_tangent, wh_tangent) * d(wh_tangent) / core::math::cosTheta(wi_tangent));
 		}
 
 		float GGXDistribution::d(const glm::vec3& wh_tangent) const
 		{
-			auto costheta_h = material::cosTheta(wh_tangent);
+			auto costheta_h = core::math::cosTheta(wh_tangent);
 			if (costheta_h > 0.0f)
 			{
-				auto temp = m_ag * m_ag + material::tan2Theta(wh_tangent);
+				auto temp = m_ag * m_ag + core::math::tan2Theta(wh_tangent);
 				return m_ag * m_ag / (glm::pi<float>() * costheta_h * costheta_h * costheta_h * costheta_h * temp * temp);
 			}
 
@@ -105,9 +105,9 @@ namespace glue
 
 		float GGXDistribution::g1(const glm::vec3& wv_tangent, const glm::vec3& wh_tangent) const
 		{
-			if (glm::dot(wv_tangent, wh_tangent) / material::cosTheta(wv_tangent) > 0.0f)
+			if (glm::dot(wv_tangent, wh_tangent) / core::math::cosTheta(wv_tangent) > 0.0f)
 			{
-				return 2.0f / (1.0f + glm::sqrt(1.0f + m_ag * m_ag * material::tan2Theta(wv_tangent)));
+				return 2.0f / (1.0f + glm::sqrt(1.0f + m_ag * m_ag * core::math::tan2Theta(wv_tangent)));
 			}
 
 			return 0.0f;
