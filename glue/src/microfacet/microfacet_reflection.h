@@ -18,7 +18,7 @@ namespace glue
 			float getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const;
 
 		private:
-			float m_a;
+			MicrofacetDistribution m_microfacet;
 		};
 	}
 }
