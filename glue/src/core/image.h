@@ -13,15 +13,19 @@ namespace glue
 		{
 		public:
 			Image(int width, int height);
+			Image(const std::string& filename);
 
-			std::vector<glm::vec3>& operator[](int x);
-			const std::vector<glm::vec3>& operator[](int x) const;
+			std::vector<glm::vec3>& operator[](int i);
+			const std::vector<glm::vec3>& operator[](int i) const;
 			void save(const std::string& filename) const;
-			int width() const;
-			int height() const;
+
+			int get_width() const { return m_width; }
+			int get_height() const { return m_height; }
 
 		private:
 			std::vector<std::vector<glm::vec3>> m_pixels;
+			int m_width;
+			int m_height;
 		};
 	}
 }

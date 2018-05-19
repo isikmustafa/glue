@@ -35,7 +35,7 @@ namespace glue
 
 			if (file.LoadFile(filepath.c_str()))
 			{
-				throw std::runtime_error("Error: The xml file cannot be loaded!");
+				throw std::runtime_error("Error: The xml file cannot be loaded");
 			}
 
 			auto scene_element = getFirstChildElementThrow(&file, "Scene");
@@ -282,12 +282,12 @@ namespace glue
 
 			if (!scene)
 			{
-				throw std::runtime_error("Error: Assimp cannot load the model!");
+				throw std::runtime_error("Error: Assimp cannot load the model");
 			}
 
 			if (scene->mNumMeshes > 1)
 			{
-				throw std::runtime_error("Unhandled case: More than one mesh to process in the same model!");
+				throw std::runtime_error("Unhandled case: More than one mesh to process in the same model");
 			}
 
 			aiMesh* mesh = scene->mMeshes[0];

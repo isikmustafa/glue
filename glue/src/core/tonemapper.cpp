@@ -7,15 +7,15 @@ namespace glue
 	namespace core
 	{
 		Clamp::Clamp(float min, float max)
-			: m_min(min)
-			, m_max(max)
+			: m_min(glm::max(min, 0.0f))
+			, m_max(glm::min(max, 1.0f))
 		{}
 
 		Image Clamp::tonemap(const Image& image) const
 		{
 			auto tonemapped_image = image;
-			int width = tonemapped_image.width();
-			int height = tonemapped_image.height();
+			int width = tonemapped_image.get_width();
+			int height = tonemapped_image.get_height();
 
 			for (int i = 0; i < width; ++i)
 			{
@@ -37,8 +37,8 @@ namespace glue
 		Image GlobalReinhard::tonemap(const Image& image) const
 		{
 			auto tonemapped_image = image;
-			int width = tonemapped_image.width();
-			int height = tonemapped_image.height();
+			int width = tonemapped_image.get_width();
+			int height = tonemapped_image.get_height();
 
 			constexpr auto epsilon = 0.0001f;
 			auto geometric_average = 0.0f;
