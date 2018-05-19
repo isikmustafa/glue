@@ -80,7 +80,20 @@ namespace glue
 				}
 			}
 
-			stbi_write_png(filename.c_str(), m_width, m_height, channel, data_ptr, stride);
+			auto image_format = filename.substr(filename.find_last_of('.') + 1);
+
+			if (image_format == "png")
+			{
+				stbi_write_png(filename.c_str(), m_width, m_height, channel, data_ptr, stride);
+			}
+			else if (image_format == "bmp")
+			{
+				stbi_write_bmp(filename.c_str(), m_width, m_height, channel, data_ptr);
+			}
+			else if (image_format == "tga")
+			{
+				stbi_write_tga(filename.c_str(), m_width, m_height, channel, data_ptr);
+			}
 		}
 	}
 }

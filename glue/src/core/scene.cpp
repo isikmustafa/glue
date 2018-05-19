@@ -142,7 +142,17 @@ namespace glue
 			while (image_element)
 			{
 				std::string image_name;
+				std::string image_format;
 				parseTagContent(image_element, "ImageName", &image_name);
+				parseTagContent(image_element, "ImageFormat", &image_format, std::string("png"));
+
+				//Supported formats are png, bmp and tga.
+				if (image_format != "png" && image_format != "bmp" && image_format != "tga")
+				{
+					throwXMLError(image_element->FirstChildElement("ImageFormat"), "Unsupported ImageFormat.");
+				}
+
+				image_name += "." + image_format;
 
 				auto tonemapper_element = getFirstChildElementThrow(image_element, "Tonemapper");
 				auto tonemapper_type = getAttributeThrow(tonemapper_element, "type");
