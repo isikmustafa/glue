@@ -72,7 +72,11 @@ namespace glue
 			template<typename T>
 			const char* getAttributeThrow(T element, const std::string& att_name);
 
-			//Caller always make sure that XMLElement pointer is not nullptr.
+			//Directly throws a std::runtime_error with given message.
+			template<typename T>
+			void throwXMLError(T element, const std::string& message);
+
+			//Caller always makes sure that XMLElement pointer is not nullptr.
 			//Callee just uses XMLElement pointer and does not check it. 
 			void parseIntegrator(tinyxml2::XMLElement* scene_element);
 			void parseCamera(tinyxml2::XMLElement* scene_element);

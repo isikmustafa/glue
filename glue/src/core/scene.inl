@@ -55,8 +55,7 @@ namespace glue
 			}
 			catch (const std::runtime_error&)
 			{
-				auto line = std::to_string(element->GetLineNum());
-				throw std::runtime_error("Error near line " + line + ": " + tag + " of " + element->Value() + " is not specified.");
+				throwXMLError(element, tag + " of " + element->Value() + " is not specified.");
 			}
 
 			m_stream.clear();
@@ -69,8 +68,7 @@ namespace glue
 
 			if (!child)
 			{
-				auto line = std::to_string(element->GetLineNum());
-				throw std::runtime_error("Error near line " + line + ": " + tag_name + " of " + element->Value() + " is not specified.");
+				throwXMLError(element, tag_name + " of " + element->Value() + " is not specified.");
 			}
 
 			return child;
@@ -83,11 +81,17 @@ namespace glue
 
 			if (!att)
 			{
-				auto line = std::to_string(element->GetLineNum());
-				throw std::runtime_error("Error near line " + line + ": " + att_name + " of " + element->Value() + " is not specified.");
+				throwXMLError(element, att_name + " of " + element->Value() + " is not specified.");
 			}
 
 			return att;
+		}
+
+		template<typename T>
+		void Scene::throwXMLError(T element, const std::string& message)
+		{
+			auto line = std::to_string(element->GetLineNum());
+			throw std::runtime_error("Error near line " + line + ": " + message);
 		}
 	}
 }

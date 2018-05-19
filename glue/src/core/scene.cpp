@@ -35,7 +35,7 @@ namespace glue
 
 			if (file.LoadFile(filepath.c_str()))
 			{
-				throw std::runtime_error("Error: The xml file cannot be loaded");
+				throwXMLError(&file, "The xml file cannot be loaded.");
 			}
 
 			auto scene_element = getFirstChildElementThrow(&file, "Scene");
@@ -106,7 +106,7 @@ namespace glue
 			}
 			else
 			{
-				throw std::runtime_error("Error: Unknown Integrator type");
+				throwXMLError(integrator_element, "Unknown Integrator type.");
 			}
 		}
 
@@ -169,7 +169,7 @@ namespace glue
 				}
 				else
 				{
-					throw std::runtime_error("Error: Unknown Tonemapper type");
+					throwXMLError(tonemapper_element, "Unknown Tonemapper type.");
 				}
 
 				image_element = image_element->NextSiblingElement("Image");
@@ -206,7 +206,7 @@ namespace glue
 				}
 				else
 				{
-					throw std::runtime_error("Error: Unknown Light type");
+					throwXMLError(light_element, "Unknown Light type.");
 				}
 
 				light_element = light_element->NextSiblingElement("Light");
@@ -329,7 +329,7 @@ namespace glue
 			}
 			else
 			{
-				throw std::runtime_error("Error: Unknown Filter type");
+				throwXMLError(filter_element, "Unknown Filter type.");
 			}
 		}
 
@@ -399,7 +399,7 @@ namespace glue
 			}
 			else
 			{
-				throw std::runtime_error("Error: Unknown BsdfMaterial type");
+				throwXMLError(bsdf_material_element, "Unknown BsdfMaterial type.");
 			}
 		}
 	}
