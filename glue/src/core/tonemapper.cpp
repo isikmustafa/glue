@@ -11,9 +11,9 @@ namespace glue
 			, m_max(max)
 		{}
 
-		HdrImage Clamp::tonemap(const HdrImage& hdr_image) const
+		Image Clamp::tonemap(const Image& image) const
 		{
-			auto tonemapped_image = hdr_image;
+			auto tonemapped_image = image;
 			int width = tonemapped_image.width();
 			int height = tonemapped_image.height();
 
@@ -34,9 +34,9 @@ namespace glue
 			, m_max_luminance(max_luminance)
 		{}
 
-		HdrImage GlobalReinhard::tonemap(const HdrImage& hdr_image) const
+		Image GlobalReinhard::tonemap(const Image& image) const
 		{
-			auto tonemapped_image = hdr_image;
+			auto tonemapped_image = image;
 			int width = tonemapped_image.width();
 			int height = tonemapped_image.height();
 

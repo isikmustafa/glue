@@ -1,7 +1,7 @@
 #ifndef __GLUE__CORE__TONEMAPPER__
 #define __GLUE__CORE__TONEMAPPER__
 
-#include "hdr_image.h"
+#include "image.h"
 
 namespace glue
 {
@@ -12,7 +12,7 @@ namespace glue
 		public:
 			virtual ~Tonemapper() {}
 
-			virtual HdrImage tonemap(const HdrImage& hdr_image) const = 0;
+			virtual Image tonemap(const Image& image) const = 0;
 		};
 
 		//Clamps the pixel values to min and max.
@@ -21,7 +21,7 @@ namespace glue
 		public:
 			Clamp(float min, float max);
 
-			HdrImage tonemap(const HdrImage& hdr_image) const override;
+			Image tonemap(const Image& image) const override;
 
 		private:
 			float m_min;
@@ -36,7 +36,7 @@ namespace glue
 			//e.g. 0.5 means half of (maximum luminance of the scene) will be mapped to 1.0 and the rest will be burnt out.
 			GlobalReinhard(float key, float max_luminance);
 
-			HdrImage tonemap(const HdrImage& hdr_image) const override;
+			Image tonemap(const Image& image) const override;
 
 		private:
 			float m_key;

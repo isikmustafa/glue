@@ -70,19 +70,19 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>..\3rd\zlib-1.2.11;..\3rd\tinyxml2;..\3rd\png++-0.2.9;..\3rd\glm-0.9.8.5;..\3rd\assimp-3.3.1\include;..\3rd\lpng1632;..\3rd\CPTL;$(IncludePath)</IncludePath>
+    <IncludePath>..\3rd\tinyxml2;..\3rd\glm-0.9.8.5;..\3rd\assimp-3.3.1\include;..\3rd\CPTL;..\3rd\stb;$(IncludePath)</IncludePath>
     <LibraryPath>..\3rd\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>..\3rd\zlib-1.2.11;..\3rd\tinyxml2;..\3rd\png++-0.2.9;..\3rd\glm-0.9.8.5;..\3rd\assimp-3.3.1\include;..\3rd\lpng1632;..\3rd\CPTL;$(IncludePath)</IncludePath>
+    <IncludePath>..\3rd\tinyxml2;..\3rd\glm-0.9.8.5;..\3rd\assimp-3.3.1\include;..\3rd\CPTL;..\3rd\stb;$(IncludePath)</IncludePath>
     <LibraryPath>..\3rd\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>..\3rd\zlib-1.2.11;..\3rd\tinyxml2;..\3rd\png++-0.2.9;..\3rd\glm-0.9.8.5;..\3rd\assimp-3.3.1\include;..\3rd\lpng1632;..\3rd\CPTL;$(IncludePath)</IncludePath>
+    <IncludePath>..\3rd\tinyxml2;..\3rd\glm-0.9.8.5;..\3rd\assimp-3.3.1\include;..\3rd\CPTL;..\3rd\stb;$(IncludePath)</IncludePath>
     <LibraryPath>..\3rd\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>..\3rd\zlib-1.2.11;..\3rd\tinyxml2;..\3rd\png++-0.2.9;..\3rd\glm-0.9.8.5;..\3rd\assimp-3.3.1\include;..\3rd\lpng1632;..\3rd\CPTL;$(IncludePath)</IncludePath>
+    <IncludePath>..\3rd\tinyxml2;..\3rd\glm-0.9.8.5;..\3rd\assimp-3.3.1\include;..\3rd\CPTL;..\3rd\stb;$(IncludePath)</IncludePath>
     <LibraryPath>..\3rd\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -92,9 +92,10 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>assimp-vc140-mt.lib;tinyxml2.lib;libpng16.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc140-mt.lib;tinyxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -104,9 +105,10 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>assimp-vc140-mt.lib;tinyxml2.lib;libpng16.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc140-mt.lib;tinyxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -118,11 +120,12 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>assimp-vc140-mt.lib;tinyxml2.lib;libpng16.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc140-mt.lib;tinyxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -134,16 +137,17 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>assimp-vc140-mt.lib;tinyxml2.lib;libpng16.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc140-mt.lib;tinyxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\core\filter.cpp" />
-    <ClCompile Include="src\core\hdr_image.cpp" />
+    <ClCompile Include="src\core\image.cpp" />
     <ClCompile Include="src\core\pinhole_camera.cpp" />
     <ClCompile Include="src\core\coordinate_space.cpp" />
     <ClCompile Include="src\core\discrete_1d_sampler.cpp" />
@@ -173,7 +177,7 @@
   <ItemGroup>
     <ClInclude Include="src\core\filter.h" />
     <ClInclude Include="src\core\forward_decl.h" />
-    <ClInclude Include="src\core\hdr_image.h" />
+    <ClInclude Include="src\core\image.h" />
     <ClInclude Include="src\core\math.h" />
     <ClInclude Include="src\core\pinhole_camera.h" />
     <ClInclude Include="src\core\coordinate_space.h" />

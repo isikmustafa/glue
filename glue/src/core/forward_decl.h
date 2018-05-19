@@ -11,7 +11,7 @@ namespace glue
 		class BoxFilter;
 		class GaussianFilter;
 		class GaussianSampler;
-		class HdrImage;
+		class Image;
 		class PinholeCamera;
 		class RealSampler;
 		struct Scene;

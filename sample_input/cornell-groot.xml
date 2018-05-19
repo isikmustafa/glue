@@ -4,19 +4,19 @@
 	
     <Integrator type="Pathtracer">
 		<Filter type="Gaussian">
-			<Sigma>0.25</Sigma>
+			<Sigma>0.5</Sigma>
 		</Filter>
-		<SampleCount>32</SampleCount>
+		<SampleCount>500</SampleCount>
 		<RRThreshold>0.2</RRThreshold>
     </Integrator>
 	
     <Output>
         <Image>
+			<ImageName>../sample_output/cornell-groot.png</ImageName>
 			<Tonemapper type="Clamp">
 				<Min>0.0</Min>
 				<Max>1.0</Max>
 			</Tonemapper>
-			<ImageName>../sample_output/glue-test.png</ImageName>
 		</Image>
     </Output>
 	
@@ -24,37 +24,22 @@
         <Position>0 0.95 1.49</Position>
         <Direction>0 0 -1</Direction>
         <Up>0 1 0</Up>
-        <FovXY>40 40</FovXY>
-		<Resolution>600 600</Resolution>
+        <FovXY>42 56</FovXY>
+		<Resolution>600 800</Resolution>
         <NearDistance>0.01</NearDistance>
     </Camera>
 	
-	<!-- Lucy -->
+	<!-- Rabbit -->
 	<Mesh>
-		<Datapath>../sample_input/lucy.obj</Datapath>
+		<Datapath>../sample_input/groot.obj</Datapath>
 		<Transformation>
-			<Scaling>0.0018 0.0018 0.0018</Scaling>
-			<Rotation>0 1 0 60</Rotation>
-			<Translation>0 0 -0.5</Translation>
+			<Scaling>0.2 0.2 0.2</Scaling>
+			<Translation>0 0.51 -1</Translation>
 		</Transformation>
-		<BsdfMaterial type="Metal">
-			<IorN>0.1778 0.5308 1.5436</IorN>
-			<IorK>3.1272 2.2774 1.8962</IorK>
-			<Roughness>0.25</Roughness>
+		<BsdfMaterial type="Lambertian">
+			<kd>0.73 0.48 0.34</kd>
 		</BsdfMaterial>
 	</Mesh>
-	<!-- Glass 
-	<Mesh>
-		<Datapath>../sample_input/box.obj</Datapath>
-		<Transformation>
-			<Scaling>0.4 0.4 0.01</Scaling>
-			<Translation>0 0.9 0.5</Translation>
-		</Transformation>
-		<BsdfMaterial type="Dielectric">
-			<IorN>1.5</IorN>
-			<Roughness>0.027</Roughness>
-		</BsdfMaterial>
-	</Mesh>-->
 	<!-- Front -->
 	<Mesh>
 		<Datapath>../sample_input/rectangle.obj</Datapath>

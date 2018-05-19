@@ -10,7 +10,7 @@ int main()
 	glue::core::Scene scene;
 	glue::core::Timer timer;
 	timer.start();
-	scene.loadFromXML("../sample_input/glue-test.xml");
+	scene.loadFromXML("../sample_input/cornell-lucy.xml");
 	std::cout << "BVH build and input read time: " << timer.getTime() << std::endl;
 
 	timer.start();

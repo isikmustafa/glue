@@ -45,7 +45,7 @@ namespace glue
 			parseLights(scene_element);
 			parseOutput(scene_element);
 			parseCamera(scene_element);
-			hdr_image = std::make_unique<HdrImage>(camera->get_screen_resolution().x, camera->get_screen_resolution().y);
+			image = std::make_unique<Image>(camera->get_screen_resolution().x, camera->get_screen_resolution().y);
 
 			parseTagContent(scene_element, "BackgroundRadiance", &background_radiance.x, 0.0f, &background_radiance.y, 0.0f, &background_radiance.z, 0.0f);
 			parseTagContent(scene_element, "SecondaryRayEpsilon", &secondary_ray_epsilon, 0.0001f);
@@ -69,7 +69,7 @@ namespace glue
 						{
 							for (int j = y; j < y + cPatchSize && j < resolution.y; ++j)
 							{
-								(*this->hdr_image)[i][j] = this->m_integrator->integratePixel(*this, i, j);
+								(*this->image)[i][j] = this->m_integrator->integratePixel(*this, i, j);
 							}
 						}
 					});
@@ -77,9 +77,9 @@ namespace glue
 			}
 			pool.stop(true);
 
-			for (const auto& image : output)
+			for (const auto& img : output)
 			{
-				image.first->tonemap(*hdr_image).save(image.second);
+				img.first->tonemap(*image).save(img.second);
 			}
 		}
 

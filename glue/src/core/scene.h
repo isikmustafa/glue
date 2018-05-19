@@ -6,7 +6,7 @@
 #include "..\geometry\bvh.h"
 #include "..\geometry\debug_sphere.h"
 #include "..\light\light.h"
-#include "hdr_image.h"
+#include "image.h"
 #include "tonemapper.h"
 
 #include <vector>
@@ -32,7 +32,7 @@ namespace glue
 			std::unordered_map<const geometry::Mesh*, const light::Light*> light_meshes;
 			std::vector<std::pair<std::unique_ptr<Tonemapper>, std::string>> output;
 			std::unique_ptr<PinholeCamera> camera;
-			std::unique_ptr<HdrImage> hdr_image;
+			std::unique_ptr<Image> image;
 			glm::vec3 background_radiance;
 			float secondary_ray_epsilon;
 

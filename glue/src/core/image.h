@@ -1,5 +1,5 @@
-#ifndef __GLUE__CORE__HDRIMAGE__
-#define __GLUE__CORE__HDRIMAGE__
+#ifndef __GLUE__CORE__IMAGE__
+#define __GLUE__CORE__IMAGE__
 
 #include <glm\vec3.hpp>
 #include <vector>
@@ -9,10 +9,10 @@ namespace glue
 {
 	namespace core
 	{
-		class HdrImage
+		class Image
 		{
 		public:
-			HdrImage(int width, int height);
+			Image(int width, int height);
 
 			std::vector<glm::vec3>& operator[](int x);
 			const std::vector<glm::vec3>& operator[](int x) const;
