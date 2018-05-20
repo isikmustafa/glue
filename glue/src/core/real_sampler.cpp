@@ -1,5 +1,7 @@
 #include "real_sampler.h"
 
+#include <glm\geometric.hpp>
+
 namespace glue
 {
 	namespace core
@@ -12,6 +14,25 @@ namespace glue
 		float UniformSampler::sample()
 		{
 			return m_distribution(m_generator);
+		}
+
+		TentSampler::TentSampler(float center, float radius)
+			: m_sampler(-1.0f, 1.0f)
+			, m_center(center)
+			, m_radius(radius)
+		{}
+
+		float TentSampler::sample()
+		{
+			auto sample = m_sampler.sample();
+			if (sample > 0.0f)
+			{
+				return (1.0f - glm::sqrt(1.0f - sample)) * m_radius + m_center;
+			}
+			else
+			{
+				return (-1.0f + glm::sqrt(1.0f + sample)) * m_radius + m_center;
+			}
 		}
 
 		GaussianSampler::GaussianSampler(float mean, float sigma)

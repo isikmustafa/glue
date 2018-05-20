@@ -9,17 +9,19 @@ namespace glue
 		class Discrete1DSampler;
 		class Filter;
 		class BoxFilter;
+		class TentFilter;
 		class GaussianFilter;
+		class RealSampler;
+		class UniformSampler;
+		class TentSampler;
 		class GaussianSampler;
 		class Image;
 		class PinholeCamera;
-		class RealSampler;
 		struct Scene;
 		class Timer;
 		class Tonemapper;
 		class Clamp;
 		class GlobalReinhard;
-		class UniformSampler;
 	}
 
 	namespace geometry

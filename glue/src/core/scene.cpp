@@ -329,6 +329,10 @@ namespace glue
 			{
 				return std::make_unique<BoxFilter>();
 			}
+			else if (filter_type == std::string("Tent"))
+			{
+				return std::make_unique<TentFilter>();
+			}
 			else if (filter_type == std::string("Gaussian"))
 			{
 				float sigma;

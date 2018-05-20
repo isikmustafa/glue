@@ -10,6 +10,11 @@ namespace glue
 			return std::make_unique<UniformSampler>(-0.5f, 1.5f);
 		}
 
+		std::unique_ptr<RealSampler> TentFilter::generateSampler() const
+		{
+			return std::make_unique<TentSampler>(0.5f, 1.0f);
+		}
+
 		GaussianFilter::GaussianFilter(float sigma)
 			: m_sigma(sigma)
 		{}

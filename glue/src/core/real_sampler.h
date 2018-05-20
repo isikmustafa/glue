@@ -27,6 +27,19 @@ namespace glue
 			std::uniform_real_distribution<float> m_distribution;
 		};
 
+		class TentSampler : public RealSampler
+		{
+		public:
+			TentSampler(float center = 0.0f, float radius = 1.0f);
+
+			float sample() override;
+
+		private:
+			UniformSampler m_sampler;
+			float m_center;
+			float m_radius;
+		};
+
 		class GaussianSampler : public RealSampler
 		{
 		public:

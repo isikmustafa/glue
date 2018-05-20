@@ -23,6 +23,12 @@ namespace glue
 			std::unique_ptr<RealSampler> generateSampler() const override;
 		};
 
+		class TentFilter : public Filter
+		{
+		public:
+			std::unique_ptr<RealSampler> generateSampler() const override;
+		};
+
 		class GaussianFilter : public Filter
 		{
 		public:
