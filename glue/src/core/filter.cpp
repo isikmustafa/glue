@@ -7,8 +7,7 @@ namespace glue
 	{
 		std::unique_ptr<RealSampler> BoxFilter::generateSampler() const
 		{
-			//3x3 window.
-			return std::make_unique<UniformSampler>(-1.0f, 2.0f);
+			return std::make_unique<UniformSampler>(-0.5f, 1.5f);
 		}
 
 		GaussianFilter::GaussianFilter(float sigma)
