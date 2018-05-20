@@ -14,6 +14,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <glm\vec3.hpp>
 #include <tinyxml2.h>
 
@@ -45,6 +46,8 @@ namespace glue
 			std::unique_ptr<integrator::Integrator> m_integrator;
 			std::unordered_map<std::string, std::shared_ptr<std::vector<geometry::Triangle>>> m_path_to_triangles;
 			std::unordered_map<std::string, std::shared_ptr<geometry::BVH>> m_path_to_bvh;
+			std::unordered_set<std::string> m_supported_imageformats_load{ "jpg", "png", "tga", "bmp", "psd", "gif", "hdr", "pic" };
+			std::unordered_set<std::string> m_supported_imageformats_save{ "png", "bmp", "tga" };
 			std::stringstream m_stream;
 
 		private:
