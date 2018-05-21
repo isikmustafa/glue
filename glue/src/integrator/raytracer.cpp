@@ -14,13 +14,13 @@ namespace glue
 		{
 			auto ray = scene.camera->castPrimayRay(x, y);
 			geometry::Intersection intersection;
-			auto result = scene.bvh.intersect(scene.meshes, ray, intersection, std::numeric_limits<float>::max());
+			auto result = scene.bvh_meshes.intersect(ray, intersection, std::numeric_limits<float>::max());
 
-			if (scene.debug_bvh.intersectShadowRay(scene.debug_spheres, ray, intersection.distance))
+			/*if (scene.debug_bvh.intersectShadowRay(scene.debug_spheres, ray, intersection.distance))
 			{
 				return glm::vec3(1.0f, 0.0f, 0.0f);
-			}
-			else if (result)
+			}*/
+			if (result)
 			{
 				return glm::vec3(glm::dot(intersection.normal, -ray.get_direction()));
 			}

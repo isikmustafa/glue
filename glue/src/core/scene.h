@@ -25,15 +25,10 @@ namespace glue
 		struct Scene
 		{
 		public:
-			std::vector<std::shared_ptr<geometry::Mesh>> meshes;
-			geometry::BVH bvh;
-			std::vector<geometry::DebugSphere> debug_spheres;
-			geometry::BVH debug_bvh;
+			std::unique_ptr<PinholeCamera> camera;
+			geometry::BVH<std::shared_ptr<geometry::Mesh>> bvh_meshes;
 			std::vector<std::shared_ptr<light::Light>> lights;
 			std::unordered_map<const geometry::Mesh*, const light::Light*> light_meshes;
-			std::vector<std::pair<std::unique_ptr<Tonemapper>, std::string>> output;
-			std::unique_ptr<PinholeCamera> camera;
-			std::unique_ptr<Image> image;
 			glm::vec3 background_radiance;
 			float secondary_ray_epsilon;
 
@@ -44,8 +39,9 @@ namespace glue
 
 		private:
 			std::unique_ptr<integrator::Integrator> m_integrator;
-			std::unordered_map<std::string, std::shared_ptr<std::vector<geometry::Triangle>>> m_path_to_triangles;
-			std::unordered_map<std::string, std::shared_ptr<geometry::BVH>> m_path_to_bvh;
+			std::unique_ptr<Image> m_image;
+			std::vector<std::pair<std::unique_ptr<Tonemapper>, std::string>> m_output;
+			std::unordered_map<std::string, std::shared_ptr<geometry::BVH<geometry::Triangle>>> m_path_to_bvh;
 			std::unordered_set<std::string> m_supported_imageformats_load{ "jpg", "png", "tga", "bmp", "psd", "gif", "hdr", "pic" };
 			std::unordered_set<std::string> m_supported_imageformats_save{ "png", "bmp", "tga" };
 			std::stringstream m_stream;

@@ -40,18 +40,18 @@ namespace glue
 
 			auto scene_element = getFirstChildElementThrow(&file, "Scene");
 
+			parseCamera(scene_element);
 			parseIntegrator(scene_element);
+			m_image = std::make_unique<Image>(camera->get_screen_resolution().x, camera->get_screen_resolution().y);
+			parseOutput(scene_element);
 			parseMeshes(scene_element);
 			parseLights(scene_element);
-			parseOutput(scene_element);
-			parseCamera(scene_element);
-			image = std::make_unique<Image>(camera->get_screen_resolution().x, camera->get_screen_resolution().y);
 
 			parseTagContent(scene_element, "BackgroundRadiance", &background_radiance.x, 0.0f, &background_radiance.y, 0.0f, &background_radiance.z, 0.0f);
 			parseTagContent(scene_element, "SecondaryRayEpsilon", &secondary_ray_epsilon, 0.0001f);
 
-			debug_bvh.buildWithSAHSplit(debug_spheres);
-			bvh.buildWithMedianSplit(meshes);
+			//debug_bvh.buildWithSAHSplit(debug_spheres);
+			bvh_meshes.buildWithMedianSplit();
 		}
 
 		void Scene::render()
@@ -69,7 +69,7 @@ namespace glue
 						{
 							for (int j = y; j < y + cPatchSize && j < resolution.y; ++j)
 							{
-								(*this->image)[i][j] = this->m_integrator->integratePixel(*this, i, j);
+								(*this->m_image)[i][j] = this->m_integrator->integratePixel(*this, i, j);
 							}
 						}
 					});
@@ -77,9 +77,9 @@ namespace glue
 			}
 			pool.stop(true);
 
-			for (const auto& img : output)
+			for (const auto& img : m_output)
 			{
-				img.first->tonemap(*image).save(img.second);
+				img.first->tonemap(*m_image).save(img.second);
 			}
 		}
 
@@ -165,7 +165,7 @@ namespace glue
 					parseTagContent(tonemapper_element, "Min", &min);
 					parseTagContent(tonemapper_element, "Max", &max);
 
-					output.emplace_back(std::make_unique<Clamp>(min, max), std::move(image_name));
+					m_output.emplace_back(std::make_unique<Clamp>(min, max), std::move(image_name));
 				}
 				else if (tonemapper_type == std::string("GlobalReinhard"))
 				{
@@ -175,7 +175,7 @@ namespace glue
 					parseTagContent(tonemapper_element, "Key", &key);
 					parseTagContent(tonemapper_element, "MaxLuminance", &max_luminance);
 
-					output.emplace_back(std::make_unique<GlobalReinhard>(key, max_luminance), std::move(image_name));
+					m_output.emplace_back(std::make_unique<GlobalReinhard>(key, max_luminance), std::move(image_name));
 				}
 				else
 				{
@@ -211,8 +211,8 @@ namespace glue
 					glm::vec3 flux;
 					parseTagContent(light_element, "Flux", &flux.x, &flux.y, &flux.z);
 
-					lights.push_back(std::make_shared<light::DiffuseArealight>(meshes.back(), flux));
-					light_meshes[meshes.back().get()] = lights.back().get();
+					lights.push_back(std::make_shared<light::DiffuseArealight>(bvh_meshes.get_objects().back(), flux));
+					light_meshes[bvh_meshes.get_objects().back().get()] = lights.back().get();
 				}
 				else
 				{
@@ -228,7 +228,7 @@ namespace glue
 			std::string datapath;
 			parseTagContent(mesh_element, "Datapath", &datapath);
 
-			if (m_path_to_triangles.find(datapath) == m_path_to_triangles.end())
+			if (m_path_to_bvh.find(datapath) == m_path_to_bvh.end())
 			{
 				parseTriangles(datapath);
 			}
@@ -242,7 +242,7 @@ namespace glue
 			geometry::BBox bbox;
 			std::vector<float> triangle_areas;
 			auto total_area = 0.0f;
-			for (const auto& triangle : *m_path_to_triangles[datapath])
+			for (const auto& triangle : m_path_to_bvh[datapath]->get_objects())
 			{
 				auto vertices = triangle.getVertices();
 				auto v0 = transformation.pointToWorldSpace(vertices[0]);
@@ -264,11 +264,11 @@ namespace glue
 				bsdf_material = parseBsdfMaterial(bsdf_material_element);
 			}
 
-			meshes.push_back(std::make_shared<geometry::Mesh>(transformation, bbox, triangle_areas, total_area, m_path_to_triangles[datapath], m_path_to_bvh[datapath],
+			bvh_meshes.addObject(std::make_shared<geometry::Mesh>(transformation, bbox, triangle_areas, total_area, m_path_to_bvh[datapath],
 				std::move(bsdf_material)));
 
 			//Create debug spheres on randomly chosen points if 'displayRandomSamples' attribute is specified.
-			auto att = mesh_element->Attribute("displayRandomSamples");
+			/*auto att = mesh_element->Attribute("displayRandomSamples");
 			if (att)
 			{
 				UniformSampler sampler;
@@ -278,13 +278,11 @@ namespace glue
 				{
 					debug_spheres.emplace_back(mesh->samplePlane(sampler).point, glm::sqrt(mesh->getSurfaceArea() / num_of_samples) / 5.0f);
 				}
-			}
+			}*/
 		}
 
 		void Scene::parseTriangles(const std::string& datapath)
 		{
-			std::vector<geometry::Triangle> triangles;
-
 			Assimp::Importer importer;
 			const aiScene* scene = importer.ReadFile(datapath,
 				aiProcess_Triangulate |
@@ -300,6 +298,8 @@ namespace glue
 				throw std::runtime_error("Unhandled case: More than one mesh to process in the same model");
 			}
 
+			geometry::BVH<geometry::Triangle> bvh;
+
 			aiMesh* mesh = scene->mMeshes[0];
 			glm::vec3 face_vertices[3];
 			int face_count = mesh->mNumFaces;
@@ -311,14 +311,12 @@ namespace glue
 					const aiVector3D& position = mesh->mVertices[face.mIndices[k]];
 					face_vertices[k] = glm::vec3(position.x, position.y, position.z);
 				}
-				triangles.emplace_back(face_vertices[0], face_vertices[1] - face_vertices[0], face_vertices[2] - face_vertices[0]);
+				bvh.addObject(geometry::Triangle(face_vertices[0], face_vertices[1] - face_vertices[0], face_vertices[2] - face_vertices[0]));
 			}
 
-			geometry::BVH bvh;
-			bvh.buildWithSAHSplit(triangles);
+			bvh.buildWithSAHSplit();
 
-			m_path_to_triangles.insert({ datapath, std::make_shared<std::vector<geometry::Triangle>>(std::move(triangles)) });
-			m_path_to_bvh.insert({ datapath, std::make_shared<geometry::BVH>(std::move(bvh)) });
+			m_path_to_bvh[datapath] = std::make_shared<geometry::BVH<geometry::Triangle>>(std::move(bvh));
 		}
 
 		std::unique_ptr<core::Filter> Scene::parseFilter(tinyxml2::XMLElement* filter_element)

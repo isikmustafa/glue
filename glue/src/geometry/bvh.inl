@@ -6,7 +6,7 @@
 #include <thread>
 #include <type_traits>
 
-//A trick to check if the type has operator->
+//A trick to check if the type has operator ->
 //Slightly modified version of https://stackoverflow.com/a/15394527/5091304
 template<typename T, typename = void>
 struct isDereferenceable : std::is_function<T> {};
@@ -21,20 +21,52 @@ namespace glue
 	namespace geometry
 	{
 		template<typename Primitive>
-		void buildWithMedianSplitWork(std::vector<Primitive>* objects, std::unique_ptr<BVHNode>* node, int work)
+		void BVH<Primitive>::addObject(Primitive primitive)
+		{
+			m_objects.push_back(std::move(primitive));
+		}
+
+		template<typename Primitive>
+		void BVH<Primitive>::buildWithMedianSplit()
+		{
+			m_root = std::make_unique<BVHNode>(0, m_objects.size());
+			buildWithMedianSplitWork(&m_root, std::thread::hardware_concurrency());
+		}
+
+		template<typename Primitive>
+		void BVH<Primitive>::buildWithSAHSplit()
+		{
+			int size = m_objects.size();
+			BBox temp;
+			for (int i = 0; i < size; ++i)
+			{
+				if constexpr (isDereferenceable<Primitive>::value)
+				{
+					temp.extend(m_objects[i]->getBBox());
+				}
+				else
+				{
+					temp.extend(m_objects[i].getBBox());
+				}
+			}
+			m_root = std::make_unique<BVHNode>(temp, 0, size);
+			buildWithSAHSplitWork(&m_root, static_cast<float>(std::thread::hardware_concurrency()));
+		}
+
+		template<typename Primitive>
+		void BVH<Primitive>::buildWithMedianSplitWork(std::unique_ptr<BVHNode>* node, int work)
 		{
 			auto& ref_node = *node;
-			auto& ref_objects = *objects;
 
 			for (int i = ref_node->start; i < ref_node->end; ++i)
 			{
 				if constexpr (isDereferenceable<Primitive>::value)
 				{
-					ref_node->bbox.extend(ref_objects[i]->getBBox());
+					ref_node->bbox.extend(m_objects[i]->getBBox());
 				}
 				else
 				{
-					ref_node->bbox.extend(ref_objects[i].getBBox());
+					ref_node->bbox.extend(m_objects[i].getBBox());
 				}
 			}
 
@@ -48,7 +80,7 @@ namespace glue
 
 			if constexpr (isDereferenceable<Primitive>::value)
 			{
-				std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->start + ref_node->end) / 2, ref_objects.begin() + ref_node->end,
+				std::nth_element(m_objects.begin() + ref_node->start, m_objects.begin() + (ref_node->start + ref_node->end) / 2, m_objects.begin() + ref_node->end,
 					[axis](const Primitive& a, const Primitive& b)
 				{
 					auto a_bbox = a->getBoundsOnAxis(axis);
@@ -58,7 +90,7 @@ namespace glue
 			}
 			else
 			{
-				std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->start + ref_node->end) / 2, ref_objects.begin() + ref_node->end,
+				std::nth_element(m_objects.begin() + ref_node->start, m_objects.begin() + (ref_node->start + ref_node->end) / 2, m_objects.begin() + ref_node->end,
 					[axis](const Primitive& a, const Primitive& b)
 				{
 					auto a_bbox = a.getBoundsOnAxis(axis);
@@ -72,30 +104,22 @@ namespace glue
 
 			if (work > 1)
 			{
-				std::thread th1(buildWithMedianSplitWork<Primitive>, objects, &ref_node->right, work >> 1);
-				std::thread th2(buildWithMedianSplitWork<Primitive>, objects, &ref_node->left, work >> 1);
+				std::thread th1(&BVH<Primitive>::buildWithMedianSplitWork, this, &ref_node->right, work >> 1);
+				std::thread th2(&BVH<Primitive>::buildWithMedianSplitWork, this, &ref_node->left, work >> 1);
 				th2.join();
 				th1.join();
 			}
 			else
 			{
-				buildWithMedianSplitWork(objects, &ref_node->right, 0);
-				buildWithMedianSplitWork(objects, &ref_node->left, 0);
+				buildWithMedianSplitWork(&ref_node->right, 0);
+				buildWithMedianSplitWork(&ref_node->left, 0);
 			}
 		}
 
 		template<typename Primitive>
-		void BVH::buildWithMedianSplit(std::vector<Primitive>& objects)
-		{
-			m_root = std::make_unique<BVHNode>(0, objects.size());
-			buildWithMedianSplitWork(&objects, &m_root, std::thread::hardware_concurrency());
-		}
-
-		template<typename Primitive>
-		void buildWithSAHSplitWork(std::vector<Primitive>* objects, std::unique_ptr<BVHNode>* node, float work)
+		void BVH<Primitive>::buildWithSAHSplitWork(std::unique_ptr<BVHNode>* node, float work)
 		{
 			auto& ref_node = *node;
-			auto& ref_objects = *objects;
 
 			if (ref_node->end - ref_node->start <= 5)
 			{
@@ -118,11 +142,11 @@ namespace glue
 					BBox object_bbox;
 					if constexpr (isDereferenceable<Primitive>::value)
 					{
-						object_bbox = ref_objects[i]->getBBox();
+						object_bbox = m_objects[i]->getBBox();
 					}
 					else
 					{
-						object_bbox = ref_objects[i].getBBox();
+						object_bbox = m_objects[i].getBBox();
 					}
 					auto bin_index = static_cast<int>(((object_bbox.get_min()[axis] + object_bbox.get_max()[axis]) * 0.5f - ref_node->bbox.get_min()[axis]) * constant_term);
 					bins[bin_index].extend(object_bbox);
@@ -161,7 +185,7 @@ namespace glue
 
 			if constexpr (isDereferenceable<Primitive>::value)
 			{
-				std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->end - right_count), ref_objects.begin() + ref_node->end,
+				std::nth_element(m_objects.begin() + ref_node->start, m_objects.begin() + (ref_node->end - right_count), m_objects.begin() + ref_node->end,
 					[cut_axis](const Primitive& a, const Primitive& b)
 				{
 					auto a_bbox = a->getBoundsOnAxis(cut_axis);
@@ -171,7 +195,7 @@ namespace glue
 			}
 			else
 			{
-				std::nth_element(ref_objects.begin() + ref_node->start, ref_objects.begin() + (ref_node->end - right_count), ref_objects.begin() + ref_node->end,
+				std::nth_element(m_objects.begin() + ref_node->start, m_objects.begin() + (ref_node->end - right_count), m_objects.begin() + ref_node->end,
 					[cut_axis](const Primitive& a, const Primitive& b)
 				{
 					auto a_bbox = a.getBoundsOnAxis(cut_axis);
@@ -186,40 +210,20 @@ namespace glue
 			if (work > 0.5f)
 			{
 				auto right_work = work * (static_cast<float>(right_count) / (ref_node->end - ref_node->start));
-				std::thread th1(buildWithSAHSplitWork<Primitive>, objects, &ref_node->right, right_work);
-				std::thread th2(buildWithSAHSplitWork<Primitive>, objects, &ref_node->left, work - right_work);
+				std::thread th1(&BVH<Primitive>::buildWithSAHSplitWork, this, &ref_node->right, right_work);
+				std::thread th2(&BVH<Primitive>::buildWithSAHSplitWork, this, &ref_node->left, work - right_work);
 				th2.join();
 				th1.join();
 			}
 			else
 			{
-				buildWithSAHSplitWork(objects, &ref_node->right, 0.0f);
-				buildWithSAHSplitWork(objects, &ref_node->left, 0.0f);
+				buildWithSAHSplitWork(&ref_node->right, 0.0f);
+				buildWithSAHSplitWork(&ref_node->left, 0.0f);
 			}
 		}
 
 		template<typename Primitive>
-		void BVH::buildWithSAHSplit(std::vector<Primitive>& objects)
-		{
-			int size = objects.size();
-			BBox temp;
-			for (int i = 0; i < size; ++i)
-			{
-				if constexpr (isDereferenceable<Primitive>::value)
-				{
-					temp.extend(objects[i]->getBBox());
-				}
-				else
-				{
-					temp.extend(objects[i].getBBox());
-				}
-			}
-			m_root = std::make_unique<BVHNode>(temp, 0, size);
-			buildWithSAHSplitWork(&objects, &m_root, static_cast<float>(std::thread::hardware_concurrency()));
-		}
-
-		template<typename Primitive>
-		bool BVH::intersect(const std::vector<Primitive>& objects, const Ray& ray, Intersection& intersection, float max_distance) const
+		bool BVH<Primitive>::intersect(const Ray& ray, Intersection& intersection, float max_distance) const
 		{
 			std::array<BVHNode*, 32> stack;
 			int stack_size = 0;
@@ -246,7 +250,7 @@ namespace glue
 							if constexpr (isDereferenceable<Primitive>::value)
 							{
 								Intersection temp;
-								if (objects[i]->intersect(ray, temp, min_distance))
+								if (m_objects[i]->intersect(ray, temp, min_distance))
 								{
 									min_distance = temp.distance;
 									intersection = temp;
@@ -255,7 +259,7 @@ namespace glue
 							else
 							{
 								Intersection temp;
-								if (objects[i].intersect(ray, temp, min_distance))
+								if (m_objects[i].intersect(ray, temp, min_distance))
 								{
 									min_distance = temp.distance;
 									intersection = temp;
@@ -270,7 +274,7 @@ namespace glue
 		}
 
 		template<typename Primitive>
-		bool BVH::intersectShadowRay(const std::vector<Primitive>& objects, const Ray& ray, float max_distance) const
+		bool BVH<Primitive>::intersectShadowRay(const Ray& ray, float max_distance) const
 		{
 			std::array<BVHNode*, 32> stack;
 			int stack_size = 0;
@@ -295,14 +299,14 @@ namespace glue
 						{
 							if constexpr (isDereferenceable<Primitive>::value)
 							{
-								if (objects[i]->intersectShadowRay(ray, max_distance))
+								if (m_objects[i]->intersectShadowRay(ray, max_distance))
 								{
 									return true;
 								}
 							}
 							else
 							{
-								if (objects[i].intersectShadowRay(ray, max_distance))
+								if (m_objects[i].intersectShadowRay(ray, max_distance))
 								{
 									return true;
 								}

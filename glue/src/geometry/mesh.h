@@ -4,6 +4,7 @@
 #include "bbox.h"
 #include "transformation.h"
 #include "plane.h"
+#include "bvh.h"
 #include "..\core\forward_decl.h"
 #include "..\core\real_sampler.h"
 #include "..\core\discrete_1d_sampler.h"
@@ -20,7 +21,7 @@ namespace glue
 		{
 		public:
 			Mesh(const Transformation& transformation, const BBox& bbox, const std::vector<float>& triangle_areas, float area,
-				const std::shared_ptr<std::vector<Triangle>>& triangles, const std::shared_ptr<BVH>& bvh, std::unique_ptr<material::BsdfMaterial> bsdf_material);
+				const std::shared_ptr<BVH<Triangle>>& bvh, std::unique_ptr<material::BsdfMaterial> bsdf_material);
 
 			geometry::Plane samplePlane(core::UniformSampler& sampler);
 			float getSurfaceArea() const;
@@ -34,8 +35,7 @@ namespace glue
 			BBox m_bbox;
 			core::Discrete1DSampler m_triangle_sampler;
 			float m_area;
-			std::shared_ptr<std::vector<Triangle>> m_triangles;
-			std::shared_ptr<BVH> m_bvh;
+			std::shared_ptr<BVH<Triangle>> m_bvh;
 			std::unique_ptr<material::BsdfMaterial> m_bsdf_material;
 		};
 	}
