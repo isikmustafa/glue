@@ -1,6 +1,5 @@
 #include "core\scene.h"
 #include "core\timer.h"
-#include "integrator\raytracer.h"
 #include "integrator\pathtracer.h"
 
 #include <iostream>

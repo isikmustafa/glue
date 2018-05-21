@@ -10,7 +10,6 @@
 #include "..\geometry\mesh.h"
 #include "..\light\diffuse_arealight.h"
 #include "..\integrator\pathtracer.h"
-#include "..\integrator\raytracer.h"
 #include "..\material\lambertian.h"
 #include "..\material\oren_nayar.h"
 #include "..\material\metal.h"
@@ -88,11 +87,7 @@ namespace glue
 			auto integrator_element = getFirstChildElementThrow(scene_element, "Integrator");
 			auto integrator_type = getAttributeThrow(integrator_element, "type");
 
-			if (integrator_type == std::string("Raytracer"))
-			{
-				m_integrator = std::make_unique<integrator::Raytracer>();
-			}
-			else if (integrator_type == std::string("Pathtracer"))
+			if (integrator_type == std::string("Pathtracer"))
 			{
 				auto filter_element = getFirstChildElementThrow(integrator_element, "Filter");
 

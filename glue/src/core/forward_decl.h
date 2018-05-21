@@ -41,7 +41,6 @@ namespace glue
 	{
 		class Integrator;
 		class Pathtracer;
-		class Raytracer;
 	}
 
 	namespace light

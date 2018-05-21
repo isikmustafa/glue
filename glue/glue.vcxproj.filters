@@ -46,9 +46,6 @@
     <ClCompile Include="src\core\scene.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
-    <ClCompile Include="src\integrator\raytracer.cpp">
-      <Filter>Source Files\integrator</Filter>
-    </ClCompile>
     <ClCompile Include="src\geometry\transformation.cpp">
       <Filter>Source Files\geometry</Filter>
     </ClCompile>
@@ -128,9 +125,6 @@
     </ClInclude>
     <ClInclude Include="src\core\scene.h">
       <Filter>Source Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\integrator\raytracer.h">
-      <Filter>Source Files\integrator</Filter>
     </ClInclude>
     <ClInclude Include="src\geometry\intersection.h">
       <Filter>Source Files\geometry</Filter>

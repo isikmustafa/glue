@@ -163,7 +163,6 @@
     <ClCompile Include="src\geometry\transformation.cpp" />
     <ClCompile Include="src\geometry\triangle.cpp" />
     <ClCompile Include="src\integrator\pathtracer.cpp" />
-    <ClCompile Include="src\integrator\raytracer.cpp" />
     <ClCompile Include="src\light\diffuse_arealight.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\material\dielectric.cpp" />
@@ -198,7 +197,6 @@
     <ClInclude Include="src\geometry\triangle.h" />
     <ClInclude Include="src\integrator\integrator.h" />
     <ClInclude Include="src\integrator\pathtracer.h" />
-    <ClInclude Include="src\integrator\raytracer.h" />
     <ClInclude Include="src\light\diffuse_arealight.h" />
     <ClInclude Include="src\light\light.h" />
     <ClInclude Include="src\material\bsdf_material.h" />
