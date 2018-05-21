@@ -56,7 +56,7 @@ namespace glue
 			auto itr = scene.light_meshes.find(intersection.mesh);
 			if (itr != scene.light_meshes.end())
 			{
-				if (!light_explicitly_sampled && glm::dot(-ray.get_direction(), intersection.normal) > 0.0f)
+				if (!light_explicitly_sampled && glm::dot(-ray.get_direction(), intersection.plane.normal) > 0.0f)
 				{
 					return importance < m_rr_threshold ? itr->second->getLe() * 2.0f : itr->second->getLe();
 				}
@@ -66,8 +66,7 @@ namespace glue
 				}
 			}
 
-			auto intersection_point = ray.getPoint(intersection.distance);
-			core::CoordinateSpace tangent_space(intersection_point, intersection.normal);
+			core::CoordinateSpace tangent_space(intersection.plane.point, intersection.plane.normal);
 			auto wi_tangent = tangent_space.vectorToLocalSpace(-ray.get_direction());
 
 			//DIRECT LIGHTING//
@@ -81,7 +80,7 @@ namespace glue
 					const auto* light = scene.lights[i].get();
 
 					auto sampled_plane = light->samplePlane(uniform_sampler);
-					auto wo_world = sampled_plane.point - intersection_point;
+					auto wo_world = sampled_plane.point - intersection.plane.point;
 					auto distance = glm::length(wo_world);
 					wo_world /= distance;
 
@@ -100,7 +99,7 @@ namespace glue
 					glm::vec3 direct_lo_light(0.0f);
 					if (f.x + f.y + f.z > 0.0f)
 					{
-						geometry::Ray shadow_ray(intersection_point + wo_world * scene.secondary_ray_epsilon, wo_world);
+						geometry::Ray shadow_ray(intersection.plane.point + wo_world * scene.secondary_ray_epsilon, wo_world);
 						if (!scene.bvh_meshes.intersectShadowRay(shadow_ray, distance - 1.1f * scene.secondary_ray_epsilon))
 						{
 							direct_lo_light = f * light->getLe();
@@ -129,7 +128,7 @@ namespace glue
 						{
 							geometry::Intersection dl_intersection;
 							auto wo_world = tangent_space.vectorToWorldSpace(wo_tangent_bsdf);
-							geometry::Ray wo_ray(intersection_point + wo_world * scene.secondary_ray_epsilon, wo_world);
+							geometry::Ray wo_ray(intersection.plane.point + wo_world * scene.secondary_ray_epsilon, wo_world);
 							if (scene.bvh_meshes.intersect(wo_ray, dl_intersection, std::numeric_limits<float>::max()))
 							{
 								//If ray through sampled direction hits this light, add its contribution.
@@ -138,7 +137,7 @@ namespace glue
 								{
 									//Get p(A) and transform it to p(w)
 									auto pdf_light = light->getPdf();
-									pdf_light *= dl_intersection.distance * dl_intersection.distance / glm::max(glm::dot(-wo_world, dl_intersection.normal), 0.0f);
+									pdf_light *= dl_intersection.distance * dl_intersection.distance / glm::max(glm::dot(-wo_world, dl_intersection.plane.normal), 0.0f);
 
 									//Compute the weight of the sample from bsdf pdf using power heuristic with beta=2
 									auto pdf_bsdf = intersection.bsdf_material->getPdf(wi_tangent, wo_tangent_bsdf);
@@ -174,7 +173,7 @@ namespace glue
 			if (f.x + f.y + f.z > 0.0f)
 			{
 				auto wo_world = tangent_space.vectorToWorldSpace(wo_tangent);
-				geometry::Ray wo_ray(intersection_point + wo_world * scene.secondary_ray_epsilon, wo_world);
+				geometry::Ray wo_ray(intersection.plane.point + wo_world * scene.secondary_ray_epsilon, wo_world);
 
 				indirect_lo = f * estimate(scene, wo_ray, uniform_sampler, importance * glm::max(glm::max(f.x, f.y), f.z), light_explicitly_sampled);
 			}

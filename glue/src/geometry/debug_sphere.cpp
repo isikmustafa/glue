@@ -37,8 +37,9 @@ namespace glue
 			auto distance = a - glm::sqrt(x);
 			if (distance > 0.0f && distance < max_distance)
 			{
+				intersection.plane.point = ray.getPoint(distance);
+				intersection.plane.normal = glm::normalize(ray.getPoint(distance) - m_center);
 				intersection.distance = distance;
-				intersection.normal = glm::normalize(ray.getPoint(distance) - m_center);
 				return true;
 			}
 			return false;

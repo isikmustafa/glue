@@ -1,9 +1,8 @@
 #ifndef __GLUE__GEOMETRY__INTERSECTION__
 #define __GLUE__GEOMETRY__INTERSECTION__
 
+#include "plane.h"
 #include "..\core\forward_decl.h"
-
-#include <glm\vec3.hpp>
 
 namespace glue
 {
@@ -11,8 +10,7 @@ namespace glue
 	{
 		struct Intersection
 		{
-			//normal should always be normalized.
-			glm::vec3 normal;
+			Plane plane;
 			float distance;
 			//Pointers will be kept as raw pointers.
 			//The reason is to prevent overhead due to shared_ptr destruction and construction

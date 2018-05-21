@@ -13,6 +13,7 @@ namespace glue
 			glm::vec3 normal;
 
 			//p_normal is assumed to be normalized.
+			Plane() = default;
 			Plane(const glm::vec3& p_point, const glm::vec3& p_normal)
 				: point(p_point)
 				, normal(p_normal)

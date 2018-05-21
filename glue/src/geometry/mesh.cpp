@@ -51,7 +51,8 @@ namespace glue
 		{
 			if (m_bvh->intersect(m_transformation.rayToObjectSpace(ray), intersection, max_distance))
 			{
-				intersection.normal = glm::normalize(m_transformation.normalToWorldSpace(intersection.normal));
+				intersection.plane.point = ray.getPoint(intersection.distance);
+				intersection.plane.normal = glm::normalize(m_transformation.normalToWorldSpace(intersection.plane.normal));
 				intersection.mesh = this;
 				intersection.bsdf_material = m_bsdf_material.get();
 				return true;
