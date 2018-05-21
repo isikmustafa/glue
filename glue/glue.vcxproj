@@ -191,6 +191,7 @@
     <ClInclude Include="src\geometry\intersection.h" />
     <ClInclude Include="src\geometry\mesh.h" />
     <ClInclude Include="src\geometry\plane.h" />
+    <ClInclude Include="src\geometry\object.h" />
     <ClInclude Include="src\geometry\ray.h" />
     <ClInclude Include="src\geometry\spherical_coordinate.h" />
     <ClInclude Include="src\geometry\transformation.h" />

@@ -14,6 +14,9 @@ namespace glue
 {
 	namespace geometry
 	{
+		//Although having almost the same member functions, this class do not inherit from Object base class.
+		//The reason is that Triangle is not designed to have its own material and transformation.
+		//Triangles exist only for building a mesh.
 		class Triangle
 		{
 		public:

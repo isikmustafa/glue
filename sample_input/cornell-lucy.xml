@@ -12,77 +12,78 @@
 	
     <Output>
         <Image>
-			<ImageName>../sample_output/cornell-lucyClamp.png</ImageName>
+			<ImageName>../sample_output/cornell-lucyClamp</ImageName>
+			<ImageFormat>png</ImageFormat>
 			<Tonemapper type="Clamp">
 				<Min>0.0</Min>
 				<Max>1.0</Max>
 			</Tonemapper>
 		</Image>
         <!--<Image>
-			<ImageName>../sample_output/cornell-lucy0.18_1.0.png</ImageName>
+			<ImageName>../sample_output/cornell-lucy0.18_1.0</ImageName>
 			<Tonemapper type="GlobalReinhard">
 				<Key>0.18</Key>
 				<MaxLuminance>1.0</MaxLuminance>
 			</Tonemapper>
 		</Image>
         <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.9.png</ImageName>
+			<ImageName>../sample_output/cornell-lucy0.18_0.9</ImageName>
 			<Tonemapper type="GlobalReinhard">
 				<Key>0.18</Key>
 				<MaxLuminance>0.9</MaxLuminance>
 			</Tonemapper>
 		</Image>
         <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.8.png</ImageName>
+			<ImageName>../sample_output/cornell-lucy0.18_0.8</ImageName>
 			<Tonemapper type="GlobalReinhard">
 				<Key>0.18</Key>
 				<MaxLuminance>0.8</MaxLuminance>
 			</Tonemapper>
 		</Image>
         <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.7.png</ImageName>
+			<ImageName>../sample_output/cornell-lucy0.18_0.7</ImageName>
 			<Tonemapper type="GlobalReinhard">
 				<Key>0.18</Key>
 				<MaxLuminance>0.7</MaxLuminance>
 			</Tonemapper>
 		</Image>
         <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.6.png</ImageName>
+			<ImageName>../sample_output/cornell-lucy0.18_0.6</ImageName>
 			<Tonemapper type="GlobalReinhard">
 				<Key>0.18</Key>
 				<MaxLuminance>0.6</MaxLuminance>
 			</Tonemapper>
 		</Image>
         <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.5.png</ImageName>
+			<ImageName>../sample_output/cornell-lucy0.18_0.5</ImageName>
 			<Tonemapper type="GlobalReinhard">
 				<Key>0.18</Key>
 				<MaxLuminance>0.5</MaxLuminance>
 			</Tonemapper>
 		</Image>
         <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.4.png</ImageName>
+			<ImageName>../sample_output/cornell-lucy0.18_0.4</ImageName>
 			<Tonemapper type="GlobalReinhard">
 				<Key>0.18</Key>
 				<MaxLuminance>0.4</MaxLuminance>
 			</Tonemapper>
 		</Image>
         <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.3.png</ImageName>
+			<ImageName>../sample_output/cornell-lucy0.18_0.3</ImageName>
 			<Tonemapper type="GlobalReinhard">
 				<Key>0.18</Key>
 				<MaxLuminance>0.3</MaxLuminance>
 			</Tonemapper>
 		</Image>
         <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.2.png</ImageName>
+			<ImageName>../sample_output/cornell-lucy0.18_0.2</ImageName>
 			<Tonemapper type="GlobalReinhard">
 				<Key>0.18</Key>
 				<MaxLuminance>0.2</MaxLuminance>
 			</Tonemapper>
 		</Image>
         <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.1.png</ImageName>
+			<ImageName>../sample_output/cornell-lucy0.18_0.1</ImageName>
 			<Tonemapper type="GlobalReinhard">
 				<Key>0.18</Key>
 				<MaxLuminance>0.1</MaxLuminance>
@@ -111,7 +112,7 @@
 			<kd>0.73 0.48 0.34</kd>
 		</BsdfMaterial>
 	</Mesh>
-	<!-- Glass -->
+	<!-- Glass 
 	<Mesh>
 		<Datapath>../sample_input/box.obj</Datapath>
 		<Transformation>
@@ -122,7 +123,7 @@
 			<IorN>1.5</IorN>
 			<Roughness>0.1</Roughness>
 		</BsdfMaterial>
-	</Mesh>
+	</Mesh>-->
 	<!-- Front -->
 	<Mesh>
 		<Datapath>../sample_input/rectangle.obj</Datapath>

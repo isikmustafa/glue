@@ -1,11 +1,9 @@
 #ifndef __GLUE__GEOMETRY__MESH__
 #define __GLUE__GEOMETRY__MESH__
 
-#include "bbox.h"
+#include "object.h"
 #include "transformation.h"
-#include "plane.h"
 #include "bvh.h"
-#include "..\core\forward_decl.h"
 #include "..\core\real_sampler.h"
 #include "..\core\discrete_1d_sampler.h"
 #include "..\material\bsdf_material.h"
@@ -17,18 +15,18 @@ namespace glue
 {
 	namespace geometry
 	{
-		class Mesh
+		class Mesh : public Object
 		{
 		public:
 			Mesh(const Transformation& transformation, const BBox& bbox, const std::vector<float>& triangle_areas, float area,
 				const std::shared_ptr<BVH<Triangle>>& bvh, std::unique_ptr<material::BsdfMaterial> bsdf_material);
 
-			geometry::Plane samplePlane(core::UniformSampler& sampler);
-			float getSurfaceArea() const;
-			BBox getBBox() const;
-			glm::vec2 getBoundsOnAxis(int axis) const;
-			bool intersect(const Ray& ray, Intersection& intersection, float max_distance) const;
-			bool intersectShadowRay(const Ray& ray, float max_distance) const;
+			geometry::Plane samplePlane(core::UniformSampler& sampler) override;
+			float getSurfaceArea() const override;
+			BBox getBBox() const override;
+			glm::vec2 getBoundsOnAxis(int axis) const override;
+			bool intersect(const Ray& ray, Intersection& intersection, float max_distance) const override;
+			bool intersectShadowRay(const Ray& ray, float max_distance) const override;
 
 		private:
 			Transformation m_transformation;

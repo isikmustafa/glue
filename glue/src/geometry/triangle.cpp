@@ -77,6 +77,7 @@ namespace glue
 			auto distance = glm::dot(m_edge2, qvec) * inv_det;
 			if (distance > 0.0f && distance < max_distance)
 			{
+				intersection.plane.point = ray.getPoint(distance);
 				intersection.plane.normal = m_normal;
 				intersection.distance = distance;
 
