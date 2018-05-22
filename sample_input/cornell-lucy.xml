@@ -1,7 +1,4 @@
 <Scene>
-    <BackgroundRadiance>0 0 0</BackgroundRadiance>
-	<SecondaryRayEpsilon>0.001</SecondaryRayEpsilon>
-	
     <Integrator type="Pathtracer">
 		<Filter type="Gaussian">
 			<Sigma>0.5</Sigma>
@@ -101,7 +98,7 @@
     </Camera>
 	
 	<!-- Lucy -->
-	<Mesh>
+	<Object type="Mesh">
 		<Datapath>../sample_input/lucy.obj</Datapath>
 		<Transformation>
 			<Scaling>0.0018 0.0018 0.0018</Scaling>
@@ -111,9 +108,9 @@
 		<BsdfMaterial type="Lambertian">
 			<kd>0.73 0.48 0.34</kd>
 		</BsdfMaterial>
-	</Mesh>
+	</Object>
 	<!-- Glass 
-	<Mesh>
+	<Object type="Mesh">
 		<Datapath>../sample_input/box.obj</Datapath>
 		<Transformation>
 			<Scaling>0.4 0.4 0.01</Scaling>
@@ -123,9 +120,9 @@
 			<IorN>1.5</IorN>
 			<Roughness>0.1</Roughness>
 		</BsdfMaterial>
-	</Mesh>-->
+	</Object>-->
 	<!-- Front -->
-	<Mesh>
+	<Object type="Mesh">
 		<Datapath>../sample_input/rectangle.obj</Datapath>
 		<Transformation>
 			<Scaling>2 2 2</Scaling>
@@ -134,9 +131,9 @@
 		<BsdfMaterial type="Lambertian">
 			<kd>0.6 0.6 0.6</kd>
 		</BsdfMaterial>
-	</Mesh>
+	</Object>
 	<!-- Back -->
-	<Mesh>
+	<Object type="Mesh">
 		<Datapath>../sample_input/rectangle.obj</Datapath>
 		<Transformation>
 			<Scaling>2 2 2</Scaling>
@@ -146,9 +143,9 @@
 		<BsdfMaterial type="Lambertian">
 			<kd>0.6 0.6 0.6</kd>
 		</BsdfMaterial>
-	</Mesh>
+	</Object>
 	<!-- Right -->
-	<Mesh>
+	<Object type="Mesh">
 		<Datapath>../sample_input/rectangle.obj</Datapath>
 		<Transformation>
 			<Scaling>3 2 2</Scaling>
@@ -158,9 +155,9 @@
 		<BsdfMaterial type="Lambertian">
 			<kd>0.6 0.6 0.6</kd>
 		</BsdfMaterial>
-	</Mesh>
+	</Object>
 	<!-- Left -->
-	<Mesh>
+	<Object type="Mesh">
 		<Datapath>../sample_input/rectangle.obj</Datapath>
 		<Transformation>
 			<Scaling>3 2 2</Scaling>
@@ -170,9 +167,9 @@
 		<BsdfMaterial type="Lambertian">
 			<kd>0.6 0.6 0.6</kd>
 		</BsdfMaterial>
-	</Mesh>
+	</Object>
 	<!-- Ceil -->
-	<Mesh>
+	<Object type="Mesh">
 		<Datapath>../sample_input/rectangle.obj</Datapath>
 		<Transformation>
 			<Scaling>2 3 2</Scaling>
@@ -182,9 +179,9 @@
 		<BsdfMaterial type="Lambertian">
 			<kd>0.6 0.6 0.6</kd>
 		</BsdfMaterial>
-	</Mesh>
+	</Object>
 	<!-- Floor -->
-	<Mesh>
+	<Object type="Mesh">
 		<Datapath>../sample_input/rectangle.obj</Datapath>
 		<Transformation>
 			<Scaling>2 3 2</Scaling>
@@ -194,15 +191,17 @@
 		<BsdfMaterial type="Lambertian">
 			<kd>0.6 0.6 0.6</kd>
 		</BsdfMaterial>
-	</Mesh>
+	</Object>
 	
 	<Light type="DiffuseArealight">
 		<Flux>10 10 10</Flux>
-		<Datapath>../sample_input/rectangle.obj</Datapath>
-		<Transformation>
-			<Scaling>0.3 0.3 0.3</Scaling>
-			<Rotation>1 0 0 90</Rotation>
-			<Translation>0 1.999 0.0</Translation>
-		</Transformation>
+		<Object type="Mesh">
+			<Datapath>../sample_input/rectangle.obj</Datapath>
+			<Transformation>
+				<Scaling>0.3 0.3 0.3</Scaling>
+				<Rotation>1 0 0 90</Rotation>
+				<Translation>0 1.999 0.0</Translation>
+			</Transformation>
+		</Object>
 	</Light>
 </Scene>

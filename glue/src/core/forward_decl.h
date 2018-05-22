@@ -27,8 +27,9 @@ namespace glue
 	namespace geometry
 	{
 		class BBox;
-		class DebugSphere;
+		class Sphere;
 		struct Intersection;
+		class Object;
 		class Mesh;
 		struct Plane;
 		class Ray;

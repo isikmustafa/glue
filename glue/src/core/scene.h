@@ -4,7 +4,7 @@
 #include "pinhole_camera.h"
 #include "..\geometry\mesh.h"
 #include "..\geometry\bvh.h"
-#include "..\geometry\debug_sphere.h"
+#include "..\geometry\sphere.h"
 #include "..\light\light.h"
 #include "image.h"
 #include "tonemapper.h"
@@ -26,21 +26,23 @@ namespace glue
 		{
 		public:
 			std::unique_ptr<PinholeCamera> camera;
-			geometry::BVH<std::shared_ptr<geometry::Mesh>> bvh_meshes;
 			std::vector<std::shared_ptr<light::Light>> lights;
-			std::unordered_map<const geometry::Mesh*, const light::Light*> light_meshes;
+			std::unordered_map<const geometry::Object*, const light::Light*> light_meshes;
 			glm::vec3 background_radiance;
 			float secondary_ray_epsilon;
 
 		public:
 			void loadFromXML(const std::string& filepath);
-
+			bool intersect(const geometry::Ray& ray, geometry::Intersection& intersection, float max_distance) const;
+			bool intersectShadowRay(const geometry::Ray& ray, float max_distance) const;
 			void render();
 
 		private:
 			std::unique_ptr<integrator::Integrator> m_integrator;
 			std::unique_ptr<Image> m_image;
 			std::vector<std::pair<std::unique_ptr<Tonemapper>, std::string>> m_output;
+			geometry::BVH<std::shared_ptr<geometry::Mesh>> m_bvh_meshes;
+			geometry::BVH<std::shared_ptr<geometry::Sphere>> m_bvh_spheres;
 			std::unordered_map<std::string, std::shared_ptr<geometry::BVH<geometry::Triangle>>> m_path_to_bvh;
 			std::unordered_set<std::string> m_supported_imageformats_load{ "jpg", "png", "tga", "bmp", "psd", "gif", "hdr", "pic" };
 			std::unordered_set<std::string> m_supported_imageformats_save{ "png", "bmp", "tga" };
@@ -80,9 +82,11 @@ namespace glue
 			void parseIntegrator(tinyxml2::XMLElement* scene_element);
 			void parseCamera(tinyxml2::XMLElement* scene_element);
 			void parseOutput(tinyxml2::XMLElement* scene_element);
-			void parseMeshes(tinyxml2::XMLElement* scene_element);
+			void parseObjects(tinyxml2::XMLElement* scene_element);
 			void parseLights(tinyxml2::XMLElement* scene_element);
+			std::shared_ptr<geometry::Object> parseObject(tinyxml2::XMLElement* object_element);
 			void parseMesh(tinyxml2::XMLElement* mesh_element);
+			void parseSphere(tinyxml2::XMLElement* sphere_element);
 			void parseTriangles(const std::string& datapath);
 			std::unique_ptr<core::Filter> parseFilter(tinyxml2::XMLElement* filter_element);
 			geometry::Transformation parseTransformation(tinyxml2::XMLElement* transformation_element);

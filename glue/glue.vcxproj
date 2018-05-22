@@ -156,7 +156,7 @@
     <ClCompile Include="src\core\timer.cpp" />
     <ClCompile Include="src\core\tonemapper.cpp" />
     <ClCompile Include="src\geometry\bbox.cpp" />
-    <ClCompile Include="src\geometry\debug_sphere.cpp" />
+    <ClCompile Include="src\geometry\sphere.cpp" />
     <ClCompile Include="src\geometry\mesh.cpp" />
     <ClCompile Include="src\geometry\ray.cpp" />
     <ClCompile Include="src\geometry\spherical_coordinate.cpp" />
@@ -187,7 +187,7 @@
     <ClInclude Include="src\core\tonemapper.h" />
     <ClInclude Include="src\geometry\bbox.h" />
     <ClInclude Include="src\geometry\bvh.h" />
-    <ClInclude Include="src\geometry\debug_sphere.h" />
+    <ClInclude Include="src\geometry\sphere.h" />
     <ClInclude Include="src\geometry\intersection.h" />
     <ClInclude Include="src\geometry\mesh.h" />
     <ClInclude Include="src\geometry\plane.h" />

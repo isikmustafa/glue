@@ -28,15 +28,11 @@ namespace glue
 			return Triangle(v0, v1 - v0, v2 - v0).samplePlane(sampler);
 		}
 
-		//This function practically serves as a getter.
-		//However, the convention for both triangle and mesh classes should be the same.
 		float Mesh::getSurfaceArea() const
 		{
 			return m_area;
 		}
 
-		//This function practically serves as a getter.
-		//However, the convention for both triangle and mesh classes should be the same.
 		BBox Mesh::getBBox() const
 		{
 			return m_bbox;
@@ -53,7 +49,7 @@ namespace glue
 			{
 				intersection.plane.point = ray.getPoint(intersection.distance);
 				intersection.plane.normal = glm::normalize(m_transformation.normalToWorldSpace(intersection.plane.normal));
-				intersection.mesh = this;
+				intersection.object = this;
 				intersection.bsdf_material = m_bsdf_material.get();
 				return true;
 			}

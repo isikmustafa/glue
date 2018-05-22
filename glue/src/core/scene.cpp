@@ -20,6 +20,7 @@
 #include <glm\vec2.hpp>
 #include <glm\vec3.hpp>
 #include <glm\trigonometric.hpp>
+#include <glm\gtc\constants.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -40,17 +41,30 @@ namespace glue
 			auto scene_element = getFirstChildElementThrow(&file, "Scene");
 
 			parseCamera(scene_element);
-			parseIntegrator(scene_element);
-			m_image = std::make_unique<Image>(camera->get_screen_resolution().x, camera->get_screen_resolution().y);
-			parseOutput(scene_element);
-			parseMeshes(scene_element);
 			parseLights(scene_element);
-
 			parseTagContent(scene_element, "BackgroundRadiance", &background_radiance.x, 0.0f, &background_radiance.y, 0.0f, &background_radiance.z, 0.0f);
 			parseTagContent(scene_element, "SecondaryRayEpsilon", &secondary_ray_epsilon, 0.0001f);
 
-			//debug_bvh.buildWithSAHSplit(debug_spheres);
-			bvh_meshes.buildWithMedianSplit();
+			parseIntegrator(scene_element);
+			m_image = std::make_unique<Image>(camera->get_screen_resolution().x, camera->get_screen_resolution().y);
+			parseOutput(scene_element);
+			parseObjects(scene_element);
+
+			m_bvh_meshes.buildWithMedianSplit();
+			m_bvh_spheres.buildWithSAHSplit();
+		}
+
+		bool Scene::intersect(const geometry::Ray& ray, geometry::Intersection& intersection, float max_distance) const
+		{
+			auto result_meshes = m_bvh_meshes.intersect(ray, intersection, max_distance);
+			auto result_spheres = m_bvh_spheres.intersect(ray, intersection, result_meshes ? intersection.distance : max_distance);
+
+			return result_meshes || result_spheres;
+		}
+
+		bool Scene::intersectShadowRay(const geometry::Ray& ray, float max_distance) const
+		{
+			return m_bvh_meshes.intersectShadowRay(ray, max_distance) || m_bvh_spheres.intersectShadowRay(ray, max_distance);
 		}
 
 		void Scene::render()
@@ -89,14 +103,13 @@ namespace glue
 
 			if (integrator_type == std::string("Pathtracer"))
 			{
-				auto filter_element = getFirstChildElementThrow(integrator_element, "Filter");
-
 				int sample_count;
-				parseTagContent(integrator_element, "SampleCount", &sample_count, 1);
-
 				float rr_threshold;
+
+				parseTagContent(integrator_element, "SampleCount", &sample_count, 1);
 				parseTagContent(integrator_element, "RRThreshold", &rr_threshold, 0.5f);
 
+				auto filter_element = getFirstChildElementThrow(integrator_element, "Filter");
 				m_integrator = std::make_unique<integrator::Pathtracer>(parseFilter(filter_element), sample_count, rr_threshold);
 			}
 			else
@@ -181,14 +194,14 @@ namespace glue
 			}
 		}
 
-		void Scene::parseMeshes(tinyxml2::XMLElement* scene_element)
+		void Scene::parseObjects(tinyxml2::XMLElement* scene_element)
 		{
-			auto mesh_element = scene_element->FirstChildElement("Mesh");
-			while (mesh_element)
+			auto object_element = scene_element->FirstChildElement("Object");
+			while (object_element)
 			{
-				parseMesh(mesh_element);
+				parseObject(object_element);
 
-				mesh_element = mesh_element->NextSiblingElement("Mesh");
+				object_element = object_element->NextSiblingElement("Object");
 			}
 		}
 
@@ -201,13 +214,14 @@ namespace glue
 
 				if (light_type == std::string("DiffuseArealight"))
 				{
-					parseMesh(light_element);
+					auto object_element = getFirstChildElementThrow(light_element, "Object");
+					auto object = parseObject(object_element);
 
 					glm::vec3 flux;
 					parseTagContent(light_element, "Flux", &flux.x, &flux.y, &flux.z);
 
-					lights.push_back(std::make_shared<light::DiffuseArealight>(bvh_meshes.get_objects().back(), flux));
-					light_meshes[bvh_meshes.get_objects().back().get()] = lights.back().get();
+					lights.push_back(std::make_shared<light::DiffuseArealight>(object, flux));
+					light_meshes[object.get()] = lights.back().get();
 				}
 				else
 				{
@@ -215,6 +229,26 @@ namespace glue
 				}
 
 				light_element = light_element->NextSiblingElement("Light");
+			}
+		}
+
+		std::shared_ptr<geometry::Object> Scene::parseObject(tinyxml2::XMLElement* object_element)
+		{
+			auto object_type = getAttributeThrow(object_element, "type");
+
+			if (object_type == std::string("Mesh"))
+			{
+				parseMesh(object_element);
+				return m_bvh_meshes.get_objects().back();
+			}
+			else if (object_type == std::string("Sphere"))
+			{
+				parseSphere(object_element);
+				return m_bvh_spheres.get_objects().back();
+			}
+			else
+			{
+				throwXMLError(object_element, "Unknown Object type.");
 			}
 		}
 
@@ -229,9 +263,10 @@ namespace glue
 			}
 
 			geometry::Transformation transformation;
-			if (mesh_element->FirstChildElement("Transformation"))
+			auto transformation_element = mesh_element->FirstChildElement("Transformation");
+			if (transformation_element)
 			{
-				transformation = parseTransformation(mesh_element->FirstChildElement("Transformation"));
+				transformation = parseTransformation(transformation_element);
 			}
 
 			geometry::BBox bbox;
@@ -253,27 +288,60 @@ namespace glue
 
 			std::unique_ptr<material::BsdfMaterial> bsdf_material = nullptr;
 
-			if (mesh_element->Value() == std::string("Mesh"))
+			if (mesh_element->Parent()->Value() != std::string("Light"))
 			{
 				auto bsdf_material_element = getFirstChildElementThrow(mesh_element, "BsdfMaterial");
 				bsdf_material = parseBsdfMaterial(bsdf_material_element);
 			}
 
-			bvh_meshes.addObject(std::make_shared<geometry::Mesh>(transformation, bbox, triangle_areas, total_area, m_path_to_bvh[datapath],
+			m_bvh_meshes.addObject(std::make_shared<geometry::Mesh>(transformation, bbox, triangle_areas, total_area, m_path_to_bvh[datapath],
 				std::move(bsdf_material)));
+		}
 
-			//Create debug spheres on randomly chosen points if 'displayRandomSamples' attribute is specified.
-			/*auto att = mesh_element->Attribute("displayRandomSamples");
-			if (att)
+		void Scene::parseSphere(tinyxml2::XMLElement* sphere_element)
+		{
+			float radius;
+			glm::vec3 center;
+
+			parseTagContent(sphere_element, "Radius", &radius);
+			parseTagContent(sphere_element, "Center", &center.x, &center.y, &center.z);
+
+			geometry::Transformation transformation;
+			auto transformation_element = sphere_element->FirstChildElement("Transformation");
+			if (transformation_element)
 			{
-				UniformSampler sampler;
-				const auto& mesh = meshes.back();
-				auto num_of_samples = std::atoi(att);
-				for (int i = 0; i < num_of_samples; ++i)
+				glm::vec3 scaling;
+				glm::vec3 axis;
+				float angle;
+				glm::vec3 translation;
+
+				parseTagContent(transformation_element, "Scaling", &scaling.x, 1.0f, &scaling.y, 1.0f, &scaling.z, 1.0f);
+				parseTagContent(transformation_element, "Rotation", &axis.x, 1.0f, &axis.y, 1.0f, &axis.z, 1.0f, &angle, 0.0f);
+				parseTagContent(transformation_element, "Translation", &translation.x, 0.0f, &translation.y, 0.0f, &translation.z, 0.0f);
+
+				if (!(scaling.x == scaling.y && scaling.y == scaling.z))
 				{
-					debug_spheres.emplace_back(mesh->samplePlane(sampler).point, glm::sqrt(mesh->getSurfaceArea() / num_of_samples) / 5.0f);
+					throwXMLError(transformation_element->FirstChildElement("Scaling"), "Non-uniform scaling is not allowed for spheres.");
 				}
-			}*/
+
+				transformation.rotate(glm::normalize(axis), angle);
+				radius *= scaling.x;
+				center += translation;
+			}
+			transformation.scale(glm::vec3(radius));
+			transformation.translate(center);
+
+			geometry::BBox bbox(center - glm::vec3(radius), center + glm::vec3(radius));
+			auto area = 4.0f * glm::pi<float>() * radius * radius;
+			std::unique_ptr<material::BsdfMaterial> bsdf_material = nullptr;
+
+			if (sphere_element->Parent()->Value() != std::string("Light"))
+			{
+				auto bsdf_material_element = getFirstChildElementThrow(sphere_element, "BsdfMaterial");
+				bsdf_material = parseBsdfMaterial(bsdf_material_element);
+			}
+
+			m_bvh_spheres.addObject(std::make_shared<geometry::Sphere>(transformation, bbox, area, std::move(bsdf_material)));
 		}
 
 		void Scene::parseTriangles(const std::string& datapath)
@@ -293,7 +361,7 @@ namespace glue
 				throw std::runtime_error("Unhandled case: More than one mesh to process in the same model");
 			}
 
-			geometry::BVH<geometry::Triangle> bvh;
+			auto& bvh = m_path_to_bvh[datapath] = std::make_shared<geometry::BVH<geometry::Triangle>>();
 
 			aiMesh* mesh = scene->mMeshes[0];
 			glm::vec3 face_vertices[3];
@@ -306,12 +374,10 @@ namespace glue
 					const aiVector3D& position = mesh->mVertices[face.mIndices[k]];
 					face_vertices[k] = glm::vec3(position.x, position.y, position.z);
 				}
-				bvh.addObject(geometry::Triangle(face_vertices[0], face_vertices[1] - face_vertices[0], face_vertices[2] - face_vertices[0]));
+				bvh->addObject(geometry::Triangle(face_vertices[0], face_vertices[1] - face_vertices[0], face_vertices[2] - face_vertices[0]));
 			}
 
-			bvh.buildWithSAHSplit();
-
-			m_path_to_bvh[datapath] = std::make_shared<geometry::BVH<geometry::Triangle>>(std::move(bvh));
+			bvh->buildWithSAHSplit();
 		}
 
 		std::unique_ptr<core::Filter> Scene::parseFilter(tinyxml2::XMLElement* filter_element)
@@ -329,7 +395,6 @@ namespace glue
 			else if (filter_type == std::string("Gaussian"))
 			{
 				float sigma;
-
 				parseTagContent(filter_element, "Sigma", &sigma, 0.5f);
 
 				return std::make_unique<GaussianFilter>(sigma);
@@ -345,16 +410,16 @@ namespace glue
 			geometry::Transformation transformation;
 
 			glm::vec3 scaling;
-			parseTagContent(transformation_element, "Scaling", &scaling.x, 1.0f, &scaling.y, 1.0f, &scaling.z, 1.0f);
-			transformation.scale(scaling);
-
 			glm::vec3 axis;
 			float angle;
-			parseTagContent(transformation_element, "Rotation", &axis.x, 1.0f, &axis.y, 1.0f, &axis.z, 1.0f, &angle, 0.0f);
-			transformation.rotate(glm::normalize(axis), angle);
-
 			glm::vec3 translation;
+
+			parseTagContent(transformation_element, "Scaling", &scaling.x, 1.0f, &scaling.y, 1.0f, &scaling.z, 1.0f);
+			parseTagContent(transformation_element, "Rotation", &axis.x, 1.0f, &axis.y, 1.0f, &axis.z, 1.0f, &angle, 0.0f);
 			parseTagContent(transformation_element, "Translation", &translation.x, 0.0f, &translation.y, 0.0f, &translation.z, 0.0f);
+
+			transformation.scale(scaling);
+			transformation.rotate(glm::normalize(axis), angle);
 			transformation.translate(translation);
 
 			return transformation;
@@ -367,7 +432,6 @@ namespace glue
 			if (bsdf_type == std::string("Lambertian"))
 			{
 				glm::vec3 kd;
-
 				parseTagContent(bsdf_material_element, "kd", &kd.x, &kd.y, &kd.z);
 
 				return std::make_unique<material::Lambertian>(kd);
