@@ -227,7 +227,7 @@ namespace glue
 					glm::vec3 flux;
 					parseTagContent(light_element, "Flux", &flux.x, &flux.y, &flux.z);
 
-					lights.push_back(std::make_shared<light::DiffuseArealight>(object, flux));
+					lights.push_back(std::make_unique<light::DiffuseArealight>(object, flux));
 					light_meshes[object.get()] = lights.back().get();
 				}
 				else

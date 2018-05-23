@@ -27,7 +27,7 @@ namespace glue
 		{
 		public:
 			std::unique_ptr<PinholeCamera> camera;
-			std::vector<std::shared_ptr<light::Light>> lights;
+			std::vector<std::unique_ptr<light::Light>> lights;
 			std::unordered_map<const geometry::Object*, const light::Light*> light_meshes;
 			glm::vec3 background_radiance;
 			float secondary_ray_epsilon;
