@@ -29,26 +29,19 @@ namespace glue
 {
 	namespace core
 	{
-		void Scene::loadFromXML(const std::string& filepath)
+		void Scene::load(const std::string& xml_filepath)
 		{
-			tinyxml2::XMLDocument file;
+			auto root = xml::Node::getRoot(xml_filepath);
 
-			if (file.LoadFile(filepath.c_str()))
-			{
-				throwXMLError(&file, "The xml file cannot be loaded.");
-			}
+			parseCamera(root);
+			parseLights(root);
+			root.parseChildText("BackgroundRadiance", &background_radiance.x, 0.0f, &background_radiance.y, 0.0f, &background_radiance.z, 0.0f);
+			root.parseChildText("SecondaryRayEpsilon", &secondary_ray_epsilon, 0.0001f);
 
-			auto scene_element = getFirstChildElementThrow(&file, "Scene");
-
-			parseCamera(scene_element);
-			parseLights(scene_element);
-			parseTagContent(scene_element, "BackgroundRadiance", &background_radiance.x, 0.0f, &background_radiance.y, 0.0f, &background_radiance.z, 0.0f);
-			parseTagContent(scene_element, "SecondaryRayEpsilon", &secondary_ray_epsilon, 0.0001f);
-
-			parseIntegrator(scene_element);
+			parseIntegrator(root);
 			m_image = std::make_unique<Image>(camera->get_screen_resolution().x, camera->get_screen_resolution().y);
-			parseOutput(scene_element);
-			parseObjects(scene_element);
+			parseOutput(root);
+			parseObjects(root);
 
 			m_bvh_meshes.buildWithMedianSplit();
 			m_bvh_spheres.buildWithSAHSplit();
@@ -96,31 +89,31 @@ namespace glue
 			}
 		}
 
-		void Scene::parseIntegrator(tinyxml2::XMLElement* scene_element)
+		void Scene::parseIntegrator(const xml::Node& root)
 		{
-			auto integrator_element = getFirstChildElementThrow(scene_element, "Integrator");
-			auto integrator_type = getAttributeThrow(integrator_element, "type");
+			auto integrator_element = root.child("Integrator", true);
+			auto integrator_type = integrator_element.attribute("type", true);
 
 			if (integrator_type == std::string("Pathtracer"))
 			{
 				int sample_count;
 				float rr_threshold;
 
-				parseTagContent(integrator_element, "SampleCount", &sample_count, 1);
-				parseTagContent(integrator_element, "RRThreshold", &rr_threshold, 0.5f);
+				integrator_element.parseChildText("SampleCount", &sample_count, 1);
+				integrator_element.parseChildText("RRThreshold", &rr_threshold, 0.5f);
 
-				auto filter_element = getFirstChildElementThrow(integrator_element, "Filter");
+				auto filter_element = integrator_element.child("Filter", true);
 				m_integrator = std::make_unique<integrator::Pathtracer>(parseFilter(filter_element), sample_count, rr_threshold);
 			}
 			else
 			{
-				throwXMLError(integrator_element, "Unknown Integrator type.");
+				integrator_element.throwError("Unknown Integrator type.");
 			}
 		}
 
-		void Scene::parseCamera(tinyxml2::XMLElement* scene_element)
+		void Scene::parseCamera(const xml::Node& root)
 		{
-			auto camera_element = getFirstChildElementThrow(scene_element, "Camera");
+			auto camera_element = root.child("Camera", true);
 
 			glm::vec3 position;
 			glm::vec3 direction;
@@ -129,12 +122,12 @@ namespace glue
 			glm::ivec2 resolution;
 			float near_distance;
 
-			parseTagContent(camera_element, "Position", &position.x, &position.y, &position.z);
-			parseTagContent(camera_element, "Direction", &direction.x, &direction.y, &direction.z);
-			parseTagContent(camera_element, "Up", &up.x, &up.y, &up.z);
-			parseTagContent(camera_element, "FovXY", &fov_xy.x, &fov_xy.y);
-			parseTagContent(camera_element, "Resolution", &resolution.x, &resolution.y);
-			parseTagContent(camera_element, "NearDistance", &near_distance);
+			camera_element.parseChildText("Position", &position.x, &position.y, &position.z);
+			camera_element.parseChildText("Direction", &direction.x, &direction.y, &direction.z);
+			camera_element.parseChildText("Up", &up.x, &up.y, &up.z);
+			camera_element.parseChildText("FovXY", &fov_xy.x, &fov_xy.y);
+			camera_element.parseChildText("Resolution", &resolution.x, &resolution.y);
+			camera_element.parseChildText("NearDistance", &near_distance);
 
 			auto s_right = glm::tan(glm::radians(fov_xy.x) * 0.5f) * near_distance;
 			auto s_up = glm::tan(glm::radians(fov_xy.y) * 0.5f) * near_distance;
@@ -142,38 +135,38 @@ namespace glue
 			camera = std::make_unique<PinholeCamera>(position, direction, up, glm::vec4(-s_right, s_right, -s_up, s_up), resolution, near_distance);
 		}
 
-		void Scene::parseOutput(tinyxml2::XMLElement* scene_element)
+		void Scene::parseOutput(const xml::Node& root)
 		{
-			auto output_element = getFirstChildElementThrow(scene_element, "Output");
+			auto output_element = root.child("Output", true);
 			while (output_element)
 			{
-				auto output_type = getAttributeThrow(output_element, "type");
+				auto output_type = output_element.attribute("type", true);
 
 				if (output_type == std::string("Ldr"))
 				{
 					std::string image_name;
 					std::string image_format;
 
-					parseTagContent(output_element, "ImageName", &image_name);
-					parseTagContent(output_element, "ImageFormat", &image_format, std::string("png"));
+					output_element.parseChildText("ImageName", &image_name);
+					output_element.parseChildText("ImageFormat", &image_format, std::string("png"));
 
 					if (m_supported_imageformats_save.find(image_format) == m_supported_imageformats_save.end())
 					{
-						throwXMLError(output_element->FirstChildElement("ImageFormat"), "Unsupported ImageFormat.");
+						output_element.child("ImageFormat").throwError("Unsupported ImageFormat.");
 					}
 
 					image_name += "." + image_format;
 
-					auto tonemapper_element = getFirstChildElementThrow(output_element, "Tonemapper");
-					auto tonemapper_type = getAttributeThrow(tonemapper_element, "type");
+					auto tonemapper_element = output_element.child("Tonemapper", true);
+					auto tonemapper_type = tonemapper_element.attribute("type", true);
 
 					if (tonemapper_type == std::string("Clamp"))
 					{
 						float min;
 						float max;
 
-						parseTagContent(tonemapper_element, "Min", &min);
-						parseTagContent(tonemapper_element, "Max", &max);
+						tonemapper_element.parseChildText("Min", &min);
+						tonemapper_element.parseChildText("Max", &max);
 
 						m_outputs.push_back(std::make_unique<Ldr>(std::move(image_name), std::make_unique<Clamp>(min, max)));
 					}
@@ -182,87 +175,87 @@ namespace glue
 						float key;
 						float max_luminance;
 
-						parseTagContent(tonemapper_element, "Key", &key);
-						parseTagContent(tonemapper_element, "MaxLuminance", &max_luminance);
+						tonemapper_element.parseChildText("Key", &key);
+						tonemapper_element.parseChildText("MaxLuminance", &max_luminance);
 
 						m_outputs.push_back(std::make_unique<Ldr>(std::move(image_name), std::make_unique<GlobalReinhard>(key, max_luminance)));
 					}
 					else
 					{
-						throwXMLError(tonemapper_element, "Unknown Tonemapper type.");
+						tonemapper_element.throwError("Unknown Tonemapper type.");
 					}
 				}
 				else
 				{
-					throwXMLError(output_element, "Unknown Output type.");
+					output_element.throwError("Unknown Output type.");
 				}
 
-				output_element = output_element->NextSiblingElement("Output");
+				output_element = output_element.next();
 			}
 		}
 
-		void Scene::parseObjects(tinyxml2::XMLElement* scene_element)
+		void Scene::parseObjects(const xml::Node& root)
 		{
-			auto object_element = scene_element->FirstChildElement("Object");
+			auto object_element = root.child("Object");
 			while (object_element)
 			{
 				parseObject(object_element);
 
-				object_element = object_element->NextSiblingElement("Object");
+				object_element = object_element.next();
 			}
 		}
 
-		void Scene::parseLights(tinyxml2::XMLElement* scene_element)
+		void Scene::parseLights(const xml::Node& root)
 		{
-			auto light_element = scene_element->FirstChildElement("Light");
+			auto light_element = root.child("Light");
 			while (light_element)
 			{
-				auto light_type = getAttributeThrow(light_element, "type");
+				auto light_type = light_element.attribute("type", true);
 
 				if (light_type == std::string("DiffuseArealight"))
 				{
-					auto object_element = getFirstChildElementThrow(light_element, "Object");
+					auto object_element = light_element.child("Object", true);
 					auto object = parseObject(object_element);
 
 					glm::vec3 flux;
-					parseTagContent(light_element, "Flux", &flux.x, &flux.y, &flux.z);
+					light_element.parseChildText("Flux", &flux.x, &flux.y, &flux.z);
 
 					lights.push_back(std::make_unique<light::DiffuseArealight>(object, flux));
 					light_meshes[object.get()] = lights.back().get();
 				}
 				else
 				{
-					throwXMLError(light_element, "Unknown Light type.");
+					light_element.throwError("Unknown Light type.");
 				}
 
-				light_element = light_element->NextSiblingElement("Light");
+				light_element = light_element.next();
 			}
 		}
 
-		std::shared_ptr<geometry::Object> Scene::parseObject(tinyxml2::XMLElement* object_element)
+		std::shared_ptr<geometry::Object> Scene::parseObject(const xml::Node& object)
 		{
-			auto object_type = getAttributeThrow(object_element, "type");
+			auto object_type = object.attribute("type", true);
 
 			if (object_type == std::string("Mesh"))
 			{
-				parseMesh(object_element);
+				parseMesh(object);
 				return m_bvh_meshes.get_objects().back();
 			}
 			else if (object_type == std::string("Sphere"))
 			{
-				parseSphere(object_element);
+				parseSphere(object);
 				return m_bvh_spheres.get_objects().back();
 			}
 			else
 			{
-				throwXMLError(object_element, "Unknown Object type.");
+				object.throwError("Unknown Object type.");
 			}
 		}
 
-		void Scene::parseMesh(tinyxml2::XMLElement* mesh_element)
+		void Scene::parseMesh(const xml::Node& mesh)
 		{
 			std::string datapath;
-			parseTagContent(mesh_element, "Datapath", &datapath);
+			mesh.parseChildText("Datapath", &datapath);
 
 			if (m_path_to_bvh.find(datapath) == m_path_to_bvh.end())
 			{
@@ -270,7 +263,7 @@ namespace glue
 			}
 
 			geometry::Transformation transformation;
-			auto transformation_element = mesh_element->FirstChildElement("Transformation");
+			auto transformation_element = mesh.child("Transformation");
 			if (transformation_element)
 			{
 				transformation = parseTransformation(transformation_element);
@@ -295,9 +288,9 @@ namespace glue
 
 			std::unique_ptr<material::BsdfMaterial> bsdf_material = nullptr;
 
-			if (mesh_element->Parent()->Value() != std::string("Light"))
+			if (mesh.parent().value() != std::string("Light"))
 			{
-				auto bsdf_material_element = getFirstChildElementThrow(mesh_element, "BsdfMaterial");
+				auto bsdf_material_element = mesh.child("BsdfMaterial", true);
 				bsdf_material = parseBsdfMaterial(bsdf_material_element);
 			}
 
@@ -305,16 +298,16 @@ namespace glue
 				std::move(bsdf_material)));
 		}
 
-		void Scene::parseSphere(tinyxml2::XMLElement* sphere_element)
+		void Scene::parseSphere(const xml::Node& sphere)
 		{
 			float radius;
 			glm::vec3 center;
 
-			parseTagContent(sphere_element, "Radius", &radius);
-			parseTagContent(sphere_element, "Center", &center.x, &center.y, &center.z);
+			sphere.parseChildText("Radius", &radius);
+			sphere.parseChildText("Center", &center.x, &center.y, &center.z);
 
 			geometry::Transformation transformation;
-			auto transformation_element = sphere_element->FirstChildElement("Transformation");
+			auto transformation_element = sphere.child("Transformation");
 			if (transformation_element)
 			{
 				glm::vec3 scaling;
@@ -322,13 +315,13 @@ namespace glue
 				float angle;
 				glm::vec3 translation;
 
-				parseTagContent(transformation_element, "Scaling", &scaling.x, 1.0f, &scaling.y, 1.0f, &scaling.z, 1.0f);
-				parseTagContent(transformation_element, "Rotation", &axis.x, 1.0f, &axis.y, 1.0f, &axis.z, 1.0f, &angle, 0.0f);
-				parseTagContent(transformation_element, "Translation", &translation.x, 0.0f, &translation.y, 0.0f, &translation.z, 0.0f);
+				transformation_element.parseChildText("Scaling", &scaling.x, 1.0f, &scaling.y, 1.0f, &scaling.z, 1.0f);
+				transformation_element.parseChildText("Rotation", &axis.x, 1.0f, &axis.y, 1.0f, &axis.z, 1.0f, &angle, 0.0f);
+				transformation_element.parseChildText("Translation", &translation.x, 0.0f, &translation.y, 0.0f, &translation.z, 0.0f);
 
 				if (!(scaling.x == scaling.y && scaling.y == scaling.z))
 				{
-					throwXMLError(transformation_element->FirstChildElement("Scaling"), "Non-uniform scaling is not allowed for spheres.");
+					transformation_element.child("Scaling").throwError("Non-uniform scaling is not allowed for spheres.");
 				}
 
 				transformation.rotate(glm::normalize(axis), angle);
@@ -342,9 +335,9 @@ namespace glue
 			auto area = 4.0f * glm::pi<float>() * radius * radius;
 			std::unique_ptr<material::BsdfMaterial> bsdf_material = nullptr;
 
-			if (sphere_element->Parent()->Value() != std::string("Light"))
+			if (sphere.parent().value() != std::string("Light"))
 			{
-				auto bsdf_material_element = getFirstChildElementThrow(sphere_element, "BsdfMaterial");
+				auto bsdf_material_element = sphere.child("BsdfMaterial", true);
 				bsdf_material = parseBsdfMaterial(bsdf_material_element);
 			}
 
@@ -387,9 +380,9 @@ namespace glue
 			bvh->buildWithSAHSplit();
 		}
 
-		std::unique_ptr<core::Filter> Scene::parseFilter(tinyxml2::XMLElement* filter_element)
+		std::unique_ptr<core::Filter> Scene::parseFilter(const xml::Node& filter)
 		{
-			auto filter_type = getAttributeThrow(filter_element, "type");
+			auto filter_type = filter.attribute("type", true);
 
 			if (filter_type == std::string("Box"))
 			{
@@ -402,44 +395,43 @@ namespace glue
 			else if (filter_type == std::string("Gaussian"))
 			{
 				float sigma;
-				parseTagContent(filter_element, "Sigma", &sigma, 0.5f);
+				filter.parseChildText("Sigma", &sigma, 0.5f);
 
 				return std::make_unique<GaussianFilter>(sigma);
 			}
 			else
 			{
-				throwXMLError(filter_element, "Unknown Filter type.");
+				filter.throwError("Unknown Filter type.");
 			}
 		}
 
-		geometry::Transformation Scene::parseTransformation(tinyxml2::XMLElement* transformation_element)
+		geometry::Transformation Scene::parseTransformation(const xml::Node& transformation)
 		{
-			geometry::Transformation transformation;
-
 			glm::vec3 scaling;
 			glm::vec3 axis;
 			float angle;
 			glm::vec3 translation;
 
-			parseTagContent(transformation_element, "Scaling", &scaling.x, 1.0f, &scaling.y, 1.0f, &scaling.z, 1.0f);
-			parseTagContent(transformation_element, "Rotation", &axis.x, 1.0f, &axis.y, 1.0f, &axis.z, 1.0f, &angle, 0.0f);
-			parseTagContent(transformation_element, "Translation", &translation.x, 0.0f, &translation.y, 0.0f, &translation.z, 0.0f);
+			transformation.parseChildText("Scaling", &scaling.x, 1.0f, &scaling.y, 1.0f, &scaling.z, 1.0f);
+			transformation.parseChildText("Rotation", &axis.x, 1.0f, &axis.y, 1.0f, &axis.z, 1.0f, &angle, 0.0f);
+			transformation.parseChildText("Translation", &translation.x, 0.0f, &translation.y, 0.0f, &translation.z, 0.0f);
 
-			transformation.scale(scaling);
-			transformation.rotate(glm::normalize(axis), angle);
-			transformation.translate(translation);
+			geometry::Transformation t;
+			t.scale(scaling);
+			t.rotate(glm::normalize(axis), angle);
+			t.translate(translation);
 
-			return transformation;
+			return t;
 		}
 
-		std::unique_ptr<material::BsdfMaterial> Scene::parseBsdfMaterial(tinyxml2::XMLElement* bsdf_material_element)
+		std::unique_ptr<material::BsdfMaterial> Scene::parseBsdfMaterial(const xml::Node& bsdf_material)
 		{
-			auto bsdf_type = getAttributeThrow(bsdf_material_element, "type");
+			auto bsdf_type = bsdf_material.attribute("type", true);
 
 			if (bsdf_type == std::string("Lambertian"))
 			{
 				glm::vec3 kd;
-				parseTagContent(bsdf_material_element, "kd", &kd.x, &kd.y, &kd.z);
+				bsdf_material.parseChildText("kd", &kd.x, &kd.y, &kd.z);
 
 				return std::make_unique<material::Lambertian>(kd);
 			}
@@ -448,8 +440,8 @@ namespace glue
 				glm::vec3 kd;
 				float roughness;
 
-				parseTagContent(bsdf_material_element, "kd", &kd.x, &kd.y, &kd.z);
-				parseTagContent(bsdf_material_element, "Roughness", &roughness);
+				bsdf_material.parseChildText("kd", &kd.x, &kd.y, &kd.z);
+				bsdf_material.parseChildText("Roughness", &roughness);
 
 				return std::make_unique<material::OrenNayar>(kd, roughness);
 			}
@@ -459,9 +451,9 @@ namespace glue
 				glm::vec3 ior_k;
 				float roughness;
 
-				parseTagContent(bsdf_material_element, "IorN", &ior_n.x, &ior_n.y, &ior_n.z);
-				parseTagContent(bsdf_material_element, "IorK", &ior_k.x, &ior_k.y, &ior_k.z);
-				parseTagContent(bsdf_material_element, "Roughness", &roughness);
+				bsdf_material.parseChildText("IorN", &ior_n.x, &ior_n.y, &ior_n.z);
+				bsdf_material.parseChildText("IorK", &ior_k.x, &ior_k.y, &ior_k.z);
+				bsdf_material.parseChildText("Roughness", &roughness);
 
 				return std::make_unique<material::Metal>(ior_n, ior_k, roughness);
 			}
@@ -470,14 +462,14 @@ namespace glue
 				float ior_n;
 				float roughness;
 
-				parseTagContent(bsdf_material_element, "IorN", &ior_n);
-				parseTagContent(bsdf_material_element, "Roughness", &roughness);
+				bsdf_material.parseChildText("IorN", &ior_n);
+				bsdf_material.parseChildText("Roughness", &roughness);
 
 				return std::make_unique<material::Dielectric>(ior_n, roughness);
 			}
 			else
 			{
-				throwXMLError(bsdf_material_element, "Unknown BsdfMaterial type.");
+				bsdf_material.throwError("Unknown BsdfMaterial type.");
 			}
 		}
 	}

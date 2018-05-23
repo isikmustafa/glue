@@ -2,13 +2,14 @@
 #define __GLUE__CORE__SCENE__
 
 #include "pinhole_camera.h"
+#include "image.h"
+#include "tonemapper.h"
+#include "output.h"
 #include "..\geometry\mesh.h"
 #include "..\geometry\bvh.h"
 #include "..\geometry\sphere.h"
 #include "..\light\light.h"
-#include "image.h"
-#include "tonemapper.h"
-#include "output.h"
+#include "..\xml\node.h"
 
 #include <vector>
 #include <sstream>
@@ -33,7 +34,7 @@ namespace glue
 			float secondary_ray_epsilon;
 
 		public:
-			void loadFromXML(const std::string& filepath);
+			void load(const std::string& xml_filepath);
 			bool intersect(const geometry::Ray& ray, geometry::Intersection& intersection, float max_distance) const;
 			bool intersectShadowRay(const geometry::Ray& ray, float max_distance) const;
 			void render();
@@ -50,52 +51,22 @@ namespace glue
 			std::stringstream m_stream;
 
 		private:
-			//If default values are NOT provided, these two will be called.
-			template<typename T>
-			void parseTag(T* arg);
-			template<typename T, typename... Args>
-			void parseTag(T* arg, Args... args);
-
-			//If default values are provided, these two will be called.
-			template<typename T>
-			void parseTag(T* arg, T default_value);
-			template<typename T, typename... Args>
-			void parseTag(T* arg, T default_value, Args... args);
-
-			//Parses tag content and assigns them to given arguments.
-			template<typename... Args>
-			void parseTagContent(tinyxml2::XMLElement* element, const std::string& tag, Args... args);
-
-			//Gets first child element and throws if it does not exist.
-			template<typename T>
-			tinyxml2::XMLElement* getFirstChildElementThrow(T element, const std::string& tag_name);
-
-			//Gets attribute and throws if it does not exist.
-			template<typename T>
-			const char* getAttributeThrow(T element, const std::string& att_name);
-
-			//Directly throws a std::runtime_error with given message.
-			template<typename T>
-			void throwXMLError(T element, const std::string& message);
-
 			//Caller always makes sure that XMLElement pointer is not nullptr.
 			//Callee just uses XMLElement pointer and does not check it. 
-			void parseIntegrator(tinyxml2::XMLElement* scene_element);
-			void parseCamera(tinyxml2::XMLElement* scene_element);
-			void parseOutput(tinyxml2::XMLElement* scene_element);
-			void parseObjects(tinyxml2::XMLElement* scene_element);
-			void parseLights(tinyxml2::XMLElement* scene_element);
-			std::shared_ptr<geometry::Object> parseObject(tinyxml2::XMLElement* object_element);
-			void parseMesh(tinyxml2::XMLElement* mesh_element);
-			void parseSphere(tinyxml2::XMLElement* sphere_element);
+			void parseIntegrator(const xml::Node& root);
+			void parseCamera(const xml::Node& root);
+			void parseOutput(const xml::Node& root);
+			void parseObjects(const xml::Node& root);
+			void parseLights(const xml::Node& root);
+			std::shared_ptr<geometry::Object> parseObject(const xml::Node& object);
+			void parseMesh(const xml::Node& mesh);
+			void parseSphere(const xml::Node& sphere);
 			void parseTriangles(const std::string& datapath);
-			std::unique_ptr<core::Filter> parseFilter(tinyxml2::XMLElement* filter_element);
-			geometry::Transformation parseTransformation(tinyxml2::XMLElement* transformation_element);
-			std::unique_ptr<material::BsdfMaterial> parseBsdfMaterial(tinyxml2::XMLElement* bsdf_material_element);
+			std::unique_ptr<core::Filter> parseFilter(const xml::Node& filter);
+			geometry::Transformation parseTransformation(const xml::Node& transformation);
+			std::unique_ptr<material::BsdfMaterial> parseBsdfMaterial(const xml::Node& bsdf_material);
 		};
 	}
 }
-
-#include "scene.inl"
 
 #endif

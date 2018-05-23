@@ -23,6 +23,9 @@
     <Filter Include="Source Files\microfacet">
       <UniqueIdentifier>{8d2532f6-dea2-4b97-9ad8-6cc7f37489c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\xml">
+      <UniqueIdentifier>{30c33063-32d7-4aa8-8001-7ad7e8da35ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -105,6 +108,9 @@
     </ClCompile>
     <ClCompile Include="src\core\output.cpp">
       <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xml\node.cpp">
+      <Filter>Source Files\xml</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -219,19 +225,22 @@
     <ClInclude Include="src\core\output.h">
       <Filter>Source Files\core</Filter>
     </ClInclude>
+    <ClInclude Include="src\xml\node.h">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\geometry\bvh.inl">
       <Filter>Source Files\geometry</Filter>
-    </None>
-    <None Include="src\core\scene.inl">
-      <Filter>Source Files\core</Filter>
     </None>
     <None Include="src\microfacet\microfacet_reflection.inl">
       <Filter>Source Files\microfacet</Filter>
     </None>
     <None Include="src\microfacet\microfacet_scattering.inl">
       <Filter>Source Files\microfacet</Filter>
+    </None>
+    <None Include="src\xml\node.inl">
+      <Filter>Source Files\xml</Filter>
     </None>
   </ItemGroup>
 </Project>

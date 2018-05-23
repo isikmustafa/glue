@@ -11,7 +11,7 @@ int main()
 	timer.start();
 	try
 	{
-		scene.loadFromXML("../sample_input/cornell-lucy.xml");
+		scene.load("../sample_input/cornell-lucy.xml");
 	}
 	catch (const std::runtime_error& e)
 	{
