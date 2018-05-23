@@ -103,6 +103,9 @@
     <ClCompile Include="src\geometry\sphere.cpp">
       <Filter>Source Files\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="src\core\output.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\geometry\triangle.h">
@@ -212,6 +215,9 @@
     </ClInclude>
     <ClInclude Include="src\geometry\sphere.h">
       <Filter>Source Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\output.h">
+      <Filter>Source Files\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

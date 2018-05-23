@@ -7,86 +7,21 @@
 		<RRThreshold>0.2</RRThreshold>
     </Integrator>
 	
-    <Output>
-        <Image>
-			<ImageName>../sample_output/cornell-lucyClamp</ImageName>
-			<ImageFormat>png</ImageFormat>
-			<Tonemapper type="Clamp">
-				<Min>0.0</Min>
-				<Max>1.0</Max>
-			</Tonemapper>
-		</Image>
-        <!--<Image>
-			<ImageName>../sample_output/cornell-lucy0.18_1.0</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.18</Key>
-				<MaxLuminance>1.0</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.9</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.18</Key>
-				<MaxLuminance>0.9</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.8</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.18</Key>
-				<MaxLuminance>0.8</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.7</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.18</Key>
-				<MaxLuminance>0.7</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.6</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.18</Key>
-				<MaxLuminance>0.6</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.5</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.18</Key>
-				<MaxLuminance>0.5</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.4</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.18</Key>
-				<MaxLuminance>0.4</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.3</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.18</Key>
-				<MaxLuminance>0.3</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.2</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.18</Key>
-				<MaxLuminance>0.2</MaxLuminance>
-			</Tonemapper>
-		</Image>
-        <Image>
-			<ImageName>../sample_output/cornell-lucy0.18_0.1</ImageName>
-			<Tonemapper type="GlobalReinhard">
-				<Key>0.18</Key>
-				<MaxLuminance>0.1</MaxLuminance>
-			</Tonemapper>
-		</Image>-->
-    </Output>
+	<Output type="Ldr">
+		<ImageName>../sample_output/cornell-lucyClamp</ImageName>
+		<ImageFormat>png</ImageFormat>
+		<Tonemapper type="Clamp">
+			<Min>0.0</Min>
+			<Max>1.0</Max>
+		</Tonemapper>
+	</Output>
+	<Output type="Ldr">
+		<ImageName>../sample_output/cornell-lucy0.18_1.0</ImageName>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.18</Key>
+			<MaxLuminance>1.0</MaxLuminance>
+		</Tonemapper>
+	</Output>
 	
     <Camera>
         <Position>0 0.95 1.49</Position>

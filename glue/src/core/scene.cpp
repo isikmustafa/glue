@@ -90,9 +90,9 @@ namespace glue
 			}
 			pool.stop(true);
 
-			for (const auto& img : m_output)
+			for (const auto& output : m_outputs)
 			{
-				img.first->tonemap(*m_image).save(img.second);
+				output->save(*m_image);
 			}
 		}
 
@@ -145,52 +145,59 @@ namespace glue
 		void Scene::parseOutput(tinyxml2::XMLElement* scene_element)
 		{
 			auto output_element = getFirstChildElementThrow(scene_element, "Output");
-
-			auto image_element = getFirstChildElementThrow(output_element, "Image");
-			while (image_element)
+			while (output_element)
 			{
-				std::string image_name;
-				std::string image_format;
+				auto output_type = getAttributeThrow(output_element, "type");
 
-				parseTagContent(image_element, "ImageName", &image_name);
-				parseTagContent(image_element, "ImageFormat", &image_format, std::string("png"));
-
-				if (m_supported_imageformats_save.find(image_format) == m_supported_imageformats_save.end())
+				if (output_type == std::string("Ldr"))
 				{
-					throwXMLError(image_element->FirstChildElement("ImageFormat"), "Unsupported ImageFormat.");
-				}
+					std::string image_name;
+					std::string image_format;
 
-				image_name += "." + image_format;
+					parseTagContent(output_element, "ImageName", &image_name);
+					parseTagContent(output_element, "ImageFormat", &image_format, std::string("png"));
 
-				auto tonemapper_element = getFirstChildElementThrow(image_element, "Tonemapper");
-				auto tonemapper_type = getAttributeThrow(tonemapper_element, "type");
+					if (m_supported_imageformats_save.find(image_format) == m_supported_imageformats_save.end())
+					{
+						throwXMLError(output_element->FirstChildElement("ImageFormat"), "Unsupported ImageFormat.");
+					}
 
-				if (tonemapper_type == std::string("Clamp"))
-				{
-					float min;
-					float max;
+					image_name += "." + image_format;
 
-					parseTagContent(tonemapper_element, "Min", &min);
-					parseTagContent(tonemapper_element, "Max", &max);
+					auto tonemapper_element = getFirstChildElementThrow(output_element, "Tonemapper");
+					auto tonemapper_type = getAttributeThrow(tonemapper_element, "type");
 
-					m_output.emplace_back(std::make_unique<Clamp>(min, max), std::move(image_name));
-				}
-				else if (tonemapper_type == std::string("GlobalReinhard"))
-				{
-					float key;
-					float max_luminance;
+					if (tonemapper_type == std::string("Clamp"))
+					{
+						float min;
+						float max;
 
-					parseTagContent(tonemapper_element, "Key", &key);
-					parseTagContent(tonemapper_element, "MaxLuminance", &max_luminance);
+						parseTagContent(tonemapper_element, "Min", &min);
+						parseTagContent(tonemapper_element, "Max", &max);
 
-					m_output.emplace_back(std::make_unique<GlobalReinhard>(key, max_luminance), std::move(image_name));
+						m_outputs.push_back(std::make_unique<Ldr>(std::move(image_name), std::make_unique<Clamp>(min, max)));
+					}
+					else if (tonemapper_type == std::string("GlobalReinhard"))
+					{
+						float key;
+						float max_luminance;
+
+						parseTagContent(tonemapper_element, "Key", &key);
+						parseTagContent(tonemapper_element, "MaxLuminance", &max_luminance);
+
+						m_outputs.push_back(std::make_unique<Ldr>(std::move(image_name), std::make_unique<GlobalReinhard>(key, max_luminance)));
+					}
+					else
+					{
+						throwXMLError(tonemapper_element, "Unknown Tonemapper type.");
+					}
 				}
 				else
 				{
-					throwXMLError(tonemapper_element, "Unknown Tonemapper type.");
+					throwXMLError(output_element, "Unknown Output type.");
 				}
 
-				image_element = image_element->NextSiblingElement("Image");
+				output_element = output_element->NextSiblingElement("Output");
 			}
 		}
 

@@ -52,7 +52,7 @@ namespace glue
 			return m_pixels[i];
 		}
 
-		void Image::save(const std::string& filename) const
+		void Image::saveLdr(const std::string& filename) const
 		{
 			constexpr int channel = 3; //RGB
 			int stride = channel * m_width;

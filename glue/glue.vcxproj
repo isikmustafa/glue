@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClCompile Include="src\core\filter.cpp" />
     <ClCompile Include="src\core\image.cpp" />
+    <ClCompile Include="src\core\output.cpp" />
     <ClCompile Include="src\core\pinhole_camera.cpp" />
     <ClCompile Include="src\core\coordinate_space.cpp" />
     <ClCompile Include="src\core\discrete_1d_sampler.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="src\core\forward_decl.h" />
     <ClInclude Include="src\core\image.h" />
     <ClInclude Include="src\core\math.h" />
+    <ClInclude Include="src\core\output.h" />
     <ClInclude Include="src\core\pinhole_camera.h" />
     <ClInclude Include="src\core\coordinate_space.h" />
     <ClInclude Include="src\core\discrete_1d_sampler.h" />

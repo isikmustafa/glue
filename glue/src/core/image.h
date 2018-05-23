@@ -17,7 +17,7 @@ namespace glue
 
 			std::vector<glm::vec3>& operator[](int i);
 			const std::vector<glm::vec3>& operator[](int i) const;
-			void save(const std::string& filename) const;
+			void saveLdr(const std::string& filename) const;
 
 			int get_width() const { return m_width; }
 			int get_height() const { return m_height; }

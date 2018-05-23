@@ -8,6 +8,7 @@
 #include "..\light\light.h"
 #include "image.h"
 #include "tonemapper.h"
+#include "output.h"
 
 #include <vector>
 #include <sstream>
@@ -40,7 +41,7 @@ namespace glue
 		private:
 			std::unique_ptr<integrator::Integrator> m_integrator;
 			std::unique_ptr<Image> m_image;
-			std::vector<std::pair<std::unique_ptr<Tonemapper>, std::string>> m_output;
+			std::vector<std::unique_ptr<Output>> m_outputs;
 			geometry::BVH<std::shared_ptr<geometry::Mesh>> m_bvh_meshes;
 			geometry::BVH<std::shared_ptr<geometry::Sphere>> m_bvh_spheres;
 			std::unordered_map<std::string, std::shared_ptr<geometry::BVH<geometry::Triangle>>> m_path_to_bvh;
