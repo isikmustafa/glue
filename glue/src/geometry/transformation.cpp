@@ -20,7 +20,7 @@ namespace glue
 			node.parseChildText("Rotation", &rotation.x, 1.0f, &rotation.y, 1.0f, &rotation.z, 1.0f, &rotation.w, 0.0f);
 			node.parseChildText("Translation", &translation.x, 0.0f, &translation.y, 0.0f, &translation.z, 0.0f);
 
-			if (node.parent().value() == std::string("Sphere"))
+			if (node.parent().attribute("type") == std::string("Sphere"))
 			{
 				if (!(scaling.x == scaling.y && scaling.y == scaling.z))
 				{
