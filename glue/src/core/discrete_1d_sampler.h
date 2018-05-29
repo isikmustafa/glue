@@ -12,6 +12,7 @@ namespace glue
 		class Discrete1DSampler
 		{
 		public:
+			Discrete1DSampler() = default;
 			Discrete1DSampler(const std::vector<float>& pdf);
 
 			int sample(UniformSampler& sampler) const;

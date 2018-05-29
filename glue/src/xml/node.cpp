@@ -30,6 +30,18 @@ namespace glue
 			return attribute;
 		}
 
+		std::unordered_map<std::string, std::string> Node::attributes() const
+		{
+			std::unordered_map<std::string, std::string> attribs;
+
+			for (auto attrib = m_node->FirstAttribute(); attrib; attrib = attrib->Next())
+			{
+				attribs[attrib->Name()] = attrib->Value();
+			}
+
+			return attribs;
+		}
+
 		Node Node::child(const std::string& child_name, bool throw_if_null) const
 		{
 			Node child(m_file, m_node->FirstChildElement(child_name.c_str()));

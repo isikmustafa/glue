@@ -1,6 +1,7 @@
 #include "mesh.h"
 #include "triangle.h"
 #include "bvh.h"
+#include "..\xml\parser.h"
 
 #include <algorithm>
 
@@ -8,24 +9,50 @@ namespace glue
 {
 	namespace geometry
 	{
-		Mesh::Mesh(const Transformation& transformation, const BBox& bbox, const std::vector<float>& triangle_areas, float area,
-			const std::shared_ptr<BVH<Triangle>>& bvh, std::unique_ptr<material::BsdfMaterial> bsdf_material)
-			: m_transformation(transformation)
-			, m_bbox(bbox)
-			, m_triangle_sampler(triangle_areas)
-			, m_area(area)
-			, m_bvh(bvh)
-			, m_bsdf_material(std::move(bsdf_material))
+		Mesh::Xml::Xml(const xml::Node& node)
+		{
+			attributes = node.attributes();
+			node.parseChildText("Datapath", &datapath);
+			transformation = node.child("Transformation") ? Transformation::Xml(node.child("Transformation")) : Transformation::Xml();
+			bsdf_material = node.parent().value() == std::string("Light") ? nullptr : material::BsdfMaterial::Xml::factory(node.child("BsdfMaterial", true));
+		}
+
+		Mesh::Xml::Xml(const std::string& p_datapath, const Transformation::Xml& p_transformation, std::unique_ptr<material::BsdfMaterial::Xml> p_bsdf_material)
+			: datapath(p_datapath)
+			, transformation(p_transformation)
+			, bsdf_material(std::move(p_bsdf_material))
 		{}
 
-		geometry::Plane Mesh::samplePlane(core::UniformSampler& sampler)
+		std::unique_ptr<Object> Mesh::Xml::create() const
 		{
-			auto vertices = m_bvh->get_objects()[m_triangle_sampler.sample(sampler)].getVertices();
-			auto v0 = m_transformation.pointToWorldSpace(vertices[0]);
-			auto v1 = m_transformation.pointToWorldSpace(vertices[1]);
-			auto v2 = m_transformation.pointToWorldSpace(vertices[2]);
+			return std::make_unique<Mesh>(*this);
+		}
 
-			return Triangle(v0, v1 - v0, v2 - v0).samplePlane(sampler);
+		Mesh::Mesh(const Mesh::Xml& xml)
+			: m_transformation(xml.transformation)
+			, m_bvh(xml::Parser::loadModel(xml.datapath))
+			, m_bsdf_material(xml.bsdf_material ? xml.bsdf_material->create() : nullptr)
+		{
+			std::vector<float> triangle_areas;
+			for (const auto& triangle : m_bvh->get_objects())
+			{
+				auto vertices = triangle.getVertices();
+				auto v0 = m_transformation.pointToWorldSpace(vertices[0]);
+				auto v1 = m_transformation.pointToWorldSpace(vertices[1]);
+				auto v2 = m_transformation.pointToWorldSpace(vertices[2]);
+				m_bbox.extend(v0);
+				m_bbox.extend(v1);
+				m_bbox.extend(v2);
+				auto area = geometry::Triangle(v0, v1 - v0, v2 - v0).getSurfaceArea();
+				triangle_areas.push_back(area);
+				m_area += area;
+			}
+			m_triangle_sampler = core::Discrete1DSampler(triangle_areas);
+		}
+
+		geometry::Plane Mesh::samplePlane(core::UniformSampler& sampler) const
+		{
+			return m_transformation.planeToWorldSpace(m_bvh->get_objects()[m_triangle_sampler.sample(sampler)].samplePlane(sampler));
 		}
 
 		float Mesh::getSurfaceArea() const

@@ -157,15 +157,19 @@
     <ClCompile Include="src\core\timer.cpp" />
     <ClCompile Include="src\core\tonemapper.cpp" />
     <ClCompile Include="src\geometry\bbox.cpp" />
+    <ClCompile Include="src\geometry\object.cpp" />
     <ClCompile Include="src\geometry\sphere.cpp" />
     <ClCompile Include="src\geometry\mesh.cpp" />
     <ClCompile Include="src\geometry\ray.cpp" />
     <ClCompile Include="src\geometry\spherical_coordinate.cpp" />
     <ClCompile Include="src\geometry\transformation.cpp" />
     <ClCompile Include="src\geometry\triangle.cpp" />
+    <ClCompile Include="src\integrator\integrator.cpp" />
     <ClCompile Include="src\integrator\pathtracer.cpp" />
     <ClCompile Include="src\light\diffuse_arealight.cpp" />
+    <ClCompile Include="src\light\light.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\material\bsdf_material.cpp" />
     <ClCompile Include="src\material\dielectric.cpp" />
     <ClCompile Include="src\material\lambertian.cpp" />
     <ClCompile Include="src\material\metal.cpp" />
@@ -174,6 +178,7 @@
     <ClCompile Include="src\microfacet\fresnel.cpp" />
     <ClCompile Include="src\microfacet\ggx_distribution.cpp" />
     <ClCompile Include="src\xml\node.cpp" />
+    <ClCompile Include="src\xml\parser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\core\filter.h" />
@@ -214,6 +219,7 @@
     <ClInclude Include="src\microfacet\microfacet_reflection.h" />
     <ClInclude Include="src\microfacet\microfacet_scattering.h" />
     <ClInclude Include="src\xml\node.h" />
+    <ClInclude Include="src\xml\parser.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\geometry\bvh.inl" />

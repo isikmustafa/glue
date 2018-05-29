@@ -17,7 +17,20 @@ namespace glue
 		class Metal : public BsdfMaterial
 		{
 		public:
-			Metal(const glm::vec3& ior_n, const glm::vec3& ior_k, float roughness);
+			//Xml structure of the class.
+			struct Xml : public BsdfMaterial::Xml
+			{
+				glm::vec3 ior_n;
+				glm::vec3 ior_k;
+				float roughness;
+
+				explicit Xml(const xml::Node& node);
+				Xml(const glm::vec3& p_ior_n, const glm::vec3& p_ior_k, float p_roughness);
+				std::unique_ptr<BsdfMaterial> create() const override;
+			};
+
+		public:
+			Metal(const Metal::Xml& xml);
 
 			std::pair<glm::vec3, glm::vec3> sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler) const override;
 			glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const override;

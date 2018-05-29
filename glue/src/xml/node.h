@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include <memory>
+#include <unordered_map>
 
 namespace glue
 {
@@ -16,6 +17,7 @@ namespace glue
 			const char* text() const;
 			const char* value() const;
 			const char* attribute(const std::string& attribute_name, bool throw_if_null = false) const;
+			std::unordered_map<std::string, std::string> attributes() const;
 			Node child(const std::string& child_name, bool throw_if_null = false) const;
 			Node next() const;
 			Node parent() const;

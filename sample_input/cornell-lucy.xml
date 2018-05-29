@@ -8,18 +8,11 @@
     </Integrator>
 	
 	<Output type="Ldr">
-		<ImageName>../sample_output/cornell-lucyClamp</ImageName>
-		<ImageFormat>png</ImageFormat>
+		<Path>../sample_output/cornell-lucyClamp</Path>
+		<Format>png</Format>
 		<Tonemapper type="Clamp">
 			<Min>0.0</Min>
 			<Max>1.0</Max>
-		</Tonemapper>
-	</Output>
-	<Output type="Ldr">
-		<ImageName>../sample_output/cornell-lucy0.18_1.0</ImageName>
-		<Tonemapper type="GlobalReinhard">
-			<Key>0.18</Key>
-			<MaxLuminance>1.0</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
@@ -41,7 +34,7 @@
 			<Translation>0 0 -0.5</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<kd>0.73 0.48 0.34</kd>
+			<Kd>0.73 0.48 0.34</Kd>
 		</BsdfMaterial>
 	</Object>
 	<!-- Glass 
@@ -64,7 +57,7 @@
 			<Translation>0 1 -1.5</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<kd>0.6 0.6 0.6</kd>
+			<Kd>0.6 0.6 0.6</Kd>
 		</BsdfMaterial>
 	</Object>
 	<!-- Back -->
@@ -76,7 +69,7 @@
 			<Translation>0 1 1.5</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<kd>0.6 0.6 0.6</kd>
+			<Kd>0.6 0.6 0.6</Kd>
 		</BsdfMaterial>
 	</Object>
 	<!-- Right -->
@@ -88,7 +81,7 @@
 			<Translation>1 1 0</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<kd>0.6 0.6 0.6</kd>
+			<Kd>0.6 0.6 0.6</Kd>
 		</BsdfMaterial>
 	</Object>
 	<!-- Left -->
@@ -100,7 +93,7 @@
 			<Translation>-1 1 0</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<kd>0.6 0.6 0.6</kd>
+			<Kd>0.6 0.6 0.6</Kd>
 		</BsdfMaterial>
 	</Object>
 	<!-- Ceil -->
@@ -112,7 +105,7 @@
 			<Translation>0 2 0</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<kd>0.6 0.6 0.6</kd>
+			<Kd>0.6 0.6 0.6</Kd>
 		</BsdfMaterial>
 	</Object>
 	<!-- Floor -->
@@ -124,7 +117,7 @@
 			<Translation>0 0 0</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<kd>0.6 0.6 0.6</kd>
+			<Kd>0.6 0.6 0.6</Kd>
 		</BsdfMaterial>
 	</Object>
 	

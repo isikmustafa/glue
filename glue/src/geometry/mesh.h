@@ -18,10 +18,22 @@ namespace glue
 		class Mesh : public Object
 		{
 		public:
-			Mesh(const Transformation& transformation, const BBox& bbox, const std::vector<float>& triangle_areas, float area,
-				const std::shared_ptr<BVH<Triangle>>& bvh, std::unique_ptr<material::BsdfMaterial> bsdf_material);
+			//Xml structure of the class.
+			struct Xml : public Object::Xml
+			{
+				std::string datapath;
+				Transformation::Xml transformation;
+				std::unique_ptr<material::BsdfMaterial::Xml> bsdf_material;
 
-			geometry::Plane samplePlane(core::UniformSampler& sampler) override;
+				explicit Xml(const xml::Node& node);
+				Xml(const std::string& p_datapath, const Transformation::Xml& p_transformation, std::unique_ptr<material::BsdfMaterial::Xml> p_bsdf_material);
+				std::unique_ptr<Object> create() const override;
+			};
+
+		public:
+			Mesh(const Mesh::Xml& xml);
+
+			geometry::Plane samplePlane(core::UniformSampler& sampler) const override;
 			float getSurfaceArea() const override;
 			BBox getBBox() const override;
 			glm::vec2 getBoundsOnAxis(int axis) const override;

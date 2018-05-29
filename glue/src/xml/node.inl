@@ -47,7 +47,11 @@ namespace glue
 			auto child = this->child(child_name);
 			if (child)
 			{
-				stream << child.text() << std::endl;
+				auto text = child.text();
+				if (text)
+				{
+					stream << text << std::endl;
+				}
 			}
 
 			try

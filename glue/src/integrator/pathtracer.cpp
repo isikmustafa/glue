@@ -4,7 +4,9 @@
 #include "..\core\coordinate_space.h"
 #include "..\core\scene.h"
 #include "..\core\math.h"
-#include "..\light\diffuse_arealight.h"
+#include "..\light\light.h"
+#include "..\material\bsdf_material.h"
+#include "..\xml\node.h"
 
 #include <limits>
 #include <glm\geometric.hpp>
@@ -13,10 +15,22 @@ namespace glue
 {
 	namespace integrator
 	{
-		Pathtracer::Pathtracer(std::unique_ptr<core::Filter> filter, int sample_count, float rr_threshold)
-			: m_filter(std::move(filter))
-			, m_sample_count(sample_count)
-			, m_rr_threshold(rr_threshold)
+		Pathtracer::Xml::Xml(const xml::Node& node)
+		{
+			filter = core::Filter::Xml::factory(node.child("Filter", true));
+			node.parseChildText("SampleCount", &sample_count);
+			node.parseChildText("RRThreshold", &rr_threshold);
+		}
+
+		std::unique_ptr<Integrator> Pathtracer::Xml::create() const
+		{
+			return std::make_unique<Pathtracer>(*this);
+		}
+
+		Pathtracer::Pathtracer(const Pathtracer::Xml& xml)
+			: m_filter(xml.filter->create())
+			, m_sample_count(xml.sample_count)
+			, m_rr_threshold(xml.rr_threshold)
 		{}
 
 		glm::vec3 Pathtracer::integratePixel(const core::Scene& scene, int x, int y) const
@@ -47,14 +61,14 @@ namespace glue
 			}
 
 			geometry::Intersection intersection;
-			if (!scene.intersect(ray, intersection, std::numeric_limits<float>::max()))
+			if (!scene.bvh.intersect(ray, intersection, std::numeric_limits<float>::max()))
 			{
 				return importance < m_rr_threshold ? scene.background_radiance * 2.0f : scene.background_radiance;
 			}
 
 			//Check if the ray hits a light source.
-			auto itr = scene.light_meshes.find(intersection.object);
-			if (itr != scene.light_meshes.end())
+			auto itr = scene.object_to_light.find(intersection.object);
+			if (itr != scene.object_to_light.end())
 			{
 				if (!light_explicitly_sampled && glm::dot(-ray.get_direction(), intersection.plane.normal) > 0.0f)
 				{
@@ -100,7 +114,7 @@ namespace glue
 					if (f.x + f.y + f.z > 0.0f)
 					{
 						geometry::Ray shadow_ray(intersection.plane.point + wo_world * scene.secondary_ray_epsilon, wo_world);
-						if (!scene.intersectShadowRay(shadow_ray, distance - 1.1f * scene.secondary_ray_epsilon))
+						if (!scene.bvh.intersectShadowRay(shadow_ray, distance - 1.1f * scene.secondary_ray_epsilon))
 						{
 							direct_lo_light = f * light->getLe();
 						}
@@ -129,11 +143,11 @@ namespace glue
 							geometry::Intersection dl_intersection;
 							auto wo_world = tangent_space.vectorToWorldSpace(wo_tangent_bsdf);
 							geometry::Ray wo_ray(intersection.plane.point + wo_world * scene.secondary_ray_epsilon, wo_world);
-							if (scene.intersect(wo_ray, dl_intersection, std::numeric_limits<float>::max()))
+							if (scene.bvh.intersect(wo_ray, dl_intersection, std::numeric_limits<float>::max()))
 							{
 								//If ray through sampled direction hits this light, add its contribution.
-								auto itr = scene.light_meshes.find(dl_intersection.object);
-								if (itr != scene.light_meshes.end() && itr->second == light)
+								auto itr = scene.object_to_light.find(dl_intersection.object);
+								if (itr != scene.object_to_light.end() && itr->second == light)
 								{
 									//Get p(A) and transform it to p(w)
 									auto pdf_light = light->getPdf();

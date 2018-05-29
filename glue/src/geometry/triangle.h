@@ -22,7 +22,7 @@ namespace glue
 		public:
 			Triangle(const glm::vec3& v0, const glm::vec3& edge1, const glm::vec3& edge2);
 
-			geometry::Plane samplePlane(core::UniformSampler& sampler);
+			geometry::Plane samplePlane(core::UniformSampler& sampler) const;
 			float getSurfaceArea() const;
 			BBox getBBox() const;
 			glm::vec2 getBoundsOnAxis(int axis) const;

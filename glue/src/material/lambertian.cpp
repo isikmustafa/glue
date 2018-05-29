@@ -2,6 +2,7 @@
 #include "..\geometry\spherical_coordinate.h"
 #include "..\core\real_sampler.h"
 #include "..\core\math.h"
+#include "..\xml\node.h"
 
 #include <glm\gtc\constants.hpp>
 #include <glm\geometric.hpp>
@@ -11,8 +12,22 @@ namespace glue
 {
 	namespace material
 	{
-		Lambertian::Lambertian(const glm::vec3& kd)
-			: m_kd(kd * glm::one_over_pi<float>())
+		Lambertian::Xml::Xml(const xml::Node& node)
+		{
+			node.parseChildText("Kd", &kd.x, &kd.y, &kd.z);
+		}
+
+		Lambertian::Xml::Xml(const glm::vec3& p_kd)
+			: kd(p_kd)
+		{}
+
+		std::unique_ptr<BsdfMaterial> Lambertian::Xml::create() const
+		{
+			return std::make_unique<Lambertian>(*this);
+		}
+
+		Lambertian::Lambertian(const Lambertian::Xml& xml)
+			: m_kd(xml.kd * glm::one_over_pi<float>())
 		{}
 
 		std::pair<glm::vec3, glm::vec3> Lambertian::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler) const

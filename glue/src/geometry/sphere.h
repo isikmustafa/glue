@@ -15,9 +15,23 @@ namespace glue
 		class Sphere : public Object
 		{
 		public:
-			Sphere(const Transformation& transformation, const BBox& bbox, float area, std::unique_ptr<material::BsdfMaterial> bsdf_material);
+			//Xml structure of the class.
+			struct Xml : public Object::Xml
+			{
+				float radius;
+				glm::vec3 center;
+				Transformation::Xml transformation;
+				std::unique_ptr<material::BsdfMaterial::Xml> bsdf_material;
 
-			geometry::Plane samplePlane(core::UniformSampler& sampler) override;
+				explicit Xml(const xml::Node& node);
+				Xml(float p_radius, glm::vec3 p_center, const Transformation::Xml& p_transformation, std::unique_ptr<material::BsdfMaterial::Xml> p_bsdf_material);
+				std::unique_ptr<Object> create() const override;
+			};
+
+		public:
+			Sphere(const Sphere::Xml& xml);
+
+			geometry::Plane samplePlane(core::UniformSampler& sampler) const override;
 			float getSurfaceArea() const override;
 			BBox getBBox() const override;
 			glm::vec2 getBoundsOnAxis(int axis) const override;

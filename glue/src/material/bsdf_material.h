@@ -4,6 +4,7 @@
 #include "..\core\forward_decl.h"
 
 #include <utility>
+#include <memory>
 #include <glm\vec3.hpp>
 #include <glm\geometric.hpp>
 
@@ -13,6 +14,15 @@ namespace glue
 	{
 		class BsdfMaterial
 		{
+		public:
+			//Xml structure of the class.
+			struct Xml
+			{
+				virtual ~Xml() {}
+				virtual std::unique_ptr<BsdfMaterial> create() const = 0;
+				static std::unique_ptr<BsdfMaterial::Xml> factory(const xml::Node& node);
+			};
+
 		public:
 			virtual ~BsdfMaterial() {}
 

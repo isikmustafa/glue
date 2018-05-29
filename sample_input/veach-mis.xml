@@ -1,24 +1,21 @@
 <Scene>
-    <BackgroundRadiance>0 0 0</BackgroundRadiance>
-	<SecondaryRayEpsilon>0.001</SecondaryRayEpsilon>
-	
     <Integrator type="Pathtracer">
 		<Filter type="Gaussian">
-			<Sigma>0.25</Sigma>
+			<Sigma>0.5</Sigma>
 		</Filter>
 		<SampleCount>128</SampleCount>
 		<RRThreshold>0.2</RRThreshold>
     </Integrator>
 	
-    <Output>
-        <Image>
-			<Tonemapper type="Clamp">
-				<Min>0.0</Min>
-				<Max>1.0</Max>
-			</Tonemapper>
-			<ImageName>../sample_output/veach-mis.png</ImageName>
-		</Image>
-    </Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/veach-mis</Path>
+		<Format>png</Format>
+		<Tonemapper type="Clamp">
+			<Min>0.0</Min>
+			<Max>1.0</Max>
+		</Tonemapper>
+	</Output>
 	
     <Camera>
         <Position>0 2 15</Position>
@@ -29,82 +26,78 @@
         <NearDistance>0.01</NearDistance>
     </Camera>
 	
-	<Mesh>
+	<Object type="Mesh">
 		<Datapath>../sample_input/plate1.obj</Datapath>
 		<BsdfMaterial type="Metal">
 			<IorN>3.1099 1.1851 0.9132</IorN>
 			<IorK>2.9567 2.2785 1.5698</IorK>
 			<Roughness>0.001</Roughness>
 		</BsdfMaterial>
-	</Mesh>
+	</Object>
 	
-	<Mesh>
+	<Object type="Mesh">
 		<Datapath>../sample_input/plate2.obj</Datapath>
 		<BsdfMaterial type="Metal">
 			<IorN>3.1099 1.1851 0.9132</IorN>
 			<IorK>2.9567 2.2785 1.5698</IorK>
 			<Roughness>0.01</Roughness>
 		</BsdfMaterial>
-	</Mesh>
+	</Object>
 	
-	<Mesh>
+	<Object type="Mesh">
 		<Datapath>../sample_input/plate3.obj</Datapath>
 		<BsdfMaterial type="Metal">
 			<IorN>3.1099 1.1851 0.9132</IorN>
 			<IorK>2.9567 2.2785 1.5698</IorK>
 			<Roughness>0.04</Roughness>
 		</BsdfMaterial>
-	</Mesh>
+	</Object>
 	
-	<Mesh>
+	<Object type="Mesh">
 		<Datapath>../sample_input/plate4.obj</Datapath>
 		<BsdfMaterial type="Metal">
 			<IorN>3.1099 1.1851 0.9132</IorN>
 			<IorK>2.9567 2.2785 1.5698</IorK>
 			<Roughness>0.09</Roughness>
 		</BsdfMaterial>
-	</Mesh>
+	</Object>
 	
-	<Mesh>
+	<Object type="Mesh">
 		<Datapath>../sample_input/floor.obj</Datapath>
 		<BsdfMaterial type="Lambertian">
-			<kd>0.5 0.5 0.5</kd>
+			<Kd>0.5 0.5 0.5</Kd>
 		</BsdfMaterial>
-	</Mesh>
+	</Object>
 	
 	<Light type="DiffuseArealight">
 		<Flux>32 32 32</Flux>
-		<Datapath>../sample_input/box.obj</Datapath>
-		<Transformation>
-			<Scaling>0.05 0.05 0.05</Scaling>
-			<Translation>-3.75 0 0</Translation>
-		</Transformation>
+		<Object type="Sphere">
+			<Radius>0.025</Radius>
+			<Center>-3.75 0 0</Center>
+		</Object>
 	</Light>
 	
 	<Light type="DiffuseArealight">
 		<Flux>32 32 32</Flux>
-		<Datapath>../sample_input/box.obj</Datapath>
-		<Transformation>
-			<Scaling>0.15 0.15 0.15</Scaling>
-			<Translation>-1.25 0 0</Translation>
-		</Transformation>
+		<Object type="Sphere">
+			<Radius>0.075</Radius>
+			<Center>-1.25 0 0</Center>
+		</Object>
 	</Light>
 	
 	<Light type="DiffuseArealight">
 		<Flux>32 32 32</Flux>
-		<Datapath>../sample_input/box.obj</Datapath>
-		<Transformation>
-			<Scaling>0.43 0.43 0.43</Scaling>
-			<Translation>1.25 0 0</Translation>
-		</Transformation>
+		<Object type="Sphere">
+			<Radius>0.215</Radius>
+			<Center>1.25 0 0</Center>
+		</Object>
 	</Light>
 	
 	<Light type="DiffuseArealight">
 		<Flux>32 32 32</Flux>
-		<Datapath>../sample_input/box.obj</Datapath>
-		<Transformation>
-			<Scaling>1.3 1.3 1.3</Scaling>
-			<Translation>3.75 0 0</Translation>
-		</Transformation>
+		<Object type="Sphere">
+			<Radius>0.65</Radius>
+			<Center>3.75 0 0</Center>
+		</Object>
 	</Light>
 </Scene>

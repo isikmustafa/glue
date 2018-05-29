@@ -2,6 +2,7 @@
 #include "..\geometry\spherical_coordinate.h"
 #include "..\core\real_sampler.h"
 #include "..\core\math.h"
+#include "..\xml\node.h"
 
 #include <glm\gtc\constants.hpp>
 #include <glm\geometric.hpp>
@@ -11,10 +12,26 @@ namespace glue
 {
 	namespace material
 	{
-		OrenNayar::OrenNayar(const glm::vec3& kd, float roughness)
-			: m_kd(kd * glm::one_over_pi<float>())
+		OrenNayar::Xml::Xml(const xml::Node& node)
 		{
-			auto r2 = roughness * roughness;
+			node.parseChildText("Kd", &kd.x, &kd.y, &kd.z);
+			node.parseChildText("Roughness", &roughness);
+		}
+
+		OrenNayar::Xml::Xml(const glm::vec3& p_kd, float p_roughness)
+			: kd(p_kd)
+			, roughness(p_roughness)
+		{}
+
+		std::unique_ptr<BsdfMaterial> OrenNayar::Xml::create() const
+		{
+			return std::make_unique<OrenNayar>(*this);
+		}
+
+		OrenNayar::OrenNayar(const OrenNayar::Xml& xml)
+			: m_kd(xml.kd * glm::one_over_pi<float>())
+		{
+			auto r2 = xml.roughness * xml.roughness;
 			m_A = 1.0f - r2 / (2.0f * (r2 + 0.33f));
 			m_B = 0.45f * r2 / (r2 + 0.09f);
 		}

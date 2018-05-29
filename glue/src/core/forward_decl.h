@@ -70,6 +70,12 @@ namespace glue
 			struct Conductor;
 		}
 	}
+	
+	namespace xml
+	{
+		class Node;
+		class Parser;
+	}
 }
 
 #endif

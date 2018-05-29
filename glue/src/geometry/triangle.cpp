@@ -15,7 +15,7 @@ namespace glue
 			, m_normal(glm::normalize(glm::cross(edge1, edge2)))
 		{}
 
-		geometry::Plane Triangle::samplePlane(core::UniformSampler& sampler)
+		geometry::Plane Triangle::samplePlane(core::UniformSampler& sampler) const
 		{
 			auto v1 = m_edge1 + m_v0;
 			auto v2 = m_edge2 + m_v0;
@@ -61,15 +61,10 @@ namespace glue
 			auto tvec = ray.get_origin() - m_v0;
 			auto w1 = glm::dot(tvec, pvec) * inv_det;
 
-			if (w1 < 0.0f || w1 > 1.0f)
-			{
-				return false;
-			}
-
 			auto qvec = glm::cross(tvec, m_edge1);
 			auto w2 = glm::dot(ray.get_direction(), qvec) * inv_det;
 
-			if (w2 < 0.0f || (w1 + w2) > 1.0f)
+			if (w1 < 0.0f || w2 < 0.0f || (w1 + w2) > 1.0f)
 			{
 				return false;
 			}
@@ -77,7 +72,6 @@ namespace glue
 			auto distance = glm::dot(m_edge2, qvec) * inv_det;
 			if (distance > 0.0f && distance < max_distance)
 			{
-				intersection.plane.point = ray.getPoint(distance);
 				intersection.plane.normal = m_normal;
 				intersection.distance = distance;
 
@@ -94,15 +88,10 @@ namespace glue
 			auto tvec = ray.get_origin() - m_v0;
 			auto w1 = glm::dot(tvec, pvec) * inv_det;
 
-			if (w1 < 0.0f || w1 > 1.0f)
-			{
-				return false;
-			}
-
 			auto qvec = glm::cross(tvec, m_edge1);
 			auto w2 = glm::dot(ray.get_direction(), qvec) * inv_det;
 
-			if (w2 < 0.0f || (w1 + w2) > 1.0f)
+			if (w1 < 0.0f || w2 < 0.0f || (w1 + w2) > 1.0f)
 			{
 				return false;
 			}

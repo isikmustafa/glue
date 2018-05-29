@@ -1,14 +1,45 @@
 #include "tonemapper.h"
+#include "..\xml\node.h"
 
 #include <glm\geometric.hpp>
+#include "output.h"
 
 namespace glue
 {
 	namespace core
 	{
-		Clamp::Clamp(float min, float max)
-			: m_min(glm::max(min, 0.0f))
-			, m_max(glm::min(max, 1.0f))
+		std::unique_ptr<Tonemapper::Xml> Tonemapper::Xml::factory(const xml::Node& node)
+		{
+			auto tonemapper_type = node.attribute("type", true);
+
+			if (tonemapper_type == std::string("Clamp"))
+			{
+				return std::make_unique<Clamp::Xml>(node);
+			}
+			else if (tonemapper_type == std::string("GlobalReinhard"))
+			{
+				return std::make_unique<GlobalReinhard::Xml>(node);
+			}
+			else
+			{
+				node.throwError("Unknown Tonemapper type.");
+			}
+		}
+
+		Clamp::Xml::Xml(const xml::Node& node)
+		{
+			node.parseChildText("Min", &min);
+			node.parseChildText("Max", &max);
+		}
+
+		std::unique_ptr<Tonemapper> Clamp::Xml::create() const
+		{
+			return std::make_unique<Clamp>(*this);
+		}
+
+		Clamp::Clamp(const Clamp::Xml& xml)
+			: m_min(xml.min)
+			, m_max(xml.max)
 		{}
 
 		Image Clamp::tonemap(const Image& image) const
@@ -29,9 +60,20 @@ namespace glue
 			return tonemapped_image;
 		}
 
-		GlobalReinhard::GlobalReinhard(float key, float max_luminance)
-			: m_key(key)
-			, m_max_luminance(max_luminance)
+		GlobalReinhard::Xml::Xml(const xml::Node& node)
+		{
+			node.parseChildText("Key", &key);
+			node.parseChildText("MaxLuminance", &max_luminance);
+		}
+
+		std::unique_ptr<Tonemapper> GlobalReinhard::Xml::create() const
+		{
+			return std::make_unique<GlobalReinhard>(*this);
+		}
+
+		GlobalReinhard::GlobalReinhard(const GlobalReinhard::Xml& xml)
+			: m_key(xml.key)
+			, m_max_luminance(xml.max_luminance)
 		{}
 
 		Image GlobalReinhard::tonemap(const Image& image) const

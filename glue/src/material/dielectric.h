@@ -17,7 +17,19 @@ namespace glue
 		class Dielectric : public BsdfMaterial
 		{
 		public:
-			Dielectric(float ior_n, float roughness);
+			//Xml structure of the class.
+			struct Xml : public BsdfMaterial::Xml
+			{
+				float ior_n;
+				float roughness;
+
+				explicit Xml(const xml::Node& node);
+				Xml(float p_ior_n, float p_roughness);
+				std::unique_ptr<BsdfMaterial> create() const override;
+			};
+
+		public:
+			Dielectric(const Dielectric::Xml& xml);
 
 			std::pair<glm::vec3, glm::vec3> sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler) const override;
 			glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const override;

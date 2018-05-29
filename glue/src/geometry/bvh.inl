@@ -249,20 +249,16 @@ namespace glue
 						{
 							if constexpr (isDereferenceable<Primitive>::value)
 							{
-								Intersection temp;
-								if (m_objects[i]->intersect(ray, temp, min_distance))
+								if (m_objects[i]->intersect(ray, intersection, min_distance))
 								{
-									min_distance = temp.distance;
-									intersection = temp;
+									min_distance = intersection.distance;
 								}
 							}
 							else
 							{
-								Intersection temp;
-								if (m_objects[i].intersect(ray, temp, min_distance))
+								if (m_objects[i].intersect(ray, intersection, min_distance))
 								{
-									min_distance = temp.distance;
-									intersection = temp;
+									min_distance = intersection.distance;
 								}
 							}
 						}

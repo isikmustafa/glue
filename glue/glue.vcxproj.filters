@@ -112,6 +112,21 @@
     <ClCompile Include="src\xml\node.cpp">
       <Filter>Source Files\xml</Filter>
     </ClCompile>
+    <ClCompile Include="src\integrator\integrator.cpp">
+      <Filter>Source Files\integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="src\geometry\object.cpp">
+      <Filter>Source Files\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\material\bsdf_material.cpp">
+      <Filter>Source Files\material</Filter>
+    </ClCompile>
+    <ClCompile Include="src\light\light.cpp">
+      <Filter>Source Files\light</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xml\parser.cpp">
+      <Filter>Source Files\xml</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\geometry\triangle.h">
@@ -226,6 +241,9 @@
       <Filter>Source Files\core</Filter>
     </ClInclude>
     <ClInclude Include="src\xml\node.h">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\xml\parser.h">
       <Filter>Source Files\xml</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,27 +1,60 @@
 #include "sphere.h"
 #include "ray.h"
 #include "intersection.h"
+#include "..\core\real_sampler.h"
+#include "..\geometry\spherical_coordinate.h"
+#include "..\xml\node.h"
 
 #include <glm\geometric.hpp>
+#include <glm\trigonometric.hpp>
+#include <glm\gtc\constants.hpp>
 
 namespace glue
 {
 	namespace geometry
 	{
-		Sphere::Sphere(const Transformation& transformation, const BBox& bbox, float area, std::unique_ptr<material::BsdfMaterial> bsdf_material)
-			: m_transformation(transformation)
-			, m_bbox(bbox)
-			, m_area(area)
-			, m_bsdf_material(std::move(bsdf_material))
+		Sphere::Xml::Xml(const xml::Node& node)
+		{
+			attributes = node.attributes();
+			node.parseChildText("Radius", &radius);
+			node.parseChildText("Center", &center.x, &center.y, &center.z);
+			transformation = node.child("Transformation") ? Transformation::Xml(node.child("Transformation")) : Transformation::Xml();
+			bsdf_material = node.parent().value() == std::string("Light") ? nullptr : material::BsdfMaterial::Xml::factory(node.child("BsdfMaterial", true));
+		}
+
+		Sphere::Xml::Xml(float p_radius, glm::vec3 p_center, const Transformation::Xml& p_transformation, std::unique_ptr<material::BsdfMaterial::Xml> p_bsdf_material)
+			: radius(p_radius)
+			, center(p_center)
+			, transformation(p_transformation)
+			, bsdf_material(std::move(p_bsdf_material))
 		{}
 
-		geometry::Plane Sphere::samplePlane(core::UniformSampler& sampler)
+		std::unique_ptr<Object> Sphere::Xml::create() const
 		{
-			//Uniform sample the sphere
-			//m_transformation.pointToWorldSpace
-			//m_transformation.normalToWorldSpace
-			//return plane
-			return geometry::Plane();
+			return std::make_unique<Sphere>(*this);
+		}
+
+		Sphere::Sphere(const Sphere::Xml& xml)
+			: m_transformation(xml.transformation)
+			, m_bsdf_material(xml.bsdf_material ? xml.bsdf_material->create() : nullptr)
+		{
+			auto t_radius = xml.radius * xml.transformation.scaling.x;
+			auto t_center = xml.center + xml.transformation.translation;
+
+			auto transformation_xml = xml.transformation;
+			transformation_xml.scaling = glm::vec3(t_radius);
+			transformation_xml.translation = t_center;
+
+			m_transformation = Transformation(transformation_xml);
+			m_bbox = geometry::BBox(t_center - transformation_xml.scaling, t_center + transformation_xml.scaling);
+			m_area = 4.0f * glm::pi<float>() * t_radius * t_radius;
+		}
+
+		geometry::Plane Sphere::samplePlane(core::UniformSampler& sampler) const
+		{
+			auto point = SphericalCoordinate(1.0f, glm::acos(1.0f - 2.0f * sampler.sample()), glm::two_pi<float>() * sampler.sample()).toCartesianCoordinate();
+
+			return m_transformation.planeToWorldSpace(Plane(point, point));
 		}
 
 		float Sphere::getSurfaceArea() const

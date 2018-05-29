@@ -12,7 +12,19 @@ namespace glue
 		class Pathtracer : public Integrator
 		{
 		public:
-			Pathtracer(std::unique_ptr<core::Filter> filter, int sample_count, float rr_threshold);
+			//Xml structure of the class.
+			struct Xml : Integrator::Xml
+			{
+				std::unique_ptr<core::Filter::Xml> filter;
+				int sample_count;
+				float rr_threshold;
+
+				explicit Xml(const xml::Node& node);
+				std::unique_ptr<Integrator> create() const override;
+			};
+
+		public:
+			Pathtracer(const Pathtracer::Xml& xml);
 
 			glm::vec3 integratePixel(const core::Scene& scene, int x, int y) const override;
 

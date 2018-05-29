@@ -13,6 +13,15 @@ namespace glue
 		class Output
 		{
 		public:
+			//Xml structure of the class.
+			struct Xml
+			{
+				virtual ~Xml() {}
+				virtual std::unique_ptr<Output> create() const = 0;
+				static std::unique_ptr<Output::Xml> factory(const xml::Node& node);
+			};
+
+		public:
 			virtual ~Output() {}
 
 			virtual void save(const Image& image) const = 0;
@@ -21,12 +30,24 @@ namespace glue
 		class Ldr : public Output
 		{
 		public:
-			Ldr(const std::string& image_name, std::unique_ptr<Tonemapper> tonemapper);
+			//Xml structure of the class.
+			struct Xml : public Output::Xml
+			{
+				std::string path;
+				std::string format;
+				std::unique_ptr<Tonemapper::Xml> tonemapper;
+
+				explicit Xml(const xml::Node& node);
+				std::unique_ptr<Output> create() const override;
+			};
+
+		public:
+			Ldr(const Ldr::Xml& xml);
 
 			void save(const Image& image) const override;
 
 		private:
-			std::string m_image_name;
+			std::string m_path;
 			std::unique_ptr<Tonemapper> m_tonemapper;
 		};
 	}
