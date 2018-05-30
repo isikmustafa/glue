@@ -32,58 +32,29 @@ namespace glue
 		{
 			auto wi = core::math::cosTheta(wi_tangent) < 0.0f ? -wi_tangent : wi_tangent;
 
-			//1-Stretch
-			auto stretched_wi = glm::normalize(glm::vec3(m_ag * wi.x, m_ag * wi.y, wi.z));
-			geometry::SphericalCoordinate spherical_stretched_wi(1.0f, 0.0f, 0.0f);
-			
-			if (core::math::cosTheta(stretched_wi) < 0.99999f)
-			{
-				spherical_stretched_wi = geometry::SphericalCoordinate(stretched_wi);
-			}
+			//A simpler and exact sampling routine for GGX.
+			//Eric Heitz. A Simpler and Exact Sampling Routine for the GGX Distribution of Visible Normals. 2017
 
-			//2-Sample P22
-			glm::vec2 slope;
+			//Stretch
+			auto stretched_wi = glm::normalize(glm::vec3(m_ag * wi.x, m_ag * wi.y, wi.z));
+
+			//Create an orthonormal basis using stretched_wi.
+			auto t1 = core::math::cosTheta(stretched_wi) < 0.9999f ? glm::normalize(glm::cross(stretched_wi, glm::vec3(0.0f, 0.0f, 1.0f))) : glm::vec3(1.0f, 0.0f, 0.0f);
+			auto t2 = glm::cross(t1, stretched_wi);
+			//Sample a point from one of the half disks.
 			auto u1 = sampler.sample();
 			auto u2 = sampler.sample();
-			if (spherical_stretched_wi.theta > 0.0001f)
-			{
-				auto tantheta_wi = glm::tan(spherical_stretched_wi.theta);
-				auto g1 = 2.0f / (1.0f + glm::sqrt(1.0f + tantheta_wi * tantheta_wi));
+			auto a = 1.0f / (1.0f + core::math::cosTheta(stretched_wi));
+			auto r = glm::sqrt(u1);
+			auto phi = u2 < a ? u2 / a * glm::pi<float>() : glm::pi<float>() + (u2 - a) / (1.0f - a) * glm::pi<float>();
+			auto p1 = r * glm::cos(phi);
+			auto p2 = r * glm::sin(phi) * (u2 < a ? 1.0f : core::math::cosTheta(stretched_wi));
+			auto p3 = glm::sqrt(glm::max(0.0f, 1.0f - p1 * p1 - p2 * p2));
+			//Compute the normal.
+			auto n = p1 * t1 + p2 * t2 + p3 * stretched_wi;
 
-				//Sample slope.x
-				auto A = 2.0f * u1 / g1 - 1.0f;
-				auto temp = 1.0f / (A * A - 1.0f);
-				auto B = tantheta_wi;
-				auto D = glm::sqrt(B * B * temp * temp - (A * A - B * B) * temp);
-				auto slope_x1 = B * temp - D;
-				auto slope_x2 = B * temp + D;
-				slope.x = (A < 0.0f || slope_x2 > 1.0f / tantheta_wi) ? slope_x1 : slope_x2;
-
-				//Sample slope.y
-				auto s = u2 <= 0.5f ? -1.0f : 1.0f;
-				u2 = 2.0f * (u2 <= 0.5f ? (0.5f - u2) : (u2 - 0.5f));
-
-				auto z = (u2 * (u2 * (u2 * 0.27385f - 0.73369f) + 0.46341f)) / (u2 * (u2 * (u2 * 0.093073f + 0.309420f) - 1.0f) + 0.597999f);
-				slope.y = s * z * glm::sqrt(1.0f + slope.x * slope.x);
-			}
-			//Normal incidence case.
-			else
-			{
-				auto r = glm::sqrt(u1 / (1.0f - u1));
-				auto phi = glm::two_pi<float>() * u2;
-				slope = r * glm::vec2(glm::cos(phi), glm::sin(phi));
-			}
-
-			//3-Rotate
-			auto sin_phi = glm::sin(spherical_stretched_wi.phi);
-			auto cos_phi = glm::cos(spherical_stretched_wi.phi);
-			slope = glm::vec2(cos_phi * slope.x - sin_phi * slope.y, sin_phi * slope.x + cos_phi * slope.y);
-
-			//4-Unstretch
-			slope *= m_ag;
-
-			//5-Compute normal
-			return glm::normalize(glm::vec3(-slope, 1.0f));
+			//Unstretch
+			return glm::normalize(glm::vec3(m_ag * n.x, m_ag * n.y, glm::max(0.0f, n.z)));
 		}
 
 		float GGXDistribution::pdfHd14(const glm::vec3& wi_tangent, const glm::vec3& wh_tangent) const

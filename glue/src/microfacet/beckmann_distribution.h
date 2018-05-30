@@ -20,6 +20,7 @@ namespace glue
 			//Samples from distribution of visible normals and causes much less variance at grazing angles.
 			glm::vec3 sampleWhHd14(const glm::vec3& wi_tangent, core::UniformSampler& sampler) const;
 			float pdfHd14(const glm::vec3& wi_tangent, const glm::vec3& wh_tangent) const;
+			//Distribution and Masking-Shadowing functions.
 			float d(const glm::vec3& wh_tangent) const;
 			float g1(const glm::vec3& wv_tangent, const glm::vec3& wh_tangent) const;
 
