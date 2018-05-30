@@ -116,10 +116,9 @@ namespace glue
 				microfacet = MicrofacetDistribution(alpha);
 			}
 
-			float pdf;
+			auto pdf = 0.0f;
 
 			//Reflection
-			if (core::math::cosTheta(wi_tangent) * core::math::cosTheta(wo_tangent) > 0.0f)
 			{
 				auto wh = glm::normalize(wi_tangent + wo_tangent);
 				auto wi_wh = glm::dot(wi_tangent, wh);
@@ -128,15 +127,14 @@ namespace glue
 
 				if constexpr (tSampleVisibleNormals)
 				{
-					pdf = fresnel * glm::abs(microfacet.pdfHd14(wi_tangent, wh) / (4.0f * glm::dot(wo_tangent, wh)));
+					pdf += fresnel * glm::abs(microfacet.pdfHd14(wi_tangent, wh) / (4.0f * glm::dot(wo_tangent, wh)));
 				}
 				else
 				{
-					pdf = fresnel * glm::abs(microfacet.pdfWmlt07(wh) / (4.0f * glm::dot(wo_tangent, wh)));
+					pdf += fresnel * glm::abs(microfacet.pdfWmlt07(wh) / (4.0f * glm::dot(wo_tangent, wh)));
 				}
 			}
 			//Transmission
-			else
 			{
 				auto wh = -glm::normalize(wi_tangent + no_over_ni * wo_tangent);
 				auto wi_wh = glm::dot(wi_tangent, wh);
@@ -147,11 +145,11 @@ namespace glue
 
 				if constexpr (tSampleVisibleNormals)
 				{
-					pdf = (1.0f - fresnel) * glm::abs(microfacet.pdfHd14(wi_tangent, wh) * wo_wh * no_over_ni * no_over_ni / (denom * denom));
+					pdf += (1.0f - fresnel) * glm::abs(microfacet.pdfHd14(wi_tangent, wh) * wo_wh * no_over_ni * no_over_ni / (denom * denom));
 				}
 				else
 				{
-					pdf = (1.0f - fresnel) * glm::abs(microfacet.pdfWmlt07(wh) * wo_wh * no_over_ni * no_over_ni / (denom * denom));
+					pdf += (1.0f - fresnel) * glm::abs(microfacet.pdfWmlt07(wh) * wo_wh * no_over_ni * no_over_ni / (denom * denom));
 				}
 			}
 
