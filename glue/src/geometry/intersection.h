@@ -4,6 +4,9 @@
 #include "plane.h"
 #include "..\core\forward_decl.h"
 
+#include <glm\vec2.hpp>
+#include <glm\vec3.hpp>
+
 namespace glue
 {
 	namespace geometry
@@ -11,6 +14,9 @@ namespace glue
 		struct Intersection
 		{
 			Plane plane;
+			glm::vec2 uv;
+			glm::vec3 dpdu;
+			glm::vec3 dpdv;
 			float distance;
 
 			//Pointers will be kept as raw pointers.

@@ -43,7 +43,7 @@ namespace glue
 				m_bbox.extend(v0);
 				m_bbox.extend(v1);
 				m_bbox.extend(v2);
-				auto area = geometry::Triangle(v0, v1 - v0, v2 - v0).getSurfaceArea();
+				auto area = glm::length(glm::cross(v1 - v0, v2 - v0)) * 0.5f;
 				triangle_areas.push_back(area);
 				m_area += area;
 			}
@@ -76,8 +76,11 @@ namespace glue
 			{
 				intersection.plane.point = ray.getPoint(intersection.distance);
 				intersection.plane.normal = glm::normalize(m_transformation.normalToWorldSpace(intersection.plane.normal));
+				intersection.dpdu = m_transformation.vectorToWorldSpace(intersection.dpdu);
+				intersection.dpdv = m_transformation.vectorToWorldSpace(intersection.dpdv);
 				intersection.object = this;
 				intersection.bsdf_material = m_bsdf_material.get();
+
 				return true;
 			}
 			return false;

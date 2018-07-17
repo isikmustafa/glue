@@ -16,6 +16,8 @@ namespace glue
 		class TentSampler;
 		class GaussianSampler;
 		class Image;
+		class Output;
+		class Ldr;
 		class PinholeCamera;
 		struct Scene;
 		class Timer;

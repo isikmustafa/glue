@@ -42,6 +42,7 @@ namespace glue
 
 				aiMesh* mesh = scene->mMeshes[0];
 				glm::vec3 face_vertices[3];
+				glm::vec2 tex_coords[3];
 				int face_count = mesh->mNumFaces;
 				for (int i = 0; i < face_count; ++i)
 				{
@@ -50,8 +51,15 @@ namespace glue
 					{
 						const aiVector3D& position = mesh->mVertices[face.mIndices[k]];
 						face_vertices[k] = glm::vec3(position.x, position.y, position.z);
+
+						if (mesh->HasTextureCoords(0))
+						{
+							const aiVector3D& uv = mesh->mTextureCoords[0][face.mIndices[k]];
+							tex_coords[k] = glm::vec2(uv.x, uv.y);
+						}
 					}
-					bvh->addObject(geometry::Triangle(face_vertices[0], face_vertices[1] - face_vertices[0], face_vertices[2] - face_vertices[0]));
+					bvh->addObject(geometry::Triangle(face_vertices[0], face_vertices[1] - face_vertices[0], face_vertices[2] - face_vertices[0], 
+						tex_coords[0], tex_coords[1], tex_coords[2]));
 				}
 
 				bvh->buildWithSAHSplit();

@@ -14,9 +14,6 @@
     <Filter Include="Source Files\integrator">
       <UniqueIdentifier>{c86076b2-ccb0-4540-80d8-d3553a5b1174}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\light">
-      <UniqueIdentifier>{21481c0c-db85-40ff-a89e-0c2e55ce4853}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\material">
       <UniqueIdentifier>{c11a97d8-2833-4b4e-bea4-0339eab06b5f}</UniqueIdentifier>
     </Filter>
@@ -25,6 +22,9 @@
     </Filter>
     <Filter Include="Source Files\xml">
       <UniqueIdentifier>{30c33063-32d7-4aa8-8001-7ad7e8da35ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\light">
+      <UniqueIdentifier>{21481c0c-db85-40ff-a89e-0c2e55ce4853}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

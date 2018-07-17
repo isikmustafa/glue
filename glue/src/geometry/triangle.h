@@ -20,7 +20,8 @@ namespace glue
 		class Triangle
 		{
 		public:
-			Triangle(const glm::vec3& v0, const glm::vec3& edge1, const glm::vec3& edge2);
+			Triangle(const glm::vec3& v0, const glm::vec3& edge1, const glm::vec3& edge2,
+				const glm::vec2& uv0, const glm::vec2& uv1, const glm::vec2& uv2);
 
 			geometry::Plane samplePlane(core::UniformSampler& sampler) const;
 			float getSurfaceArea() const;
@@ -35,6 +36,11 @@ namespace glue
 			glm::vec3 m_edge1;
 			glm::vec3 m_edge2;
 			glm::vec3 m_normal;
+			glm::vec3 m_dpdu;
+			glm::vec3 m_dpdv;
+			glm::vec2 m_uv0;
+			glm::vec2 m_uv1;
+			glm::vec2 m_uv2;
 		};
 	}
 }

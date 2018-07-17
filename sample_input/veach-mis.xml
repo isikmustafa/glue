@@ -7,7 +7,6 @@
 		<RRThreshold>0.2</RRThreshold>
     </Integrator>
 	
-	
 	<Output type="Ldr">
 		<Path>../sample_output/veach-mis</Path>
 		<Format>png</Format>
