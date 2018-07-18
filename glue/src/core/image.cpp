@@ -47,13 +47,13 @@ namespace glue
 		template<typename T, int tMax>
 		void ImageRepr<T, tMax>::set(int x, int y, const glm::vec3& value)
 		{
-			constexpr T max = tMax;
 			if constexpr (tMax == 1)
 			{
 				m_pixels[x][y] = RGB(static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z));
 			}
 			else
 			{
+				constexpr float max = tMax;
 				m_pixels[x][y] = RGB(static_cast<T>(value.x * max), static_cast<T>(value.y * max), static_cast<T>(value.z * max));
 			}
 		}
