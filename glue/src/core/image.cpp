@@ -11,13 +11,15 @@ namespace glue
 {
 	namespace core
 	{
-		Image::Image(int width, int height)
-			: m_pixels(width, std::vector<glm::vec3>(height))
+		template<typename T, int tMax>
+		ImageRepr<T, tMax>::ImageRepr(int width, int height)
+			: m_pixels(width, std::vector<RGB>(height))
 			, m_width(width)
 			, m_height(height)
 		{}
 
-		Image::Image(const std::string& filename)
+		template<typename T, int tMax>
+		ImageRepr<T, tMax>::ImageRepr(const std::string& filename)
 		{
 			//If given image is LDR, stbi_loadf applies an sRGB->Linear conversion.
 			int channel;
@@ -28,13 +30,13 @@ namespace glue
 				throw std::runtime_error("Error: Image cannot be loaded");
 			}
 
-			m_pixels.resize(m_width, std::vector<glm::vec3>(m_height));
+			m_pixels.resize(m_width, std::vector<RGB>(m_height));
 			auto index = 0;
 			for (int j = 0; j < m_height; ++j)
 			{
 				for (int i = 0; i < m_width; ++i)
 				{
-					m_pixels[i][j] = glm::vec3(data[index], data[index + 1], data[index + 2]);
+					set(i, j, glm::vec3(data[index], data[index + 1], data[index + 2]));
 					index += channel;
 				}
 			}
@@ -42,14 +44,90 @@ namespace glue
 			stbi_image_free(data);
 		}
 
-		std::vector<glm::vec3>& Image::operator[](int i)
+		template<typename T, int tMax>
+		void ImageRepr<T, tMax>::set(int x, int y, const glm::vec3& value)
 		{
-			return m_pixels[i];
+			constexpr T max = tMax;
+			if constexpr (tMax == 1)
+			{
+				m_pixels[x][y] = RGB(static_cast<T>(value.x), static_cast<T>(value.y), static_cast<T>(value.z));
+			}
+			else
+			{
+				m_pixels[x][y] = RGB(static_cast<T>(value.x * max), static_cast<T>(value.y * max), static_cast<T>(value.z * max));
+			}
 		}
 
-		const std::vector<glm::vec3>& Image::operator[](int i) const
+		template<typename T, int tMax>
+		glm::vec3 ImageRepr<T, tMax>::get(int x, int y) const
 		{
-			return m_pixels[i];
+			if constexpr (tMax == 1)
+			{
+				const auto& value = m_pixels[x][y];
+				return glm::vec3(value.r, value.g, value.b);
+			}
+			else
+			{
+				constexpr float inv_max = 1.0f / tMax;
+				const auto& value = m_pixels[x][y];
+				return glm::vec3(value.r, value.g, value.b) * inv_max;
+			}
+		}
+
+		Image::Image(int width, int height)
+			: m_byte_image(0, 0)
+			, m_float_image(width, height)
+			, m_width(width)
+			, m_height(height)
+			, m_type(Type::FLOAT)
+		{}
+
+		Image::Image(const std::string& filename)
+			: m_byte_image(0, 0)
+			, m_float_image(0, 0)
+		{
+			if (stbi_is_hdr(filename.c_str()))
+			{
+				m_float_image = FloatImage(filename);
+				m_width = m_float_image.get_width();
+				m_height = m_float_image.get_height();
+				m_type = Type::FLOAT;
+			}
+			else
+			{
+				m_byte_image = ByteImage(filename);
+				m_width = m_byte_image.get_width();
+				m_height = m_byte_image.get_height();
+				m_type = Type::BYTE;
+			}
+		}
+
+		void Image::set(int x, int y, const glm::vec3& value)
+		{
+			switch (m_type)
+			{
+			case Type::BYTE:
+				m_byte_image.set(x, y, value);
+				break;
+
+			case Type::FLOAT:
+				m_float_image.set(x, y, value);
+				break;
+			}
+		}
+
+		glm::vec3 Image::get(int x, int y) const
+		{
+			switch (m_type)
+			{
+			case Type::BYTE:
+				return m_byte_image.get(x, y);
+				break;
+
+			case Type::FLOAT:
+				return m_float_image.get(x, y);
+				break;
+			}
 		}
 
 		void Image::saveLdr(const std::string& filename) const
@@ -64,7 +142,7 @@ namespace glue
 			{
 				for (int i = 0; i < m_width; ++i)
 				{
-					auto pixel = m_pixels[i][j];
+					auto pixel = get(i, j);
 
 					//Linear->sRGB
 					pixel.x = glm::pow(pixel.x, 0.45454545f);

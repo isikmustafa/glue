@@ -52,8 +52,8 @@ namespace glue
 			{
 				for (int j = 0; j < height; ++j)
 				{
-					auto& pixel = tonemapped_image[i][j];
-					pixel = glm::clamp(pixel, m_min, m_max);
+					auto pixel = tonemapped_image.get(i, j);
+					tonemapped_image.set(i, j, glm::clamp(pixel, m_min, m_max));
 				}
 			}
 
@@ -89,7 +89,7 @@ namespace glue
 			{
 				for (int j = 0; j < height; ++j)
 				{
-					const auto& pixel = tonemapped_image[i][j];
+					auto pixel = tonemapped_image.get(i, j);
 
 					auto luminance = glm::dot(glm::vec3(0.2126f, 0.7152f, 0.0722f), pixel);
 					max_l_t = glm::max(luminance, max_l_t);
@@ -106,12 +106,12 @@ namespace glue
 			{
 				for (int j = 0; j < height; ++j)
 				{
-					auto& pixel = tonemapped_image[i][j];
+					auto pixel = tonemapped_image.get(i, j);
 
 					auto l_t = scale * glm::dot(glm::vec3(0.2126f, 0.7152f, 0.0722f), pixel);
 
 					pixel *= scale * (1.0f + l_t / (max_l_t * max_l_t)) / (1.0f + l_t);
-					pixel = glm::clamp(pixel, 0.0f, 1.0f);
+					tonemapped_image.set(i, j, glm::clamp(pixel, 0.0f, 1.0f));
 				}
 			}
 

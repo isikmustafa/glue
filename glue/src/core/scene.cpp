@@ -99,7 +99,7 @@ namespace glue
 						{
 							for (int j = y; j < y + cPatchSize && j < resolution.y; ++j)
 							{
-								(*this->m_image)[i][j] = this->m_integrator->integratePixel(*this, i, j);
+								this->m_image->set(i, j, this->m_integrator->integratePixel(*this, i, j));
 							}
 						}
 					});
