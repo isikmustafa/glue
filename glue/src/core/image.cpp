@@ -5,6 +5,10 @@
 #include <stb_image.h>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
+#define STB_IMAGE_RESIZE_IMPLEMENTATION
+#define STBIR_DEFAULT_FILTER_UPSAMPLE STBIR_FILTER_TRIANGLE //Avoids ringing.
+#define STBIR_DEFAULT_FILTER_DOWNSAMPLE STBIR_FILTER_TRIANGLE //Avoids ringing.
+#include <stb_image_resize.h>
 #include <glm\geometric.hpp>
 
 namespace glue
@@ -31,13 +35,11 @@ namespace glue
 			}
 
 			m_pixels.resize(m_width, std::vector<RGB>(m_height));
-			auto index = 0;
-			for (int j = 0; j < m_height; ++j)
+			for (int j = 0, index = 0; j < m_height; ++j)
 			{
-				for (int i = 0; i < m_width; ++i)
+				for (int i = 0; i < m_width; ++i, index += channel)
 				{
 					set(i, j, glm::vec3(data[index], data[index + 1], data[index + 2]));
-					index += channel;
 				}
 			}
 
@@ -74,13 +76,24 @@ namespace glue
 			}
 		}
 
-		Image::Image(int width, int height)
+		Image::Image(int width, int height, Type type)
 			: m_byte_image(0, 0)
-			, m_float_image(width, height)
+			, m_float_image(0, 0)
 			, m_width(width)
 			, m_height(height)
-			, m_type(Type::FLOAT)
-		{}
+			, m_type(type)
+		{
+			switch (m_type)
+			{
+			case Type::BYTE:
+				m_byte_image = ByteImage(width, height);
+				break;
+
+			case Type::FLOAT:
+				m_float_image = FloatImage(width, height);
+				break;
+			}
+		}
 
 		Image::Image(const std::string& filename)
 			: m_byte_image(0, 0)
@@ -130,17 +143,67 @@ namespace glue
 			}
 		}
 
+		std::vector<Image> Image::getMipmaps() const
+		{
+			constexpr int channel = 3; //RGB
+			int width = m_width;
+			int height = m_height;
+			int stride_src = channel * width * sizeof(float);
+			int stride_dest = channel * (width / 2) * sizeof(float);
+			std::unique_ptr<float[]> src(new float[stride_src * height]);
+			std::unique_ptr<float[]> dest(new float[stride_dest * (height / 2)]);
+			auto src_ptr = src.get();
+
+			for (int j = 0, index = 0; j < m_height; ++j)
+			{
+				for (int i = 0; i < m_width; ++i, index += channel)
+				{
+					auto pixel = get(i, j);
+
+					src_ptr[index] = pixel.x;
+					src_ptr[index + 1] = pixel.y;
+					src_ptr[index + 2] = pixel.z;
+				}
+			}
+
+			std::vector<Image> mipmaps;
+			while (width > 1 && height > 1)
+			{
+				stbir_resize_float(src.get(), width, height, stride_src, dest.get(), width / 2, height / 2, stride_dest, channel);
+
+				width /= 2;
+				height /= 2;
+				stride_src = channel * width * sizeof(float);
+				stride_dest = channel * (width / 2) * sizeof(float);
+				src = std::move(dest);
+				dest = std::unique_ptr<float[]>(new float[stride_dest * (height / 2)]);
+				src_ptr = src.get();
+
+				Image mipmap(width, height, m_type);
+				for (int j = 0, index = 0; j < height; ++j)
+				{
+					for (int i = 0; i < width; ++i, index += channel)
+					{
+						mipmap.set(i, j, glm::vec3(src_ptr[index], src_ptr[index + 1], src_ptr[index + 2]));
+					}
+				}
+
+				mipmaps.push_back(std::move(mipmap));
+			}
+
+			return mipmaps;
+		}
+
 		void Image::saveLdr(const std::string& filename) const
 		{
 			constexpr int channel = 3; //RGB
 			int stride = channel * m_width;
-			std::unique_ptr<unsigned char> data(new unsigned char[stride * m_height]);
+			std::unique_ptr<unsigned char[]> data(new unsigned char[stride * m_height]);
 			auto data_ptr = data.get();
 
-			auto index = 0;
-			for (int j = 0; j < m_height; ++j)
+			for (int j = 0, index = 0; j < m_height; ++j)
 			{
-				for (int i = 0; i < m_width; ++i)
+				for (int i = 0; i < m_width; ++i, index += channel)
 				{
 					auto pixel = get(i, j);
 
@@ -154,7 +217,6 @@ namespace glue
 					data_ptr[index] = static_cast<unsigned char>(pixel.x);
 					data_ptr[index + 1] = static_cast<unsigned char>(pixel.y);
 					data_ptr[index + 2] = static_cast<unsigned char>(pixel.z);
-					index += channel;
 				}
 			}
 

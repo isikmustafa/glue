@@ -56,11 +56,12 @@ namespace glue
 			};
 
 		public:
-			Image(int width, int height);
+			Image(int width, int height, Type type = Type::FLOAT);
 			Image(const std::string& filename);
 
 			void set(int x, int y, const glm::vec3& value);
 			glm::vec3 get(int x, int y) const;
+			std::vector<Image> getMipmaps() const;
 			void saveLdr(const std::string& filename) const;
 
 			int get_width() const { return m_width; }
