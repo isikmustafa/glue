@@ -100,7 +100,7 @@ namespace glue
 
 					auto wo_tangent_light = tangent_space.vectorToLocalSpace(wo_world);
 
-					auto bsdf = intersection.bsdf_material->getBsdf(wi_tangent, wo_tangent_light);
+					auto bsdf = intersection.bsdf_material->getBsdf(wi_tangent, wo_tangent_light, intersection);
 					auto cos = glm::abs(core::math::cosTheta(wo_tangent_light));
 
 					//Get p(A) and transform it to p(w)
@@ -124,7 +124,7 @@ namespace glue
 					if (intersection.bsdf_material->useMultipleImportanceSampling() && !light->hasDeltaDistribution())
 					{
 						//Compute the weight of the sample from light pdf using power heuristic with beta=2
-						auto pdf_bsdf = intersection.bsdf_material->getPdf(wi_tangent, wo_tangent_light);
+						auto pdf_bsdf = intersection.bsdf_material->getPdf(wi_tangent, wo_tangent_light, intersection);
 						auto weight_light = pdf_light * pdf_light / (pdf_light * pdf_light + pdf_bsdf * pdf_bsdf);
 
 						if (!std::isnan(weight_light))
@@ -133,7 +133,7 @@ namespace glue
 						}
 
 						//Generate a sample according to the bsdf.
-						auto w_f = intersection.bsdf_material->sampleWo(wi_tangent, uniform_sampler);
+						auto w_f = intersection.bsdf_material->sampleWo(wi_tangent, uniform_sampler, intersection);
 						const auto& wo_tangent_bsdf = w_f.first;
 						const auto& f = w_f.second;
 
@@ -154,7 +154,7 @@ namespace glue
 									pdf_light *= dl_intersection.distance * dl_intersection.distance / glm::max(glm::dot(-wo_world, dl_intersection.plane.normal), 0.0f);
 
 									//Compute the weight of the sample from bsdf pdf using power heuristic with beta=2
-									auto pdf_bsdf = intersection.bsdf_material->getPdf(wi_tangent, wo_tangent_bsdf);
+									auto pdf_bsdf = intersection.bsdf_material->getPdf(wi_tangent, wo_tangent_bsdf, intersection);
 									auto weight_bsdf = pdf_bsdf * pdf_bsdf / (pdf_light * pdf_light + pdf_bsdf * pdf_bsdf);
 
 									if (!std::isnan(weight_bsdf))
@@ -177,7 +177,7 @@ namespace glue
 			}
 
 			//INDIRECT LIGHTING//
-			auto w_f = intersection.bsdf_material->sampleWo(wi_tangent, uniform_sampler);
+			auto w_f = intersection.bsdf_material->sampleWo(wi_tangent, uniform_sampler, intersection);
 
 			const auto& wo_tangent = w_f.first;
 			const auto& f = w_f.second;

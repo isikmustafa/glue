@@ -2,6 +2,7 @@
 #include "..\core\real_sampler.h"
 #include "..\geometry\sphere.h"
 #include "..\material\lambertian.h"
+#include "..\texture\constant_texture.h"
 #include "..\xml\node.h"
 
 #include <ctpl_stl.h>
@@ -56,7 +57,7 @@ namespace glue
 						auto radius = glm::sqrt(object->getSurfaceArea() / number_of_samples) * 0.2f;
 						auto center = object->samplePlane(sampler).point;
 						geometry::Transformation::Xml transformation;
-						auto bsdf_material = std::make_unique<material::Lambertian::Xml>(glm::vec3(0.8f, 0.0f, 0.0f));
+						auto bsdf_material = std::make_unique<material::Lambertian::Xml>(std::make_unique<texture::ConstantTexture::Xml>(glm::vec3(0.8f, 0.0f, 0.0f)));
 						geometry::Sphere::Xml debug_sphere_xml(radius, center, transformation, std::move(bsdf_material));
 
 						bvh.addObject(debug_sphere_xml.create());

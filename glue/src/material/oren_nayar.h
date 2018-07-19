@@ -24,9 +24,9 @@ namespace glue
 		public:
 			OrenNayar(const OrenNayar::Xml& xml);
 
-			std::pair<glm::vec3, glm::vec3> sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler) const override;
-			glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const override;
-			float getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const override;
+			std::pair<glm::vec3, glm::vec3> sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const override;
+			glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const override;
+			float getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const override;
 			bool hasDeltaDistribution() const override;
 			bool useMultipleImportanceSampling() const override;
 

@@ -61,7 +61,7 @@ namespace glue
 
 			void set(int x, int y, const glm::vec3& value);
 			glm::vec3 get(int x, int y) const;
-			std::vector<Image> getMipmaps() const;
+			std::vector<Image> generateMipmaps() const;
 			void saveLdr(const std::string& filename) const;
 
 			int get_width() const { return m_width; }

@@ -36,16 +36,16 @@ namespace glue
 			m_B = 0.45f * r2 / (r2 + 0.09f);
 		}
 
-		std::pair<glm::vec3, glm::vec3> OrenNayar::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler) const
+		std::pair<glm::vec3, glm::vec3> OrenNayar::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
 		{
 			//Sample from cosine-weighted distribution.
 			auto wo = geometry::SphericalCoordinate(1.0f, glm::acos(glm::sqrt(sampler.sample())), glm::two_pi<float>() * sampler.sample()).toCartesianCoordinate();
-			auto f = getBsdf(wi_tangent, wo) * glm::pi<float>();
+			auto f = getBsdf(wi_tangent, wo, intersection) * glm::pi<float>();
 
 			return std::make_pair(wo, f);
 		}
 
-		glm::vec3 OrenNayar::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const
+		glm::vec3 OrenNayar::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
 		{
 			geometry::SphericalCoordinate wi_ts(wi_tangent);
 			geometry::SphericalCoordinate wo_ts(wo_tangent);
@@ -54,7 +54,7 @@ namespace glue
 				glm::tan(glm::min(wi_ts.theta, wo_ts.theta)));
 		}
 
-		float OrenNayar::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const
+		float OrenNayar::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
 		{
 			//Cosine-weighted pdf.
 			return core::math::cosTheta(wo_tangent) * glm::one_over_pi<float>();

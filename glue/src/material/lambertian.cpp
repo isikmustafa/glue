@@ -14,11 +14,11 @@ namespace glue
 	{
 		Lambertian::Xml::Xml(const xml::Node& node)
 		{
-			node.parseChildText("Kd", &kd.x, &kd.y, &kd.z);
+			kd = texture::Texture::Xml::factory(node.child("Kd", true).child("Texture", true));
 		}
 
-		Lambertian::Xml::Xml(const glm::vec3& p_kd)
-			: kd(p_kd)
+		Lambertian::Xml::Xml(std::unique_ptr<texture::Texture::Xml> p_kd)
+			: kd(std::move(p_kd))
 		{}
 
 		std::unique_ptr<BsdfMaterial> Lambertian::Xml::create() const
@@ -27,24 +27,24 @@ namespace glue
 		}
 
 		Lambertian::Lambertian(const Lambertian::Xml& xml)
-			: m_kd(xml.kd * glm::one_over_pi<float>())
+			: m_kd(xml.kd->create())
 		{}
 
-		std::pair<glm::vec3, glm::vec3> Lambertian::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler) const
+		std::pair<glm::vec3, glm::vec3> Lambertian::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
 		{
 			//Sample from cosine-weighted distribution.
 			auto wo = geometry::SphericalCoordinate(1.0f, glm::acos(glm::sqrt(sampler.sample())), glm::two_pi<float>() * sampler.sample()).toCartesianCoordinate();
-			auto f = m_kd * glm::pi<float>();
+			auto f = m_kd->fetch(intersection);
 
 			return std::make_pair(wo, f);
 		}
 
-		glm::vec3 Lambertian::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const
+		glm::vec3 Lambertian::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
 		{
-			return m_kd;
+			return m_kd->fetch(intersection) * glm::one_over_pi<float>();
 		}
 
-		float Lambertian::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const
+		float Lambertian::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
 		{
 			//Cosine-weighted pdf.
 			return core::math::cosTheta(wo_tangent) * glm::one_over_pi<float>();

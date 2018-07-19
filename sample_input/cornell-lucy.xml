@@ -16,6 +16,15 @@
 		</Tonemapper>
 	</Output>
 	
+	<!--<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.18-0.7</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.18</Key>
+			<MaxLuminance>0.7</MaxLuminance>
+		</Tonemapper>
+	</Output>-->
+	
     <Camera>
         <Position>0 0.95 1.49</Position>
         <Direction>0 0 -1</Direction>
@@ -34,9 +43,23 @@
 			<Translation>0 0 -0.5</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<Kd>0.73 0.48 0.34</Kd>
+			
+			<Kd>
+				<Texture type="Image">
+					<Datapath>../sample_input/checkerboard.png</Datapath>
+					<TexelInterpolation>Nearest</TexelInterpolation>
+					<MipmapInterpolation>Nearest</MipmapInterpolation>
+				</Texture>
+			</Kd>
+			
+			<!--<Kd>
+				<Texture type="Constant">
+					<Value>0.73 0.48 0.34</Value>
+				</Texture>
+			</Kd>-->
 		</BsdfMaterial>
 	</Object>
+	
 	<!-- Glass 
 	<Object type="Mesh">
 		<Datapath>../sample_input/box.obj</Datapath>
@@ -49,6 +72,7 @@
 			<Roughness>0.1</Roughness>
 		</BsdfMaterial>
 	</Object>-->
+	
 	<!-- Front -->
 	<Object type="Mesh">
 		<Datapath>../sample_input/rectangle.obj</Datapath>
@@ -57,7 +81,11 @@
 			<Translation>0 1 -1.5</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<Kd>0.6 0.6 0.6</Kd>
+			<Kd>
+				<Texture type="Constant">
+					<Value>0.6 0.6 0.6</Value>
+				</Texture>
+			</Kd>
 		</BsdfMaterial>
 	</Object>
 	<!-- Back -->
@@ -69,7 +97,11 @@
 			<Translation>0 1 1.5</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<Kd>0.6 0.6 0.6</Kd>
+			<Kd>
+				<Texture type="Constant">
+					<Value>0.6 0.6 0.6</Value>
+				</Texture>
+			</Kd>
 		</BsdfMaterial>
 	</Object>
 	<!-- Right -->
@@ -81,7 +113,11 @@
 			<Translation>1 1 0</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<Kd>0.6 0.6 0.6</Kd>
+			<Kd>
+				<Texture type="Constant">
+					<Value>0.6 0.6 0.6</Value>
+				</Texture>
+			</Kd>
 		</BsdfMaterial>
 	</Object>
 	<!-- Left -->
@@ -93,7 +129,11 @@
 			<Translation>-1 1 0</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<Kd>0.6 0.6 0.6</Kd>
+			<Kd>
+				<Texture type="Constant">
+					<Value>0.6 0.6 0.6</Value>
+				</Texture>
+			</Kd>
 		</BsdfMaterial>
 	</Object>
 	<!-- Ceil -->
@@ -105,7 +145,11 @@
 			<Translation>0 2 0</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<Kd>0.6 0.6 0.6</Kd>
+			<Kd>
+				<Texture type="Constant">
+					<Value>0.6 0.6 0.6</Value>
+				</Texture>
+			</Kd>
 		</BsdfMaterial>
 	</Object>
 	<!-- Floor -->
@@ -117,7 +161,11 @@
 			<Translation>0 0 0</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<Kd>0.6 0.6 0.6</Kd>
+			<Kd>
+				<Texture type="Constant">
+					<Value>0.6 0.6 0.6</Value>
+				</Texture>
+			</Kd>
 		</BsdfMaterial>
 	</Object>
 	

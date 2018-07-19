@@ -143,7 +143,7 @@ namespace glue
 			}
 		}
 
-		std::vector<Image> Image::getMipmaps() const
+		std::vector<Image> Image::generateMipmaps() const
 		{
 			constexpr int channel = 3; //RGB
 			int width = m_width;

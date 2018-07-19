@@ -19,9 +19,9 @@ namespace glue
 
 		std::shared_ptr<geometry::BVH<geometry::Triangle>> Parser::loadModel(const std::string& path)
 		{
-			static std::unordered_map<std::string, std::shared_ptr<geometry::BVH<geometry::Triangle>>> gPathToBvh;
+			static std::unordered_map<std::string, std::shared_ptr<geometry::BVH<geometry::Triangle>>> path_to_bvh;
 
-			if (gPathToBvh.find(path) == gPathToBvh.end())
+			if (path_to_bvh.find(path) == path_to_bvh.end())
 			{
 				Assimp::Importer importer;
 				const aiScene* scene = importer.ReadFile(path,
@@ -38,7 +38,7 @@ namespace glue
 					throw std::runtime_error("Unhandled case: More than one mesh to process in the same model");
 				}
 
-				auto& bvh = gPathToBvh[path] = std::make_shared<geometry::BVH<geometry::Triangle>>();
+				auto& bvh = path_to_bvh[path] = std::make_shared<geometry::BVH<geometry::Triangle>>();
 
 				aiMesh* mesh = scene->mMeshes[0];
 				glm::vec3 face_vertices[3];
@@ -65,7 +65,22 @@ namespace glue
 				bvh->buildWithSAHSplit();
 			}
 
-			return gPathToBvh[path];
+			return path_to_bvh[path];
+		}
+
+		std::shared_ptr<std::vector<core::Image>> Parser::loadImage(const std::string& path)
+		{
+			static std::unordered_map<std::string, std::shared_ptr<std::vector<core::Image>>> path_to_image;
+
+			if (path_to_image.find(path) == path_to_image.end())
+			{
+				core::Image image(path);
+
+				auto& mipmaps = path_to_image[path] = std::make_shared<std::vector<core::Image>>(image.generateMipmaps());
+				mipmaps->insert(mipmaps->begin(), std::move(image));
+			}
+
+			return path_to_image[path];
 		}
 	}
 }

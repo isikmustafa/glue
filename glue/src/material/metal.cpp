@@ -31,17 +31,17 @@ namespace glue
 			, m_use_mis(xml.roughness < 0.1f)
 		{}
 
-		std::pair<glm::vec3, glm::vec3> Metal::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler) const
+		std::pair<glm::vec3, glm::vec3> Metal::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
 		{
 			return m_microfacet.sampleWo(wi_tangent, sampler, m_ior_n, m_ior_k);
 		}
 
-		glm::vec3 Metal::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const
+		glm::vec3 Metal::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
 		{
 			return m_microfacet.getBsdf(wi_tangent, wo_tangent, m_ior_n, m_ior_k);
 		}
 
-		float Metal::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const
+		float Metal::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
 		{
 			return m_microfacet.getPdf(wi_tangent, wo_tangent);
 		}

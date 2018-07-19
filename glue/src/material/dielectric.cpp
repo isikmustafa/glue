@@ -29,17 +29,17 @@ namespace glue
 			, m_use_mis(xml.roughness < 0.1f)
 		{}
 
-		std::pair<glm::vec3, glm::vec3> Dielectric::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler) const
+		std::pair<glm::vec3, glm::vec3> Dielectric::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
 		{
 			return m_microfacet.sampleWo(wi_tangent, sampler, core::math::cosTheta(wi_tangent) > 0.0f ? m_ior_n : 1.0f / m_ior_n);
 		}
 
-		glm::vec3 Dielectric::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const
+		glm::vec3 Dielectric::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
 		{
 			return m_microfacet.getBsdf(wi_tangent, wo_tangent, core::math::cosTheta(wi_tangent) > 0.0f ? m_ior_n : 1.0f / m_ior_n);
 		}
 
-		float Dielectric::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const
+		float Dielectric::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
 		{
 			return m_microfacet.getPdf(wi_tangent, wo_tangent, core::math::cosTheta(wi_tangent) > 0.0f ? m_ior_n : 1.0f / m_ior_n);
 		}

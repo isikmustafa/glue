@@ -177,6 +177,9 @@
     <ClCompile Include="src\microfacet\beckmann_distribution.cpp" />
     <ClCompile Include="src\microfacet\fresnel.cpp" />
     <ClCompile Include="src\microfacet\ggx_distribution.cpp" />
+    <ClCompile Include="src\texture\constant_texture.cpp" />
+    <ClCompile Include="src\texture\image_texture.cpp" />
+    <ClCompile Include="src\texture\texture.cpp" />
     <ClCompile Include="src\xml\node.cpp" />
     <ClCompile Include="src\xml\parser.cpp" />
   </ItemGroup>
@@ -218,6 +221,9 @@
     <ClInclude Include="src\microfacet\ggx_distribution.h" />
     <ClInclude Include="src\microfacet\microfacet_reflection.h" />
     <ClInclude Include="src\microfacet\microfacet_scattering.h" />
+    <ClInclude Include="src\texture\constant_texture.h" />
+    <ClInclude Include="src\texture\image_texture.h" />
+    <ClInclude Include="src\texture\texture.h" />
     <ClInclude Include="src\xml\node.h" />
     <ClInclude Include="src\xml\parser.h" />
   </ItemGroup>

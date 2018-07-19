@@ -2,6 +2,7 @@
 #define __GLUE__MATERIAL__LAMBERTIAN__
 
 #include "bsdf_material.h"
+#include "..\texture\texture.h"
 
 namespace glue
 {
@@ -13,24 +14,24 @@ namespace glue
 			//Xml structure of the class.
 			struct Xml : public BsdfMaterial::Xml
 			{
-				glm::vec3 kd;
+				std::unique_ptr<texture::Texture::Xml> kd;
 
 				explicit Xml(const xml::Node& node);
-				explicit Xml(const glm::vec3& p_kd);
+				explicit Xml(std::unique_ptr<texture::Texture::Xml> p_kd);
 				std::unique_ptr<BsdfMaterial> create() const override;
 			};
 
 		public:
 			Lambertian(const Lambertian::Xml& xml);
 
-			std::pair<glm::vec3, glm::vec3> sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler) const override;
-			glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const override;
-			float getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const override;
+			std::pair<glm::vec3, glm::vec3> sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const override;
+			glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const override;
+			float getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const override;
 			bool hasDeltaDistribution() const override;
 			bool useMultipleImportanceSampling() const override;
 
 		private:
-			glm::vec3 m_kd;
+			std::unique_ptr<texture::Texture> m_kd;
 		};
 	}
 }
