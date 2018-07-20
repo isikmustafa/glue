@@ -56,11 +56,11 @@ namespace glue
 
 		glm::vec3 ImageTexture::fetch(const geometry::Intersection& intersection) const
 		{
-			//Always clamp for now.
+			//Always repeat for now.
 			//Nearest-Nearest
 			auto& mipmap = (*m_images)[0];
-			float u = glm::clamp(intersection.uv.x, 0.0f, 0.9999f);
-			float v = glm::clamp(intersection.uv.y, 0.0f, 0.9999f);
+			float u = glm::fract(intersection.uv.x);
+			float v = glm::fract(intersection.uv.y);
 
 			return mipmap.get(static_cast<int>(mipmap.get_width() * u), static_cast<int>(mipmap.get_height() * v));
 		}
