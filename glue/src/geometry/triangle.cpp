@@ -1,10 +1,8 @@
 #include "triangle.h"
 #include "ray.h"
 #include "intersection.h"
-#include "..\geometry\spherical_coordinate.h"
+#include "spherical_mapper.h"
 
-#include <glm\trigonometric.hpp>
-#include <glm\gtc\constants.hpp>
 #include <glm\geometric.hpp>
 #include <glm\mat2x2.hpp>
 #include <glm\mat3x2.hpp>
@@ -89,11 +87,10 @@ namespace glue
 				intersection.plane.normal = m_normal;
 				if (std::isnan(m_dpdu.x) || std::isnan(m_dpdv.x))
 				{
-					auto local_point = ray.getPoint(distance);
-					geometry::SphericalCoordinate spherical_position(local_point);
-					intersection.uv = glm::vec2(spherical_position.phi * glm::one_over_two_pi<float>(), spherical_position.theta * glm::one_over_pi<float>());
-					intersection.dpdu = glm::vec3(-glm::two_pi<float>() * local_point.y, glm::two_pi<float>() * local_point.x, 0.0f);
-					intersection.dpdv = glm::vec3((local_point.z * glm::cos(spherical_position.phi), local_point.z * glm::sin(spherical_position.phi), -glm::sin(spherical_position.theta)) * glm::pi<float>());
+					SphericalMapper mapper(ray.getPoint(distance));
+					intersection.uv = mapper.uv;
+					intersection.dpdu = mapper.dpdu;
+					intersection.dpdv = mapper.dpdv;
 				}
 				else
 				{

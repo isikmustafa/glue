@@ -59,8 +59,8 @@ namespace glue
 			//Always repeat for now.
 			//Nearest-Nearest
 			auto& mipmap = (*m_images)[0];
-			float u = glm::fract(intersection.uv.x);
-			float v = glm::fract(intersection.uv.y);
+			auto u = glm::fract(intersection.uv.x);
+			auto v = glm::fract(intersection.uv.y);
 
 			return mipmap.get(static_cast<int>(mipmap.get_width() * u), static_cast<int>(mipmap.get_height() * v));
 		}

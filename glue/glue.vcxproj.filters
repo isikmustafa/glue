@@ -139,6 +139,9 @@
     <ClCompile Include="src\texture\texture.cpp">
       <Filter>Source Files\texture</Filter>
     </ClCompile>
+    <ClCompile Include="src\geometry\spherical_mapper.cpp">
+      <Filter>Source Files\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\geometry\triangle.h">
@@ -266,6 +269,9 @@
     </ClInclude>
     <ClInclude Include="src\texture\constant_texture.h">
       <Filter>Source Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\geometry\spherical_mapper.h">
+      <Filter>Source Files\geometry</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

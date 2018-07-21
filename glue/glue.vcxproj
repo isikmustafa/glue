@@ -162,6 +162,7 @@
     <ClCompile Include="src\geometry\mesh.cpp" />
     <ClCompile Include="src\geometry\ray.cpp" />
     <ClCompile Include="src\geometry\spherical_coordinate.cpp" />
+    <ClCompile Include="src\geometry\spherical_mapper.cpp" />
     <ClCompile Include="src\geometry\transformation.cpp" />
     <ClCompile Include="src\geometry\triangle.cpp" />
     <ClCompile Include="src\integrator\integrator.cpp" />
@@ -205,6 +206,7 @@
     <ClInclude Include="src\geometry\object.h" />
     <ClInclude Include="src\geometry\ray.h" />
     <ClInclude Include="src\geometry\spherical_coordinate.h" />
+    <ClInclude Include="src\geometry\spherical_mapper.h" />
     <ClInclude Include="src\geometry\transformation.h" />
     <ClInclude Include="src\geometry\triangle.h" />
     <ClInclude Include="src\integrator\integrator.h" />
