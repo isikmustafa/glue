@@ -80,7 +80,7 @@ namespace glue
 				}
 			}
 
-			core::CoordinateSpace tangent_space(intersection.plane.point, intersection.plane.normal);
+			core::CoordinateSpace tangent_space(intersection.plane.point, intersection.plane.normal, intersection.dpdu);
 			auto wi_tangent = tangent_space.vectorToLocalSpace(-ray.get_direction());
 
 			//DIRECT LIGHTING//

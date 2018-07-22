@@ -70,12 +70,12 @@ namespace glue
 			auto inv_det = 1.0f / glm::dot(m_edge1, pvec);
 
 			auto tvec = ray.get_origin() - m_v0;
-			auto w0 = glm::dot(tvec, pvec) * inv_det;
+			auto w1 = glm::dot(tvec, pvec) * inv_det;
 
 			auto qvec = glm::cross(tvec, m_edge1);
-			auto w1 = glm::dot(ray.get_direction(), qvec) * inv_det;
+			auto w2 = glm::dot(ray.get_direction(), qvec) * inv_det;
 
-			if (w0 < 0.0f || w1 < 0.0f || (w0 + w1) > 1.0f)
+			if (w1 < 0.0f || w2 < 0.0f || (w1 + w2) > 1.0f)
 			{
 				return false;
 			}
@@ -84,7 +84,7 @@ namespace glue
 			if (distance > 0.0f && distance < max_distance)
 			{
 				intersection.plane.normal = m_normal;
-				auto values = m_mapper->map(ray.getPoint(distance), glm::vec3(1.0f - w0 - w1, w0, w1));
+				auto values = m_mapper->map(ray.getPoint(distance), glm::vec3(1.0f - w1 - w2, w1, w2));
 				intersection.uv = values.uv;
 				intersection.dpdu = values.dpdu;
 				intersection.dpdv = values.dpdv;
@@ -101,12 +101,12 @@ namespace glue
 			auto inv_det = 1.0f / glm::dot(m_edge1, pvec);
 
 			auto tvec = ray.get_origin() - m_v0;
-			auto w0 = glm::dot(tvec, pvec) * inv_det;
+			auto w1 = glm::dot(tvec, pvec) * inv_det;
 
 			auto qvec = glm::cross(tvec, m_edge1);
-			auto w1 = glm::dot(ray.get_direction(), qvec) * inv_det;
+			auto w2 = glm::dot(ray.get_direction(), qvec) * inv_det;
 
-			if (w0 < 0.0f || w1 < 0.0f || (w0 + w1) > 1.0f)
+			if (w1 < 0.0f || w2 < 0.0f || (w1 + w2) > 1.0f)
 			{
 				return false;
 			}
