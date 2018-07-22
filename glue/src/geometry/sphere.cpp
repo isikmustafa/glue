@@ -1,7 +1,7 @@
 #include "sphere.h"
 #include "ray.h"
 #include "intersection.h"
-#include "spherical_mapper.h"
+#include "mapper.h"
 #include "..\core\real_sampler.h"
 #include "..\geometry\spherical_coordinate.h"
 #include "..\xml\node.h"
@@ -101,10 +101,10 @@ namespace glue
 				auto local_point = transformed_ray.getPoint(distance);
 				intersection.plane.normal = glm::normalize(m_transformation.normalToWorldSpace(local_point));
 
-				SphericalMapper mapper(local_point);
-				intersection.uv = mapper.uv;
-				intersection.dpdu = m_transformation.vectorToWorldSpace(mapper.dpdu);
-				intersection.dpdv = m_transformation.vectorToWorldSpace(mapper.dpdv);
+				auto values = SphericalMapper().map(local_point, glm::vec3(0.0f));
+				intersection.uv = values.uv;
+				intersection.dpdu = m_transformation.vectorToWorldSpace(values.dpdu);
+				intersection.dpdv = m_transformation.vectorToWorldSpace(values.dpdv);
 
 				intersection.distance = distance;
 				intersection.object = this;

@@ -42,7 +42,7 @@ namespace glue
 
 				aiMesh* mesh = scene->mMeshes[0];
 				glm::vec3 face_vertices[3];
-				glm::vec2 tex_coords[3];
+				glm::vec2 tex_coords[3] = { glm::vec2(0.0f), glm::vec2(0.0f), glm::vec2(0.0f) };
 				int face_count = mesh->mNumFaces;
 				for (int i = 0; i < face_count; ++i)
 				{

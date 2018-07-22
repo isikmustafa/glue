@@ -139,7 +139,7 @@
     <ClCompile Include="src\texture\texture.cpp">
       <Filter>Source Files\texture</Filter>
     </ClCompile>
-    <ClCompile Include="src\geometry\spherical_mapper.cpp">
+    <ClCompile Include="src\geometry\mapper.cpp">
       <Filter>Source Files\geometry</Filter>
     </ClCompile>
   </ItemGroup>
@@ -270,7 +270,7 @@
     <ClInclude Include="src\texture\constant_texture.h">
       <Filter>Source Files\texture</Filter>
     </ClInclude>
-    <ClInclude Include="src\geometry\spherical_mapper.h">
+    <ClInclude Include="src\geometry\mapper.h">
       <Filter>Source Files\geometry</Filter>
     </ClInclude>
   </ItemGroup>

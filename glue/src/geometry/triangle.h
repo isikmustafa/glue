@@ -5,10 +5,12 @@
 #include "plane.h"
 #include "..\core\forward_decl.h"
 #include "..\core\real_sampler.h"
+#include "mapper.h"
 
 #include <glm\vec2.hpp>
 #include <glm\vec3.hpp>
 #include <array>
+#include <memory>
 
 namespace glue
 {
@@ -36,11 +38,7 @@ namespace glue
 			glm::vec3 m_edge1;
 			glm::vec3 m_edge2;
 			glm::vec3 m_normal;
-			glm::vec3 m_dpdu;
-			glm::vec3 m_dpdv;
-			glm::vec2 m_uv0;
-			glm::vec2 m_uv1;
-			glm::vec2 m_uv2;
+			std::unique_ptr<Mapper> m_mapper;
 		};
 	}
 }

@@ -1,11 +1,8 @@
 #include "triangle.h"
 #include "ray.h"
 #include "intersection.h"
-#include "spherical_mapper.h"
 
 #include <glm\geometric.hpp>
-#include <glm\mat2x2.hpp>
-#include <glm\mat3x2.hpp>
 
 namespace glue
 {
@@ -17,14 +14,16 @@ namespace glue
 			, m_edge1(edge1)
 			, m_edge2(edge2)
 			, m_normal(glm::normalize(glm::cross(edge1, edge2)))
-			, m_uv0(uv0)
-			, m_uv1(uv1)
-			, m_uv2(uv2)
+			, m_mapper(nullptr)
 		{
-			//glm::transpose is used only for brevity. If this constructor will be called on hot areas, do not use it and make it more efficient.
-			auto dp = glm::transpose(glm::inverse(glm::transpose(glm::mat2(m_uv0 - m_uv2, m_uv1 - m_uv2))) * glm::transpose(glm::mat2x3(-m_edge2, m_edge1 - m_edge2)));
-			m_dpdu = dp[0];
-			m_dpdv = dp[1];
+			if (uv0.x == 0.0f && uv1.x == 0.0f && uv2.x == 0.0f)
+			{
+				m_mapper = std::make_unique<SphericalMapper>();
+			}
+			else
+			{
+				m_mapper = std::make_unique<UVMapper>(edge1, edge2, uv0, uv1, uv2);
+			}
 		}
 
 		geometry::Plane Triangle::samplePlane(core::UniformSampler& sampler) const
@@ -85,19 +84,10 @@ namespace glue
 			if (distance > 0.0f && distance < max_distance)
 			{
 				intersection.plane.normal = m_normal;
-				if (std::isnan(m_dpdu.x) || std::isnan(m_dpdv.x))
-				{
-					SphericalMapper mapper(ray.getPoint(distance));
-					intersection.uv = mapper.uv;
-					intersection.dpdu = mapper.dpdu;
-					intersection.dpdv = mapper.dpdv;
-				}
-				else
-				{
-					intersection.uv = m_uv0 * w0 + m_uv1 * w1 + m_uv2 * (1.0f - w0 - w1);
-					intersection.dpdu = m_dpdu;
-					intersection.dpdv = m_dpdv;
-				}
+				auto values = m_mapper->map(ray.getPoint(distance), glm::vec3(w0, w1, 1.0f - w0 - w1));
+				intersection.uv = values.uv;
+				intersection.dpdu = values.dpdu;
+				intersection.dpdv = values.dpdv;
 				intersection.distance = distance;
 
 				return true;
