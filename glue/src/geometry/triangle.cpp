@@ -84,7 +84,7 @@ namespace glue
 			if (distance > 0.0f && distance < max_distance)
 			{
 				intersection.plane.normal = m_normal;
-				auto values = m_mapper->map(ray.getPoint(distance), glm::vec3(w0, w1, 1.0f - w0 - w1));
+				auto values = m_mapper->map(ray.getPoint(distance), glm::vec3(1.0f - w0 - w1, w0, w1));
 				intersection.uv = values.uv;
 				intersection.dpdu = values.dpdu;
 				intersection.dpdv = values.dpdv;
