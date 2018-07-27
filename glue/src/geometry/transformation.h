@@ -18,7 +18,7 @@ namespace glue
 			struct Xml
 			{
 				glm::vec3 scaling;
-				glm::vec4 rotation;
+				glm::vec3 rotation;
 				glm::vec3 translation;
 
 				Xml();

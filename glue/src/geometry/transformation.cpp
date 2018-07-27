@@ -2,6 +2,7 @@
 #include "..\xml\node.h"
 
 #include <glm\gtx\transform.hpp>
+#include <glm\gtx\euler_angles.hpp>
 #include "..\core\tonemapper.h"
 
 namespace glue
@@ -10,14 +11,14 @@ namespace glue
 	{
 		Transformation::Xml::Xml()
 			: scaling(1.0f)
-			, rotation(glm::vec3(1.0f, 0.0f, 0.0f), 0.0f)
+			, rotation(0.0f)
 			, translation(0.0f)
 		{}
 
 		Transformation::Xml::Xml(const xml::Node& node)
 		{
 			node.parseChildText("Scaling", &scaling.x, 1.0f, &scaling.y, 1.0f, &scaling.z, 1.0f);
-			node.parseChildText("Rotation", &rotation.x, 1.0f, &rotation.y, 1.0f, &rotation.z, 1.0f, &rotation.w, 0.0f);
+			node.parseChildText("Rotation", &rotation.x, 0.0f, &rotation.y, 0.0f, &rotation.z, 0.0f);
 			node.parseChildText("Translation", &translation.x, 0.0f, &translation.y, 0.0f, &translation.z, 0.0f);
 
 			if (node.parent().attribute("type") == std::string("Sphere"))
@@ -28,9 +29,9 @@ namespace glue
 				}
 			}
 		}
-
+		
 		Transformation::Transformation(const Transformation::Xml& xml)
-			: m_transformation(glm::rotate(glm::radians(xml.rotation.w), glm::normalize(glm::vec3(xml.rotation))) * glm::scale(xml.scaling))
+			: m_transformation(glm::orientate4(glm::radians(glm::vec3(xml.rotation.x, xml.rotation.z, xml.rotation.y))) * glm::scale(xml.scaling))
 			, m_inverse_transformation(glm::inverse(m_transformation))
 			, m_translation(xml.translation)
 		{}

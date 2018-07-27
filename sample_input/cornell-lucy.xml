@@ -8,7 +8,7 @@
     </Integrator>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/cornell-lucyClamp</Path>
+		<Path>../sample_output/cornell-lucy</Path>
 		<Format>png</Format>
 		<Tonemapper type="Clamp">
 			<Min>0.0</Min>
@@ -34,12 +34,12 @@
         <NearDistance>0.01</NearDistance>
     </Camera>
 	
-	<!-- Lucy -->
+	<!-- Lucy 
 	<Object type="Mesh">
 		<Datapath>../sample_input/lucy.obj</Datapath>
 		<Transformation>
 			<Scaling>0.0018 0.0018 0.0018</Scaling>
-			<Rotation>0 1 0 60</Rotation>
+			<Rotation>0 60 0</Rotation>
 			<Translation>0 0 -0.5</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
@@ -51,12 +51,23 @@
 					<MipmapInterpolation>Nearest</MipmapInterpolation>
 				</Texture>
 			</Kd>
-			
-			<!--<Kd>
-				<Texture type="Constant">
-					<Value>0.73 0.48 0.34</Value>
+		</BsdfMaterial>
+	</Object>-->
+	
+	<Object type="Sphere">
+		<Radius>0.3</Radius>
+		<Center>0 0.5 -0.5</Center>
+		<Transformation>
+			<Rotation>-90 0 0</Rotation>
+		</Transformation>
+		<BsdfMaterial type="Lambertian">
+			<Kd>
+				<Texture type="Image">
+					<Datapath>../sample_input/earth.jpg</Datapath>
+					<TexelInterpolation>Nearest</TexelInterpolation>
+					<MipmapInterpolation>Nearest</MipmapInterpolation>
 				</Texture>
-			</Kd>-->
+			</Kd>
 		</BsdfMaterial>
 	</Object>
 	
@@ -93,7 +104,7 @@
 		<Datapath>../sample_input/rectangle.obj</Datapath>
 		<Transformation>
 			<Scaling>2 2 2</Scaling>
-			<Rotation>0 1 0 180</Rotation>
+			<Rotation>0 180 0</Rotation>
 			<Translation>0 1 1.5</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
@@ -109,7 +120,7 @@
 		<Datapath>../sample_input/rectangle.obj</Datapath>
 		<Transformation>
 			<Scaling>3 2 2</Scaling>
-			<Rotation>0 1 0 270</Rotation>
+			<Rotation>0 270 0</Rotation>
 			<Translation>1 1 0</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
@@ -125,7 +136,7 @@
 		<Datapath>../sample_input/rectangle.obj</Datapath>
 		<Transformation>
 			<Scaling>3 2 2</Scaling>
-			<Rotation>0 1 0 90</Rotation>
+			<Rotation>0 90 0</Rotation>
 			<Translation>-1 1 0</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
@@ -141,7 +152,7 @@
 		<Datapath>../sample_input/rectangle.obj</Datapath>
 		<Transformation>
 			<Scaling>2 3 2</Scaling>
-			<Rotation>1 0 0 90</Rotation>
+			<Rotation>90 0 0</Rotation>
 			<Translation>0 2 0</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
@@ -157,7 +168,7 @@
 		<Datapath>../sample_input/rectangle.obj</Datapath>
 		<Transformation>
 			<Scaling>2 3 2</Scaling>
-			<Rotation>-1 0 0 90</Rotation>
+			<Rotation>-90 0 0</Rotation>
 			<Translation>0 0 0</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
@@ -175,7 +186,7 @@
 			<Datapath>../sample_input/rectangle.obj</Datapath>
 			<Transformation>
 				<Scaling>0.3 0.3 0.3</Scaling>
-				<Rotation>1 0 0 90</Rotation>
+				<Rotation>90 0 0</Rotation>
 				<Translation>0 1.999 0.0</Translation>
 			</Transformation>
 		</Object>
