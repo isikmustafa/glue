@@ -15,7 +15,7 @@ namespace glue
 		Scene::Xml::Xml(const xml::Node& node)
 		{
 			node.parseChildText("BackgroundRadiance", &background_radiance.x, 0.0f, &background_radiance.y, 0.0f, &background_radiance.z, 0.0f);
-			node.parseChildText("SecondaryRayEpsilon", &secondary_ray_epsilon, 0.0001f);
+			node.parseChildText("SecondaryRayEpsilon", &secondary_ray_epsilon, 1e-4f);
 			integrator = integrator::Integrator::Xml::factory(node.child("Integrator", true));
 			for (auto output = node.child("Output"); output; output = output.next())
 			{

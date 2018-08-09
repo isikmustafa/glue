@@ -44,6 +44,26 @@ namespace glue
 				return p * x;
 			}
 
+			inline unsigned int closestPowTwo(unsigned int number)
+			{
+				auto v = number;
+				--v;
+				v |= v >> 1;
+				v |= v >> 2;
+				v |= v >> 4;
+				v |= v >> 8;
+				v |= v >> 16;
+				++v;
+
+				return (v - number) > (v >> 2) ? (v >> 1) : v;
+			}
+
+			template<typename Value>
+			inline Value lerp(float t, Value v0, Value v1)
+			{
+				return (1.0f - t) * v0 + t * v1;
+			}
+
 			//Following trigonometric functions assumes the parameters are given in tangent space.
 			//This results in efficient computations.
 			inline float cosTheta(const glm::vec3& w_tangent)

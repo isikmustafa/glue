@@ -77,7 +77,6 @@ namespace glue
 				core::Image image(path);
 
 				auto& mipmaps = path_to_image[path] = std::make_shared<std::vector<core::Image>>(image.generateMipmaps());
-				mipmaps->insert(mipmaps->begin(), std::move(image));
 			}
 
 			return path_to_image[path];

@@ -157,7 +157,9 @@
     <ClCompile Include="src\core\timer.cpp" />
     <ClCompile Include="src\core\tonemapper.cpp" />
     <ClCompile Include="src\geometry\bbox.cpp" />
+    <ClCompile Include="src\geometry\intersection.cpp" />
     <ClCompile Include="src\geometry\object.cpp" />
+    <ClCompile Include="src\geometry\plane.cpp" />
     <ClCompile Include="src\geometry\sphere.cpp" />
     <ClCompile Include="src\geometry\mesh.cpp" />
     <ClCompile Include="src\geometry\ray.cpp" />

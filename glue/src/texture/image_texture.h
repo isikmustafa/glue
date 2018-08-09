@@ -13,19 +13,10 @@ namespace glue
 		class ImageTexture : public Texture
 		{
 		public:
-			enum class Interpolation
-			{
-				NEAREST,
-				BILINEAR
-			};
-
-		public:
 			//Xml structure of the class.
 			struct Xml : public Texture::Xml
 			{
 				std::string datapath;
-				Interpolation texel_interpolation;
-				Interpolation mipmap_interpolation;
 
 				explicit Xml(const xml::Node& node);
 				std::unique_ptr<Texture> create() const override;
@@ -38,8 +29,11 @@ namespace glue
 
 		private:
 			std::shared_ptr<std::vector<core::Image>> m_images;
-			Interpolation m_texel_interpolation;
-			Interpolation m_mipmap_interpolation;
+			float m_coeff_u;
+			float m_coeff_v;
+
+		private:
+			glm::vec3 fetchTexel(const glm::vec2& uv, int mipmap_level) const;
 		};
 	}
 }

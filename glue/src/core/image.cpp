@@ -1,4 +1,5 @@
 #include "image.h"
+#include "math.h"
 
 #include <memory>
 #define STB_IMAGE_IMPLEMENTATION
@@ -146,12 +147,14 @@ namespace glue
 		std::vector<Image> Image::generateMipmaps() const
 		{
 			constexpr int channel = 3; //RGB
-			int width = m_width;
-			int height = m_height;
-			int stride_src = channel * width * sizeof(float);
-			int stride_dest = channel * (width / 2) * sizeof(float);
-			std::unique_ptr<float[]> src(new float[stride_src * height]);
-			std::unique_ptr<float[]> dest(new float[stride_dest * (height / 2)]);
+			int src_width = m_width;
+			int src_height = m_height;
+			int dest_width = core::math::closestPowTwo(m_width);
+			int dest_height = core::math::closestPowTwo(m_height);
+			int stride_src = channel * src_width * sizeof(float);
+			int stride_dest = channel * dest_width * sizeof(float);
+			std::unique_ptr<float[]> src(new float[stride_src * src_height]);
+			std::unique_ptr<float[]> dest(new float[stride_dest * dest_height]);
 			auto src_ptr = src.get();
 
 			for (int j = 0, index = 0; j < m_height; ++j)
@@ -167,22 +170,24 @@ namespace glue
 			}
 
 			std::vector<Image> mipmaps;
-			while (width > 1 && height > 1)
+			while (dest_width >= 1 && dest_height >= 1)
 			{
-				stbir_resize_float(src.get(), width, height, stride_src, dest.get(), width / 2, height / 2, stride_dest, channel);
+				stbir_resize_float(src.get(), src_width, src_height, stride_src, dest.get(), dest_width, dest_height, stride_dest, channel);
 
-				width /= 2;
-				height /= 2;
-				stride_src = channel * width * sizeof(float);
-				stride_dest = channel * (width / 2) * sizeof(float);
+				src_width = dest_width;
+				src_height = dest_height;
+				dest_width >>= 1;
+				dest_height >>= 1;
+				stride_src = channel * src_width * sizeof(float);
+				stride_dest = channel * dest_width * sizeof(float);
 				src = std::move(dest);
-				dest = std::unique_ptr<float[]>(new float[stride_dest * (height / 2)]);
+				dest = std::unique_ptr<float[]>(new float[stride_dest * dest_height]);
 				src_ptr = src.get();
 
-				Image mipmap(width, height, m_type);
-				for (int j = 0, index = 0; j < height; ++j)
+				Image mipmap(src_width, src_height, m_type);
+				for (int j = 0, index = 0; j < src_height; ++j)
 				{
-					for (int i = 0; i < width; ++i, index += channel)
+					for (int i = 0; i < src_width; ++i, index += channel)
 					{
 						mipmap.set(i, j, glm::vec3(src_ptr[index], src_ptr[index + 1], src_ptr[index + 2]));
 					}
