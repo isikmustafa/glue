@@ -19,8 +19,6 @@ namespace glue
 		template<typename T, int tMax>
 		ImageRepr<T, tMax>::ImageRepr(int width, int height)
 			: m_pixels(width, std::vector<RGB>(height))
-			, m_width(width)
-			, m_height(height)
 		{}
 
 		template<typename T, int tMax>
@@ -28,17 +26,19 @@ namespace glue
 		{
 			//If given image is LDR, stbi_loadf applies an sRGB->Linear conversion.
 			int channel;
-			auto data = stbi_loadf(filename.c_str(), &m_width, &m_height, &channel, 0);
+			int width;
+			int height;
+			auto data = stbi_loadf(filename.c_str(), &width, &height, &channel, 0);
 
 			if (!data)
 			{
 				throw std::runtime_error("Error: Image cannot be loaded");
 			}
 
-			m_pixels.resize(m_width, std::vector<RGB>(m_height));
-			for (int j = 0, index = 0; j < m_height; ++j)
+			m_pixels.resize(width, std::vector<RGB>(height));
+			for (int j = 0, index = 0; j < height; ++j)
 			{
-				for (int i = 0; i < m_width; ++i, index += channel)
+				for (int i = 0; i < width; ++i, index += channel)
 				{
 					set(i, j, glm::vec3(data[index], data[index + 1], data[index + 2]));
 				}
@@ -103,17 +103,16 @@ namespace glue
 			if (stbi_is_hdr(filename.c_str()))
 			{
 				m_float_image = FloatImage(filename);
-				m_width = m_float_image.get_width();
-				m_height = m_float_image.get_height();
 				m_type = Type::FLOAT;
 			}
 			else
 			{
 				m_byte_image = ByteImage(filename);
-				m_width = m_byte_image.get_width();
-				m_height = m_byte_image.get_height();
 				m_type = Type::BYTE;
 			}
+
+			int channel;
+			stbi_info(filename.c_str(), &m_width, &m_height, &channel);
 		}
 
 		void Image::set(int x, int y, const glm::vec3& value)

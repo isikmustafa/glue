@@ -34,13 +34,8 @@ namespace glue
 			void set(int x, int y, const glm::vec3& value);
 			glm::vec3 get(int x, int y) const;
 
-			int get_width() const { return m_width; }
-			int get_height() const { return m_height; }
-
 		private:
 			std::vector<std::vector<RGB>> m_pixels;
-			int m_width;
-			int m_height;
 		};
 
 		using ByteImage = ImageRepr<unsigned char, 255>;

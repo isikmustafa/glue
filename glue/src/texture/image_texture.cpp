@@ -39,15 +39,15 @@ namespace glue
 			{
 				return fetchTexel(intersection.uv, 0);
 			}
-			else if (mipmap_level >= m_images->size() - 1.0f)
-			{
-				return fetchTexel(intersection.uv, m_images->size() - 1);
-			}
-			else
+			else if (mipmap_level < m_images->size() - 1.0f)
 			{
 				//Always blend between mipmap levels with a triangle filter (linear interpolation).
 				int floor_level = static_cast<int>(glm::floor(mipmap_level));
 				return core::math::lerp(mipmap_level - floor_level, fetchTexel(intersection.uv, floor_level), fetchTexel(intersection.uv, floor_level + 1));
+			}
+			else
+			{
+				return fetchTexel(intersection.uv, m_images->size() - 1);
 			}
 		}
 
