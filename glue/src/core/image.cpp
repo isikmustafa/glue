@@ -16,13 +16,13 @@ namespace glue
 {
 	namespace core
 	{
-		template<typename T, int tMax>
-		ImageRepr<T, tMax>::ImageRepr(int width, int height)
+		template<typename T, int tMax, ImageReprBase::Type tType>
+		ImageRepr<T, tMax, tType>::ImageRepr(int width, int height)
 			: m_pixels(width, std::vector<RGB>(height))
 		{}
 
-		template<typename T, int tMax>
-		ImageRepr<T, tMax>::ImageRepr(const std::string& filename)
+		template<typename T, int tMax, ImageReprBase::Type tType>
+		ImageRepr<T, tMax, tType>::ImageRepr(const std::string& filename)
 		{
 			//If given image is LDR, stbi_loadf applies an sRGB->Linear conversion.
 			int channel;
@@ -47,8 +47,8 @@ namespace glue
 			stbi_image_free(data);
 		}
 
-		template<typename T, int tMax>
-		void ImageRepr<T, tMax>::set(int x, int y, const glm::vec3& value)
+		template<typename T, int tMax, ImageReprBase::Type tType>
+		void ImageRepr<T, tMax, tType>::set(int x, int y, const glm::vec3& value)
 		{
 			if constexpr (tMax == 1)
 			{
@@ -61,8 +61,8 @@ namespace glue
 			}
 		}
 
-		template<typename T, int tMax>
-		glm::vec3 ImageRepr<T, tMax>::get(int x, int y) const
+		template<typename T, int tMax, ImageReprBase::Type tType>
+		glm::vec3 ImageRepr<T, tMax, tType>::get(int x, int y) const
 		{
 			if constexpr (tMax == 1)
 			{
@@ -77,70 +77,80 @@ namespace glue
 			}
 		}
 
-		Image::Image(int width, int height, Type type)
-			: m_byte_image(0, 0)
-			, m_float_image(0, 0)
+		template<typename T, int tMax, ImageReprBase::Type tType>
+		ImageReprBase::Type ImageRepr<T, tMax, tType>::type() const
+		{
+			return tType;
+		}
+
+		template<typename T, int tMax, ImageReprBase::Type tType>
+		std::unique_ptr<ImageReprBase> ImageRepr<T, tMax, tType>::clone() const
+		{
+			return std::make_unique<ImageRepr<T, tMax, tType>>(*this);
+		}
+
+		Image::Image(int width, int height, ImageReprBase::Type type)
+			: m_image_repr(nullptr)
 			, m_width(width)
 			, m_height(height)
-			, m_type(type)
 		{
-			switch (m_type)
+			switch (type)
 			{
-			case Type::BYTE:
-				m_byte_image = ByteImage(width, height);
+			case ImageReprBase::Type::BYTE:
+				m_image_repr = std::make_unique<ByteImage>(width, height);
 				break;
 
-			case Type::FLOAT:
-				m_float_image = FloatImage(width, height);
+			case ImageReprBase::Type::FLOAT:
+				m_image_repr = std::make_unique<FloatImage>(width, height);
 				break;
 			}
 		}
 
 		Image::Image(const std::string& filename)
-			: m_byte_image(0, 0)
-			, m_float_image(0, 0)
+			: m_image_repr(nullptr)
 		{
 			if (stbi_is_hdr(filename.c_str()))
 			{
-				m_float_image = FloatImage(filename);
-				m_type = Type::FLOAT;
+				m_image_repr = std::make_unique<FloatImage>(filename);
 			}
 			else
 			{
-				m_byte_image = ByteImage(filename);
-				m_type = Type::BYTE;
+				m_image_repr = std::make_unique<ByteImage>(filename);
 			}
 
 			int channel;
 			stbi_info(filename.c_str(), &m_width, &m_height, &channel);
 		}
 
+		Image::Image(const Image& image)
+			: m_image_repr(image.m_image_repr->clone())
+			, m_width(image.m_width)
+			, m_height(image.m_height)
+		{}
+
+		Image::Image(Image&& image)
+			: m_image_repr(std::move(image.m_image_repr))
+			, m_width(image.m_width)
+			, m_height(image.m_height)
+		{}
+
+		Image& Image::operator=(Image image)
+		{
+			m_image_repr = std::move(image.m_image_repr);
+			m_width = image.m_width;
+			m_height = image.m_height;
+
+			return *this;
+		}
+
 		void Image::set(int x, int y, const glm::vec3& value)
 		{
-			switch (m_type)
-			{
-			case Type::BYTE:
-				m_byte_image.set(x, y, value);
-				break;
-
-			case Type::FLOAT:
-				m_float_image.set(x, y, value);
-				break;
-			}
+			m_image_repr->set(x, y, value);
 		}
 
 		glm::vec3 Image::get(int x, int y) const
 		{
-			switch (m_type)
-			{
-			case Type::BYTE:
-				return m_byte_image.get(x, y);
-				break;
-
-			case Type::FLOAT:
-				return m_float_image.get(x, y);
-				break;
-			}
+			return m_image_repr->get(x, y);
 		}
 
 		std::vector<Image> Image::generateMipmaps() const
@@ -183,7 +193,7 @@ namespace glue
 				dest = std::unique_ptr<float[]>(new float[stride_dest * dest_height]);
 				src_ptr = src.get();
 
-				Image mipmap(src_width, src_height, m_type);
+				Image mipmap(src_width, src_height, m_image_repr->type());
 				for (int j = 0, index = 0; j < src_height; ++j)
 				{
 					for (int i = 0; i < src_width; ++i, index += channel)

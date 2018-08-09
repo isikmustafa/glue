@@ -10,8 +10,26 @@ namespace glue
 {
 	namespace core
 	{
-		template<typename T, int tMax>
-		class ImageRepr
+		class ImageReprBase
+		{
+		public:
+			enum class Type
+			{
+				BYTE,
+				FLOAT
+			};
+
+		public:
+			virtual ~ImageReprBase() {}
+
+			virtual void set(int x, int y, const glm::vec3& value) = 0;
+			virtual glm::vec3 get(int x, int y) const = 0;
+			virtual Type type() const = 0;
+			virtual std::unique_ptr<ImageReprBase> clone() const = 0;
+		};
+
+		template<typename T, int tMax, ImageReprBase::Type tType>
+		class ImageRepr : public ImageReprBase
 		{
 		public:
 			struct RGB
@@ -27,32 +45,29 @@ namespace glue
 			};
 
 		public:
-			ImageRepr() = default;
 			ImageRepr(int width, int height);
 			ImageRepr(const std::string& filename);
 
-			void set(int x, int y, const glm::vec3& value);
-			glm::vec3 get(int x, int y) const;
+			void set(int x, int y, const glm::vec3& value) override;
+			glm::vec3 get(int x, int y) const override;
+			ImageReprBase::Type type() const override;
+			std::unique_ptr<ImageReprBase> clone() const override;
 
 		private:
 			std::vector<std::vector<RGB>> m_pixels;
 		};
 
-		using ByteImage = ImageRepr<unsigned char, 255>;
-		using FloatImage = ImageRepr<float, 1>;
+		using ByteImage = ImageRepr<unsigned char, 255, ImageReprBase::Type::BYTE>;
+		using FloatImage = ImageRepr<float, 1, ImageReprBase::Type::FLOAT>;
 
 		class Image
 		{
 		public:
-			enum class Type
-			{
-				BYTE,
-				FLOAT
-			};
-
-		public:
-			Image(int width, int height, Type type = Type::FLOAT);
+			Image(int width, int height, ImageReprBase::Type type = ImageReprBase::Type::FLOAT);
 			Image(const std::string& filename);
+			Image(const Image& image);
+			Image(Image&& image);
+			Image& operator=(Image image);
 
 			void set(int x, int y, const glm::vec3& value);
 			glm::vec3 get(int x, int y) const;
@@ -63,11 +78,9 @@ namespace glue
 			int get_height() const { return m_height; }
 
 		private:
-			ByteImage m_byte_image;
-			FloatImage m_float_image;
+			std::unique_ptr<ImageReprBase> m_image_repr;
 			int m_width;
 			int m_height;
-			Type m_type;
 		};
 	}
 }
