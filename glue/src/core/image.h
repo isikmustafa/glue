@@ -66,8 +66,9 @@ namespace glue
 			Image(int width, int height, ImageReprBase::Type type = ImageReprBase::Type::FLOAT);
 			Image(const std::string& filename);
 			Image(const Image& image);
-			Image(Image&& image);
-			Image& operator=(Image image);
+			Image(Image&& image) = default;
+			Image& operator=(const Image& image);
+			Image& operator=(Image&& image) = default;
 
 			void set(int x, int y, const glm::vec3& value);
 			glm::vec3 get(int x, int y) const;

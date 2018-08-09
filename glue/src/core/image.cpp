@@ -128,15 +128,9 @@ namespace glue
 			, m_height(image.m_height)
 		{}
 
-		Image::Image(Image&& image)
-			: m_image_repr(std::move(image.m_image_repr))
-			, m_width(image.m_width)
-			, m_height(image.m_height)
-		{}
-
-		Image& Image::operator=(Image image)
+		Image& Image::operator=(const Image& image)
 		{
-			m_image_repr = std::move(image.m_image_repr);
+			m_image_repr = image.m_image_repr->clone();
 			m_width = image.m_width;
 			m_height = image.m_height;
 
