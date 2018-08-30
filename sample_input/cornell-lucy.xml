@@ -52,20 +52,18 @@
 		</BsdfMaterial>
 	</Object>-->
 	
-	<!--<Object type="Sphere">
+	<!----><Object type="Sphere">
 		<Radius>0.3</Radius>
 		<Center>0 0.5 -0.5</Center>
 		<Transformation>
 			<Rotation>-90 0 0</Rotation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<Kd>
-				<Texture type="Image">
-					<Datapath>../sample_input/earth.jpg</Datapath>
-				</Texture>
+			<Kd textureType="Image">
+				<Datapath>../sample_input/earth.jpg</Datapath>
 			</Kd>
 		</BsdfMaterial>
-	</Object>-->
+	</Object>
 	
 	<!-- Glass 
 	<Object type="Mesh">
@@ -88,10 +86,8 @@
 			<Translation>0 1 -1.5</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<Kd>
-				<Texture type="Constant">
-					<Value>0.6 0.6 0.6</Value>
-				</Texture>
+			<Kd textureType="Constant">
+				<Value>0.6 0.6 0.6</Value>
 			</Kd>
 		</BsdfMaterial>
 	</Object>
@@ -104,10 +100,8 @@
 			<Translation>0 1 1.5</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<Kd>
-				<Texture type="Constant">
-					<Value>0.6 0.6 0.6</Value>
-				</Texture>
+			<Kd textureType="Constant">
+				<Value>0.6 0.6 0.6</Value>
 			</Kd>
 		</BsdfMaterial>
 	</Object>
@@ -120,10 +114,8 @@
 			<Translation>1 1 0</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<Kd>
-				<Texture type="Constant">
-					<Value>0.6 0.6 0.6</Value>
-				</Texture>
+			<Kd textureType="Constant">
+				<Value>0.6 0.6 0.6</Value>
 			</Kd>
 		</BsdfMaterial>
 	</Object>
@@ -136,10 +128,8 @@
 			<Translation>-1 1 0</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<Kd>
-				<Texture type="Constant">
-					<Value>0.6 0.6 0.6</Value>
-				</Texture>
+			<Kd textureType="Constant">
+				<Value>0.6 0.6 0.6</Value>
 			</Kd>
 		</BsdfMaterial>
 	</Object>
@@ -152,10 +142,8 @@
 			<Translation>0 2 0</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<Kd>
-				<Texture type="Constant">
-					<Value>0.6 0.6 0.6</Value>
-				</Texture>
+			<Kd textureType="Constant">
+				<Value>0.6 0.6 0.6</Value>
 			</Kd>
 		</BsdfMaterial>
 	</Object>
@@ -168,10 +156,8 @@
 			<Translation>0 0 0</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<Kd>
-				<Texture type="Image">
-					<Datapath>../sample_input/checkerboard.png</Datapath>
-				</Texture>
+			<Kd textureType="Constant">
+				<Value>0.6 0.6 0.6</Value>
 			</Kd>
 		</BsdfMaterial>
 	</Object>

@@ -14,7 +14,7 @@ namespace glue
 	{
 		Lambertian::Xml::Xml(const xml::Node& node)
 		{
-			kd = texture::Texture::Xml::factory(node.child("Kd", true).child("Texture", true));
+			kd = texture::Texture::Xml::factory(node.child("Kd", true));
 		}
 
 		Lambertian::Xml::Xml(std::unique_ptr<texture::Texture::Xml> p_kd)

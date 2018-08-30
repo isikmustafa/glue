@@ -8,7 +8,7 @@ namespace glue
 	{
 		std::unique_ptr<Texture::Xml> Texture::Xml::factory(const xml::Node& node)
 		{
-			auto texture_type = node.attribute("type", true);
+			auto texture_type = node.attribute("textureType", true);
 
 			if (texture_type == std::string("Constant"))
 			{

@@ -14,12 +14,9 @@ namespace glue
 			glm::vec3 point;
 			glm::vec3 normal;
 
-			//p_normal is assumed to be normalized.
 			Plane() = default;
-			Plane(const glm::vec3& p_point, const glm::vec3& p_normal)
-				: point(p_point)
-				, normal(p_normal)
-			{}
+			//p_normal is assumed to be normalized.
+			Plane(const glm::vec3& p_point, const glm::vec3& p_normal);
 
 			//Returns the point intersected on the plane.
 			glm::vec3 intersect(const Ray& ray);
