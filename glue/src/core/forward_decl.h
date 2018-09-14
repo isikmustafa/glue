@@ -7,6 +7,7 @@ namespace glue
 	{
 		class CoordinateSpace;
 		class Discrete1DSampler;
+		class Discrete2DSampler;
 		class Filter;
 		class BoxFilter;
 		class TentFilter;
@@ -49,6 +50,7 @@ namespace glue
 	namespace light
 	{
 		class DiffuseArealight;
+		class EnvironmentLight;
 		class Light;
 	}
 

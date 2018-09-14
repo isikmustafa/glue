@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\core\discrete_2d_sampler.cpp" />
     <ClCompile Include="src\core\filter.cpp" />
     <ClCompile Include="src\core\image.cpp" />
     <ClCompile Include="src\core\output.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="src\integrator\integrator.cpp" />
     <ClCompile Include="src\integrator\pathtracer.cpp" />
     <ClCompile Include="src\light\diffuse_arealight.cpp" />
+    <ClCompile Include="src\light\environment_light.cpp" />
     <ClCompile Include="src\light\light.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\material\bsdf_material.cpp" />
@@ -187,6 +189,7 @@
     <ClCompile Include="src\xml\parser.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\core\discrete_2d_sampler.h" />
     <ClInclude Include="src\core\filter.h" />
     <ClInclude Include="src\core\forward_decl.h" />
     <ClInclude Include="src\core\image.h" />
@@ -214,6 +217,7 @@
     <ClInclude Include="src\integrator\integrator.h" />
     <ClInclude Include="src\integrator\pathtracer.h" />
     <ClInclude Include="src\light\diffuse_arealight.h" />
+    <ClInclude Include="src\light\environment_light.h" />
     <ClInclude Include="src\light\light.h" />
     <ClInclude Include="src\material\bsdf_material.h" />
     <ClInclude Include="src\material\dielectric.h" />

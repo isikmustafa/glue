@@ -26,7 +26,6 @@ namespace glue
 		Dielectric::Dielectric(const Dielectric::Xml& xml)
 			: m_ior_n(xml.ior_n)
 			, m_microfacet(xml.roughness)
-			, m_use_mis(xml.roughness < 0.1f)
 		{}
 
 		std::pair<glm::vec3, glm::vec3> Dielectric::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
@@ -51,7 +50,7 @@ namespace glue
 
 		bool Dielectric::useMultipleImportanceSampling() const
 		{
-			return m_use_mis;
+			return true;
 		}
 	}
 }

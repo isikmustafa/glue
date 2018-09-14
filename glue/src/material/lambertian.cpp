@@ -47,7 +47,7 @@ namespace glue
 		float Lambertian::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
 		{
 			//Cosine-weighted pdf.
-			return core::math::cosTheta(wo_tangent) * glm::one_over_pi<float>();
+			return glm::max(core::math::cosTheta(wo_tangent), 0.0f) * glm::one_over_pi<float>();
 		}
 
 		bool Lambertian::hasDeltaDistribution() const
@@ -57,7 +57,7 @@ namespace glue
 
 		bool Lambertian::useMultipleImportanceSampling() const
 		{
-			return false;
+			return true;
 		}
 	}
 }

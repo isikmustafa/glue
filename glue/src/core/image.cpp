@@ -156,8 +156,8 @@ namespace glue
 			int dest_height = core::math::closestPowTwo(m_height);
 			int stride_src = channel * src_width * sizeof(float);
 			int stride_dest = channel * dest_width * sizeof(float);
-			std::unique_ptr<float[]> src(new float[stride_src * src_height]);
-			std::unique_ptr<float[]> dest(new float[stride_dest * dest_height]);
+			std::unique_ptr<float[]> src(new float[channel * src_width * src_height]);
+			std::unique_ptr<float[]> dest(new float[channel * dest_width * dest_height]);
 			auto src_ptr = src.get();
 
 			for (int j = 0, index = 0; j < m_height; ++j)
@@ -184,7 +184,7 @@ namespace glue
 				stride_src = channel * src_width * sizeof(float);
 				stride_dest = channel * dest_width * sizeof(float);
 				src = std::move(dest);
-				dest = std::unique_ptr<float[]>(new float[stride_dest * dest_height]);
+				dest = std::unique_ptr<float[]>(new float[channel * dest_width * dest_height]);
 				src_ptr = src.get();
 
 				Image mipmap(src_width, src_height, m_image_repr->type());

@@ -37,29 +37,39 @@ namespace glue
 
 			if (mipmap_level < 0.0f)
 			{
-				return fetchTexel(intersection.uv, 0);
+				return fetchTexelNearest(intersection.uv, 0);
 			}
 			else if (mipmap_level < m_images->size() - 1.0f)
 			{
 				//Always blend between mipmap levels with a triangle filter (linear interpolation).
 				int floor_level = static_cast<int>(glm::floor(mipmap_level));
-				return core::math::lerp(mipmap_level - floor_level, fetchTexel(intersection.uv, floor_level), fetchTexel(intersection.uv, floor_level + 1));
+				return core::math::lerp(mipmap_level - floor_level, fetchTexelNearest(intersection.uv, floor_level), fetchTexelNearest(intersection.uv, floor_level + 1));
 			}
 			else
 			{
-				return fetchTexel(intersection.uv, m_images->size() - 1);
+				return fetchTexelNearest(intersection.uv, m_images->size() - 1);
 			}
 		}
 
-		glm::vec3 ImageTexture::fetchTexel(const glm::vec2& uv, int mipmap_level) const
+		glm::vec3 ImageTexture::fetchTexelNearest(const glm::vec2& uv, int mipmap_level) const
 		{
 			auto& mipmap = (*m_images)[mipmap_level];
 
-			//Always in REPEAT-NEAREST mode.
+			//Always in REPEAT mode.
 			auto u = glm::fract(uv.x);
 			auto v = glm::fract(uv.y);
 
 			return mipmap.get(static_cast<int>(mipmap.get_width() * u), static_cast<int>(mipmap.get_height() * v));
+		}
+
+		int ImageTexture::getWidth() const
+		{
+			return (*m_images)[0].get_width();
+		}
+
+		int ImageTexture::getHeight() const
+		{
+			return (*m_images)[0].get_height();
 		}
 	}
 }

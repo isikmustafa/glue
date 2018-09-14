@@ -5,3 +5,4 @@ glue/Debug/
 sample_output/
 *.png
 *.jpg
+*.hdr

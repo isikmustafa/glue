@@ -1,4 +1,5 @@
 #include "tonemapper.h"
+#include "math.h"
 #include "..\xml\node.h"
 
 #include <glm\geometric.hpp>
@@ -91,7 +92,7 @@ namespace glue
 				{
 					auto pixel = tonemapped_image.get(i, j);
 
-					auto luminance = glm::dot(glm::vec3(0.2126f, 0.7152f, 0.0722f), pixel);
+					auto luminance = math::rgbToLuminance(pixel);
 					max_l_t = glm::max(luminance, max_l_t);
 
 					geometric_average += glm::log(epsilon + luminance);
@@ -108,7 +109,7 @@ namespace glue
 				{
 					auto pixel = tonemapped_image.get(i, j);
 
-					auto l_t = scale * glm::dot(glm::vec3(0.2126f, 0.7152f, 0.0722f), pixel);
+					auto l_t = scale * math::rgbToLuminance(pixel);
 
 					pixel *= scale * (1.0f + l_t / (max_l_t * max_l_t)) / (1.0f + l_t);
 					tonemapped_image.set(i, j, glm::clamp(pixel, 0.0f, 1.0f));

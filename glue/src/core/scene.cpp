@@ -70,9 +70,12 @@ namespace glue
 			{
 				auto light = light_xml->create();
 				auto object = light->getObject();
-				object_to_light[object.get()] = light.get();
+				if (object)
+				{
+					object_to_light[object.get()] = light.get();
+					bvh.addObject(object);
+				}
 				lights.push_back(std::move(light));
-				bvh.addObject(object);
 			}
 
 			if (bvh.get_objects().size() < 1024)

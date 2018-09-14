@@ -148,6 +148,12 @@
     <ClCompile Include="src\geometry\plane.cpp">
       <Filter>Source Files\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="src\light\environment_light.cpp">
+      <Filter>Source Files\light</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\discrete_2d_sampler.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\geometry\triangle.h">
@@ -278,6 +284,12 @@
     </ClInclude>
     <ClInclude Include="src\geometry\mapper.h">
       <Filter>Source Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\light\environment_light.h">
+      <Filter>Source Files\light</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\discrete_2d_sampler.h">
+      <Filter>Source Files\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

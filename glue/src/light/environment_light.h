@@ -1,30 +1,31 @@
-#ifndef __GLUE__LIGHT__DIFFUSEAREALIGHT__
-#define __GLUE__LIGHT__DIFFUSEAREALIGHT__
+#ifndef __GLUE__LIGHT__ENVIRONMENTLIGHT__
+#define __GLUE__LIGHT__ENVIRONMENTLIGHT__
 
 #include "light.h"
-
-#include <glm\vec3.hpp>
-#include <memory>
+#include "..\texture\image_texture.h"
+#include "..\geometry\sphere.h"
+#include "..\geometry\transformation.h"
+#include "..\core\discrete_2d_sampler.h"
 
 namespace glue
 {
 	namespace light
 	{
-		class DiffuseArealight : public Light
+		class EnvironmentLight : public Light
 		{
 		public:
 			//Xml structure of the class.
 			struct Xml : public Light::Xml
 			{
-				glm::vec3 flux;
-				std::unique_ptr<geometry::Object::Xml> object;
+				texture::ImageTexture::Xml hdri;
+				geometry::Transformation::Xml transformation;
 
 				explicit Xml(const xml::Node& node);
 				std::unique_ptr<Light> create() const override;
 			};
 
 		public:
-			DiffuseArealight(const DiffuseArealight::Xml& xml);
+			EnvironmentLight(const EnvironmentLight::Xml& xml);
 
 			LightSample sample(core::UniformSampler& sampler, const geometry::Intersection& intersection) const override;
 			LightSample getVisibleSample(const core::Scene& scene, const geometry::Ray& ray) const override;
@@ -34,9 +35,13 @@ namespace glue
 			std::shared_ptr<geometry::Object> getObject() const override;
 
 		private:
-			std::shared_ptr<geometry::Object> m_object;
-			float m_pdf;
-			glm::vec3 m_le;
+			texture::ImageTexture m_hdri;
+			core::Discrete2DSampler m_sampler;
+			geometry::Transformation m_transformation;
+
+		private:
+			glm::vec3 getLeObjectSpace(const glm::vec3& wo_object, const glm::vec3& light_plane_normal, float distance) const;
+			float getPdfObjectSpace(const glm::vec3& wo_object, const glm::vec3& light_plane_normal, float distance) const;
 		};
 	}
 }

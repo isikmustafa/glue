@@ -58,6 +58,11 @@ namespace glue
 				return (v - number) > (v >> 2) ? (v >> 1) : v;
 			}
 
+			inline float rgbToLuminance(const glm::vec3& rgb)
+			{
+				return glm::dot(glm::vec3(0.2126f, 0.7152f, 0.0722f), rgb);
+			}
+
 			template<typename Value>
 			inline Value lerp(float t, Value v0, Value v1)
 			{

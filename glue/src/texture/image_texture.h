@@ -26,14 +26,14 @@ namespace glue
 			ImageTexture(const ImageTexture::Xml& xml);
 
 			glm::vec3 fetch(const geometry::Intersection& intersection) const override;
+			glm::vec3 fetchTexelNearest(const glm::vec2& uv, int mipmap_level) const;
+			int getWidth() const;
+			int getHeight() const;
 
 		private:
 			std::shared_ptr<std::vector<core::Image>> m_images;
 			float m_coeff_u;
 			float m_coeff_v;
-
-		private:
-			glm::vec3 fetchTexel(const glm::vec2& uv, int mipmap_level) const;
 		};
 	}
 }

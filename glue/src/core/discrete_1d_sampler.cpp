@@ -17,5 +17,10 @@ namespace glue
 		{
 			return std::distance(m_cdf.begin(), std::upper_bound(m_cdf.begin(), m_cdf.end(), sampler.sample() * m_sum));
 		}
+
+		float Discrete1DSampler::getPdf(int x) const
+		{
+			return (x == 0 ? m_cdf[0] : m_cdf[x] - m_cdf[x - 1]) / m_sum;
+		}
 	}
 }

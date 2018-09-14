@@ -22,6 +22,7 @@ namespace glue
 			virtual ~Mapper() {}
 
 			virtual Values map(const glm::vec3& cartesian, const glm::vec3& barycentric) const = 0;
+			virtual Values mapOnlyUV(const glm::vec3& cartesian, const glm::vec3& barycentric) const = 0;
 		};
 
 		class UVMapper : public Mapper
@@ -30,6 +31,7 @@ namespace glue
 			UVMapper(const glm::vec3& edge1, const glm::vec3& edge2, const glm::vec2& uv0, const glm::vec2& uv1, const glm::vec2& uv2);
 
 			Values map(const glm::vec3& cartesian, const glm::vec3& barycentric) const override;
+			Values mapOnlyUV(const glm::vec3& cartesian, const glm::vec3& barycentric) const override;
 
 		private:
 			glm::vec3 m_dpdu;
@@ -45,6 +47,7 @@ namespace glue
 			SphericalMapper();
 
 			Values map(const glm::vec3& cartesian, const glm::vec3& barycentric) const override;
+			Values mapOnlyUV(const glm::vec3& cartesian, const glm::vec3& barycentric) const override;
 		};
 	}
 }

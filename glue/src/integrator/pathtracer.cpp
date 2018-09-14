@@ -63,7 +63,18 @@ namespace glue
 			geometry::Intersection intersection;
 			if (!scene.bvh.intersect(ray, intersection, std::numeric_limits<float>::max()))
 			{
-				return importance < m_rr_threshold ? scene.background_radiance * 2.0f : scene.background_radiance;
+				if (!light_explicitly_sampled)
+				{
+					const auto* light = scene.lights[0].get();
+
+					auto le = light->getLe(ray.get_direction(), glm::vec3(0.0f), 0.0f);
+
+					return importance < m_rr_threshold ? le * 2.0f : le;
+				}
+				else
+				{
+					return glm::vec3(0.0f);
+				}
 			}
 
 			intersection.computeDifferentials(ray);
@@ -72,9 +83,11 @@ namespace glue
 			auto itr = scene.object_to_light.find(intersection.object);
 			if (itr != scene.object_to_light.end())
 			{
-				if (!light_explicitly_sampled && glm::dot(-ray.get_direction(), intersection.plane.normal) > 0.0f)
+				if (!light_explicitly_sampled)
 				{
-					return importance < m_rr_threshold ? itr->second->getLe() * 2.0f : itr->second->getLe();
+					auto le = itr->second->getLe(ray.get_direction(), intersection.plane.normal, intersection.distance);
+
+					return importance < m_rr_threshold ? le * 2.0f : le;
 				}
 				else
 				{
@@ -95,30 +108,21 @@ namespace glue
 				{
 					const auto* light = scene.lights[i].get();
 
-					auto sampled_plane = light->samplePlane(uniform_sampler);
-					auto wo_world = sampled_plane.point - intersection.plane.point;
-					auto distance = glm::length(wo_world);
-					wo_world /= distance;
-
-					auto wo_tangent_light = tangent_space.vectorToLocalSpace(wo_world);
+					auto light_sample = light->sample(uniform_sampler, intersection);
+					auto wo_tangent_light = tangent_space.vectorToLocalSpace(light_sample.wo_world);
 
 					auto bsdf = intersection.bsdf_material->getBsdf(wi_tangent, wo_tangent_light, intersection);
 					auto cos = glm::abs(core::math::cosTheta(wo_tangent_light));
-
-					//Get p(A) and transform it to p(w)
-					auto pdf_light = light->getPdf();
-					pdf_light *= distance * distance / glm::max(glm::dot(-wo_world, sampled_plane.normal), 0.0f);
-
-					auto f = bsdf * cos / pdf_light;
+					auto f = bsdf * light_sample.le * cos / light_sample.pdf_w;
 
 					//One other important thing about this if check is that it never does a computation for NAN values of f.
 					glm::vec3 direct_lo_light(0.0f);
 					if (f.x + f.y + f.z > 0.0f)
 					{
-						geometry::Ray shadow_ray(intersection.plane.point + wo_world * scene.secondary_ray_epsilon, wo_world);
-						if (!scene.bvh.intersectShadowRay(shadow_ray, distance - 1.1f * scene.secondary_ray_epsilon))
+						geometry::Ray shadow_ray(intersection.plane.point + light_sample.wo_world * scene.secondary_ray_epsilon, light_sample.wo_world);
+						if (!scene.bvh.intersectShadowRay(shadow_ray, light_sample.distance - 1.1f * scene.secondary_ray_epsilon))
 						{
-							direct_lo_light = f * light->getLe();
+							direct_lo_light = f;
 						}
 					}
 
@@ -127,7 +131,7 @@ namespace glue
 					{
 						//Compute the weight of the sample from light pdf using power heuristic with beta=2
 						auto pdf_bsdf = intersection.bsdf_material->getPdf(wi_tangent, wo_tangent_light, intersection);
-						auto weight_light = pdf_light * pdf_light / (pdf_light * pdf_light + pdf_bsdf * pdf_bsdf);
+						auto weight_light = light_sample.pdf_w * light_sample.pdf_w / (light_sample.pdf_w * light_sample.pdf_w + pdf_bsdf * pdf_bsdf);
 
 						if (!std::isnan(weight_light))
 						{
@@ -142,27 +146,19 @@ namespace glue
 						//One other important thing about this if check is that it never does a computation for NAN values of f.
 						if (f.x + f.y + f.z > 0.0f)
 						{
-							geometry::Intersection dl_intersection;
 							auto wo_world = tangent_space.vectorToWorldSpace(wo_tangent_bsdf);
 							geometry::Ray wo_ray(intersection.plane.point + wo_world * scene.secondary_ray_epsilon, wo_world);
-							if (scene.bvh.intersect(wo_ray, dl_intersection, std::numeric_limits<float>::max()))
+
+							auto visible_sample = light->getVisibleSample(scene, wo_ray);
+							if (visible_sample.le.x + visible_sample.le.y + visible_sample.le.z > 0.0f)
 							{
-								//If ray through sampled direction hits this light, add its contribution.
-								auto itr = scene.object_to_light.find(dl_intersection.object);
-								if (itr != scene.object_to_light.end() && itr->second == light)
+								//Compute the weight of the sample from bsdf pdf using power heuristic with beta=2
+								auto pdf_bsdf = intersection.bsdf_material->getPdf(wi_tangent, wo_tangent_bsdf, intersection);
+								auto weight_bsdf = pdf_bsdf * pdf_bsdf / (visible_sample.pdf_w * visible_sample.pdf_w + pdf_bsdf * pdf_bsdf);
+
+								if (!std::isnan(weight_bsdf))
 								{
-									//Get p(A) and transform it to p(w)
-									auto pdf_light = light->getPdf();
-									pdf_light *= dl_intersection.distance * dl_intersection.distance / glm::max(glm::dot(-wo_world, dl_intersection.plane.normal), 0.0f);
-
-									//Compute the weight of the sample from bsdf pdf using power heuristic with beta=2
-									auto pdf_bsdf = intersection.bsdf_material->getPdf(wi_tangent, wo_tangent_bsdf, intersection);
-									auto weight_bsdf = pdf_bsdf * pdf_bsdf / (pdf_light * pdf_light + pdf_bsdf * pdf_bsdf);
-
-									if (!std::isnan(weight_bsdf))
-									{
-										direct_lo += f * light->getLe() * weight_bsdf;
-									}
+									direct_lo += f * visible_sample.le * weight_bsdf;
 								}
 							}
 						}

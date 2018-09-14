@@ -12,8 +12,14 @@ namespace glue
 {
 	namespace light
 	{
-		//This class is not designed to abstract every possible light.
-		//Its functions and function signatures may change over time.
+		struct LightSample
+		{
+			glm::vec3 wo_world;
+			glm::vec3 le;
+			float pdf_w;
+			float distance;
+		};
+
 		class Light
 		{
 		public:
@@ -28,9 +34,10 @@ namespace glue
 		public:
 			virtual ~Light() {}
 
-			virtual geometry::Plane samplePlane(core::UniformSampler& sampler) const = 0;
-			virtual glm::vec3 getLe() const = 0;
-			virtual float getPdf() const = 0;
+			virtual LightSample sample(core::UniformSampler& sampler, const geometry::Intersection& intersection) const = 0;
+			virtual LightSample getVisibleSample(const core::Scene& scene, const geometry::Ray& ray) const = 0;
+			virtual glm::vec3 getLe(const glm::vec3& wo_world, const glm::vec3& light_plane_normal, float distance) const = 0;
+			virtual float getPdf(const glm::vec3& wo_world, const glm::vec3& light_plane_normal, float distance) const = 0;
 			virtual bool hasDeltaDistribution() const = 0;
 			virtual std::shared_ptr<geometry::Object> getObject() const = 0;
 		};

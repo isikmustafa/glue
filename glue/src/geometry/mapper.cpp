@@ -33,6 +33,15 @@ namespace glue
 			return values;
 		}
 
+		Mapper::Values UVMapper::mapOnlyUV(const glm::vec3 & cartesian, const glm::vec3 & barycentric) const
+		{
+			Values values;
+
+			values.uv = m_uv0 * barycentric.x + m_uv1 * barycentric.y + m_uv2 * barycentric.z;
+
+			return values;
+		}
+
 		SphericalMapper::SphericalMapper()
 		{}
 
@@ -44,6 +53,16 @@ namespace glue
 			values.uv = glm::vec2(spherical_position.phi * glm::one_over_two_pi<float>(), spherical_position.theta * glm::one_over_pi<float>());
 			values.dpdu = glm::vec3(-glm::two_pi<float>() * cartesian.y, glm::two_pi<float>() * cartesian.x, 0.0f);
 			values.dpdv = glm::vec3(cartesian.z * glm::cos(spherical_position.phi), cartesian.z * glm::sin(spherical_position.phi), -spherical_position.radius * glm::sin(spherical_position.theta)) * glm::pi<float>();
+
+			return values;
+		}
+
+		Mapper::Values SphericalMapper::mapOnlyUV(const glm::vec3 & cartesian, const glm::vec3 & barycentric) const
+		{
+			Values values;
+
+			geometry::SphericalCoordinate spherical_position(cartesian);
+			values.uv = glm::vec2(spherical_position.phi * glm::one_over_two_pi<float>(), spherical_position.theta * glm::one_over_pi<float>());
 
 			return values;
 		}

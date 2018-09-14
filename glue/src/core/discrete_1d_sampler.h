@@ -3,8 +3,6 @@
 
 #include "real_sampler.h"
 
-#include <random>
-
 namespace glue
 {
 	namespace core
@@ -16,6 +14,9 @@ namespace glue
 			Discrete1DSampler(const std::vector<float>& pdf);
 
 			int sample(UniformSampler& sampler) const;
+			float getPdf(int x) const;
+
+			float get_sum() const { return m_sum; }
 
 		private:
 			std::vector<float> m_cdf;
