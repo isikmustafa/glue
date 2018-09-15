@@ -160,6 +160,9 @@
     <ClCompile Include="src\texture\checkerboard_2d_texture.cpp">
       <Filter>Source Files\texture</Filter>
     </ClCompile>
+    <ClCompile Include="src\light\pointlight.cpp">
+      <Filter>Source Files\light</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\geometry\triangle.h">
@@ -302,6 +305,9 @@
     </ClInclude>
     <ClInclude Include="src\texture\checkerboard_2d_texture.h">
       <Filter>Source Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\light\pointlight.h">
+      <Filter>Source Files\light</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

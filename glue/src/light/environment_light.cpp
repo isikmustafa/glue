@@ -73,10 +73,7 @@ namespace glue
 			}
 			else
 			{
-				light_sample.wo_world = glm::vec3(0.0f);
 				light_sample.le = glm::vec3(0.0f);
-				light_sample.pdf_w = 0.0f;
-				light_sample.distance = 0.0f;
 			}
 
 			return light_sample;

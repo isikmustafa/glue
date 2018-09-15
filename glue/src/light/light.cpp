@@ -1,5 +1,6 @@
 #include "diffuse_arealight.h"
 #include "environment_light.h"
+#include "pointlight.h"
 #include "..\xml\node.h"
 
 namespace glue
@@ -17,6 +18,10 @@ namespace glue
 			else if (light_type == std::string("EnvironmentLight"))
 			{
 				return std::make_unique<EnvironmentLight::Xml>(node);
+			}
+			else if (light_type == std::string("Pointlight"))
+			{
+				return std::make_unique<Pointlight::Xml>(node);
 			}
 			else
 			{

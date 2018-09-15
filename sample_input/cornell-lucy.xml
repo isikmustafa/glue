@@ -16,15 +16,6 @@
 		</Tonemapper>
 	</Output>
 	
-	<!--<Output type="Ldr">
-		<Path>../sample_output/cornell-lucy-0.18-0.7</Path>
-		<Format>png</Format>
-		<Tonemapper type="GlobalReinhard">
-			<Key>0.18</Key>
-			<MaxLuminance>0.7</MaxLuminance>
-		</Tonemapper>
-	</Output>-->
-	
     <Camera>
         <Position>0 0.95 1.49</Position>
         <Direction>0 0 -1</Direction>
@@ -43,7 +34,6 @@
 			<Translation>0 0 -0.5</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			
 			<Kd>
 				<Texture type="Image">
 					<Datapath>../sample_input/checkerboard.png</Datapath>
@@ -51,18 +41,25 @@
 			</Kd>
 		</BsdfMaterial>
 	</Object>-->
-	
-	<!----><Object type="Sphere">
+
+	<Object type="Sphere">
 		<Radius>0.3</Radius>
 		<Center>0 0.5 -0.5</Center>
 		<Transformation>
 			<Rotation>-90 0 0</Rotation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<Kd textureType="Image">
-				<Datapath>../sample_input/earth.jpg</Datapath>
+			<Kd textureType="Checkerboard2D">
+				<First>0.5 0.7 0.5</First>
+				<Second>0.7 0.5 0.5</Second>
+				<Frequency>10</Frequency>
 			</Kd>
 		</BsdfMaterial>
+		<!--<BsdfMaterial type="Metal">
+			<IorN>3.1099 1.1851 0.9132</IorN>
+			<IorK>2.9567 2.2785 1.5698</IorK>
+			<Roughness>0.01</Roughness>
+		</BsdfMaterial>-->
 	</Object>
 	
 	<!-- Glass 
@@ -169,8 +166,13 @@
 			<Transformation>
 				<Scaling>0.3 0.3 0.3</Scaling>
 				<Rotation>90 0 0</Rotation>
-				<Translation>0 1.999 0.0</Translation>
+				<Translation>0 1.5 -0.5</Translation>
 			</Transformation>
 		</Object>
 	</Light>
+	
+	<!--<Light type="Pointlight">
+		<Flux>10 10 10</Flux>
+		<Position>0 1.5 -0.5</Position>
+	</Light>-->
 </Scene>

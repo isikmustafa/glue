@@ -173,6 +173,7 @@
     <ClCompile Include="src\light\diffuse_arealight.cpp" />
     <ClCompile Include="src\light\environment_light.cpp" />
     <ClCompile Include="src\light\light.cpp" />
+    <ClCompile Include="src\light\pointlight.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\material\bsdf_material.cpp" />
     <ClCompile Include="src\material\dielectric.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="src\light\diffuse_arealight.h" />
     <ClInclude Include="src\light\environment_light.h" />
     <ClInclude Include="src\light\light.h" />
+    <ClInclude Include="src\light\pointlight.h" />
     <ClInclude Include="src\material\bsdf_material.h" />
     <ClInclude Include="src\material\dielectric.h" />
     <ClInclude Include="src\material\lambertian.h" />
