@@ -38,14 +38,15 @@ namespace glue
 			auto offset_sampler = m_filter->generateSampler();
 			core::UniformSampler uniform_sampler;
 
-			glm::vec3 pixel_acc;
+			glm::vec3 pixel_acc(0.0f);
 			for (int i = 0; i < m_sample_count; ++i)
 			{
 				auto ray = scene.camera->castPrimayRay(x, y, offset_sampler->sample(), offset_sampler->sample());
-				pixel_acc += estimate(scene, ray, uniform_sampler, 1.0f, false);
+				pixel_acc *= (static_cast<float>(i) / (i + 1));
+				pixel_acc += 1.0f / (i + 1) * estimate(scene, ray, uniform_sampler, 1.0f, false);
 			}
 
-			return pixel_acc / static_cast<float>(m_sample_count);
+			return pixel_acc;
 		}
 
 		glm::vec3 Pathtracer::estimate(const core::Scene& scene, const geometry::Ray& ray,
@@ -117,7 +118,8 @@ namespace glue
 
 					//One other important thing about this if check is that it never does a computation for NAN values of f.
 					glm::vec3 direct_lo_light(0.0f);
-					if (f.x + f.y + f.z > 0.0f)
+					auto f_sum = f.x + f.y + f.z;
+					if (f_sum > 0.0f && !std::isinf(f_sum))
 					{
 						geometry::Ray shadow_ray(intersection.plane.point + light_sample.wo_world * scene.secondary_ray_epsilon, light_sample.wo_world);
 						if (!scene.bvh.intersectShadowRay(shadow_ray, light_sample.distance - 1.1f * scene.secondary_ray_epsilon))
@@ -141,25 +143,24 @@ namespace glue
 						//Generate a sample according to the bsdf.
 						auto w_f = intersection.bsdf_material->sampleWo(wi_tangent, uniform_sampler, intersection);
 						const auto& wo_tangent_bsdf = w_f.first;
-						const auto& f = w_f.second;
+
+						//Get the light sample through the sampled direction.
+						auto wo_world = tangent_space.vectorToWorldSpace(wo_tangent_bsdf);
+						geometry::Ray wo_ray(intersection.plane.point + wo_world * scene.secondary_ray_epsilon, wo_world);
+						auto visible_sample = light->getVisibleSample(scene, wo_ray);
+						auto f = w_f.second * visible_sample.le;
 
 						//One other important thing about this if check is that it never does a computation for NAN values of f.
-						if (f.x + f.y + f.z > 0.0f)
+						auto f_sum = f.x + f.y + f.z;
+						if (f_sum > 0.0f && !std::isinf(f_sum))
 						{
-							auto wo_world = tangent_space.vectorToWorldSpace(wo_tangent_bsdf);
-							geometry::Ray wo_ray(intersection.plane.point + wo_world * scene.secondary_ray_epsilon, wo_world);
+							//Compute the weight of the sample from bsdf pdf using power heuristic with beta=2
+							auto pdf_bsdf = intersection.bsdf_material->getPdf(wi_tangent, wo_tangent_bsdf, intersection);
+							auto weight_bsdf = pdf_bsdf * pdf_bsdf / (visible_sample.pdf_w * visible_sample.pdf_w + pdf_bsdf * pdf_bsdf);
 
-							auto visible_sample = light->getVisibleSample(scene, wo_ray);
-							if (visible_sample.le.x + visible_sample.le.y + visible_sample.le.z > 0.0f)
+							if (!std::isnan(weight_bsdf))
 							{
-								//Compute the weight of the sample from bsdf pdf using power heuristic with beta=2
-								auto pdf_bsdf = intersection.bsdf_material->getPdf(wi_tangent, wo_tangent_bsdf, intersection);
-								auto weight_bsdf = pdf_bsdf * pdf_bsdf / (visible_sample.pdf_w * visible_sample.pdf_w + pdf_bsdf * pdf_bsdf);
-
-								if (!std::isnan(weight_bsdf))
-								{
-									direct_lo += f * visible_sample.le * weight_bsdf;
-								}
+								direct_lo += f * weight_bsdf;
 							}
 						}
 					}
@@ -182,7 +183,8 @@ namespace glue
 
 			glm::vec3 indirect_lo(0.0f);
 			//One other important thing about this if check is that it never does a computation for NAN values of f.
-			if (f.x + f.y + f.z > 0.0f)
+			auto f_sum = f.x + f.y + f.z;
+			if (f_sum > 0.0f && !std::isinf(f_sum))
 			{
 				auto wo_world = tangent_space.vectorToWorldSpace(wo_tangent);
 				geometry::Ray wo_ray(intersection.plane.point + wo_world * scene.secondary_ray_epsilon, wo_world);
@@ -190,7 +192,8 @@ namespace glue
 				indirect_lo = f * estimate(scene, wo_ray, uniform_sampler, importance * glm::max(glm::max(f.x, f.y), f.z), light_explicitly_sampled);
 			}
 
-			return importance < m_rr_threshold ? (direct_lo + indirect_lo) * 2.0f : direct_lo + indirect_lo;
+			auto lo = direct_lo + indirect_lo;
+			return importance < m_rr_threshold ? lo * 2.0f : lo;
 		}
 	}
 }

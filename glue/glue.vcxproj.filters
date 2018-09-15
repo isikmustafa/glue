@@ -154,6 +154,12 @@
     <ClCompile Include="src\core\discrete_2d_sampler.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="src\texture\checkerboard_3d_texture.cpp">
+      <Filter>Source Files\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="src\texture\checkerboard_2d_texture.cpp">
+      <Filter>Source Files\texture</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\geometry\triangle.h">
@@ -290,6 +296,12 @@
     </ClInclude>
     <ClInclude Include="src\core\discrete_2d_sampler.h">
       <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\texture\checkerboard_3d_texture.h">
+      <Filter>Source Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\texture\checkerboard_2d_texture.h">
+      <Filter>Source Files\texture</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -182,6 +182,8 @@
     <ClCompile Include="src\microfacet\beckmann_distribution.cpp" />
     <ClCompile Include="src\microfacet\fresnel.cpp" />
     <ClCompile Include="src\microfacet\ggx_distribution.cpp" />
+    <ClCompile Include="src\texture\checkerboard_2d_texture.cpp" />
+    <ClCompile Include="src\texture\checkerboard_3d_texture.cpp" />
     <ClCompile Include="src\texture\constant_texture.cpp" />
     <ClCompile Include="src\texture\image_texture.cpp" />
     <ClCompile Include="src\texture\texture.cpp" />
@@ -229,6 +231,8 @@
     <ClInclude Include="src\microfacet\ggx_distribution.h" />
     <ClInclude Include="src\microfacet\microfacet_reflection.h" />
     <ClInclude Include="src\microfacet\microfacet_scattering.h" />
+    <ClInclude Include="src\texture\checkerboard_2d_texture.h" />
+    <ClInclude Include="src\texture\checkerboard_3d_texture.h" />
     <ClInclude Include="src\texture\constant_texture.h" />
     <ClInclude Include="src\texture\image_texture.h" />
     <ClInclude Include="src\texture\texture.h" />

@@ -3,12 +3,12 @@
 		<Filter type="Gaussian">
 			<Sigma>0.5</Sigma>
 		</Filter>
-		<SampleCount>2048</SampleCount>
+		<SampleCount>16</SampleCount>
 		<RRThreshold>0.2</RRThreshold>
     </Integrator>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/cornell-lucywithoutRadianceSampling</Path>
+		<Path>../sample_output/cornell-lucy-clamp</Path>
 		<Format>png</Format>
 		<Tonemapper type="Clamp">
 			<Min>0.0</Min>
@@ -17,16 +17,7 @@
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/cornell-lucy-0.18-1.0withoutRadianceSampling</Path>
-		<Format>png</Format>
-		<Tonemapper type="GlobalReinhard">
-			<Key>0.18</Key>
-			<MaxLuminance>1.0</MaxLuminance>
-		</Tonemapper>
-	</Output>
-	
-	<Output type="Ldr">
-		<Path>../sample_output/cornell-lucy-0.18-1.0-0.36keywithoutRadianceSampling</Path>
+		<Path>../sample_output/cornell-lucy-0.36-1.0</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
 			<Key>0.36</Key>
@@ -34,9 +25,81 @@
 		</Tonemapper>
 	</Output>
 	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.36-0.9</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>0.9</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.36-0.8</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>0.8</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.36-0.7</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>0.7</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.36-0.6</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>0.6</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.36-0.5</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>0.5</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.36-0.4</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>0.4</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.36-0.3</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>0.3</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.36-0.2</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>0.2</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
     <Camera>
-        <Position>0 0 0</Position>
-        <Direction>0 0 -1</Direction>
+        <Position>0 1.5 1</Position>
+        <Direction>0 -0.25 -1</Direction>
         <Up>0 1 0</Up>
         <FovXY>42 56</FovXY>
 		<Resolution>600 800</Resolution>
@@ -46,17 +109,47 @@
 	<Object type="Mesh">
 		<Datapath>../sample_input/lucy.obj</Datapath>
 		<Transformation>
-			<Scaling>0.0018 0.0018 0.0018</Scaling>
+			<Scaling>0.0021 0.0021 0.0021</Scaling>
 			<Rotation>0 60 0</Rotation>
-			<Translation>0 -0.9 -2</Translation>
+			<Translation>0 -0.03 -1.1</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
 			<Kd textureType="Constant">
-				<Value>0.6 0.6 0.6</Value>
+				<Value>0.73 0.48 0.34</Value>
 			</Kd>
 		</BsdfMaterial>
 	</Object>
-
+	
+	<Object type="Mesh">
+		<Datapath>../sample_input/rectangle.obj</Datapath>
+		<Transformation>
+			<Scaling>6 6 6</Scaling>
+			<Translation>0 3 -3</Translation>
+		</Transformation>
+		<BsdfMaterial type="Lambertian">
+			<Kd textureType="Checkerboard2D">
+				<First>0.2 0.2 0.2</First>
+				<Second>0.25 0.25 0.25</Second>
+				<Frequency>20</Frequency>
+			</Kd>
+		</BsdfMaterial>
+	</Object>
+	
+	<Object type="Mesh">
+		<Datapath>../sample_input/rectangle.obj</Datapath>
+		<Transformation>
+			<Scaling>6 6 6</Scaling>
+			<Rotation>-90 0 0</Rotation>
+			<Translation>0 0 0</Translation>
+		</Transformation>
+		<BsdfMaterial type="Lambertian">
+			<Kd textureType="Checkerboard2D">
+				<First>0.2 0.2 0.2</First>
+				<Second>0.25 0.25 0.25</Second>
+				<Frequency>20</Frequency>
+			</Kd>
+		</BsdfMaterial>
+	</Object>
 	
 	<!--<Object type="Sphere">
 		<Radius>0.3</Radius>
@@ -81,7 +174,7 @@
 			<Rotation>-90 0 0</Rotation>
 		</Transformation>
 		<Texture type="Image">
-			<Datapath>../sample_input/lythwood_room_8k.hdr</Datapath>
+			<Datapath>../sample_input/spruit_sunrise_4k.hdr</Datapath>
 		</Texture>
 	</Light>
 </Scene>
