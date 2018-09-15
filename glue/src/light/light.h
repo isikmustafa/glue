@@ -7,6 +7,7 @@
 
 #include <glm\vec3.hpp>
 #include <memory>
+#include <unordered_map>
 
 namespace glue
 {
@@ -26,6 +27,8 @@ namespace glue
 			//Xml structure of the class.
 			struct Xml
 			{
+				std::unordered_map<std::string, std::string> attributes;
+
 				virtual ~Xml() {}
 				virtual std::unique_ptr<Light> create() const = 0;
 				static std::unique_ptr<Light::Xml> factory(const xml::Node& node);

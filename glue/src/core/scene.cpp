@@ -33,6 +33,7 @@ namespace glue
 		}
 
 		Scene::Scene(const Scene::Xml& xml)
+			: environment_light(nullptr)
 		{
 			background_radiance = xml.background_radiance;
 			secondary_ray_epsilon = xml.secondary_ray_epsilon;
@@ -76,6 +77,15 @@ namespace glue
 					bvh.addObject(object);
 				}
 				lights.push_back(std::move(light));
+
+				if (light_xml->attributes["type"] == "EnvironmentLight")
+				{
+					if (environment_light)
+					{
+						throw std::runtime_error("Error: There can be at most one EnvironmentLight");
+					}
+					environment_light = lights.back();
+				}
 			}
 
 			if (bvh.get_objects().size() < 1024)
@@ -114,6 +124,25 @@ namespace glue
 			for (const auto& output : m_outputs)
 			{
 				output->save(*m_image);
+			}
+		}
+
+		glm::vec3 Scene::getBackgroundRadiance(const glm::vec3& direction, bool light_explicitly_sampled) const
+		{
+			if (environment_light)
+			{
+				if (!light_explicitly_sampled)
+				{
+					return environment_light->getLe(direction, glm::vec3(0.0f), 0.0f);
+				}
+				else
+				{
+					return glm::vec3(0.0f);
+				}
+			}
+			else
+			{
+				return background_radiance;
 			}
 		}
 	}

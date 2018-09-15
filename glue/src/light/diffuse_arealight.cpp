@@ -13,9 +13,10 @@ namespace glue
 	namespace light
 	{
 		DiffuseArealight::Xml::Xml(const xml::Node& node)
+			: object(geometry::Object::Xml::factory(node.child("Object", true)))
 		{
 			node.parseChildText("Flux", &flux.x, &flux.y, &flux.z);
-			object = geometry::Object::Xml::factory(node.child("Object", true));
+			attributes = node.attributes();
 		}
 
 		std::unique_ptr<Light> DiffuseArealight::Xml::create() const

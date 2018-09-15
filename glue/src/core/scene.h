@@ -38,7 +38,8 @@ namespace glue
 		public:
 			std::unique_ptr<PinholeCamera> camera;
 			geometry::BVH<std::shared_ptr<geometry::Object>> bvh;
-			std::vector<std::unique_ptr<light::Light>> lights;
+			std::vector<std::shared_ptr<light::Light>> lights;
+			std::shared_ptr<light::Light> environment_light;
 			std::unordered_map<const geometry::Object*, const light::Light*> object_to_light;
 			glm::vec3 background_radiance;
 			float secondary_ray_epsilon;
@@ -47,6 +48,7 @@ namespace glue
 			Scene(const Scene::Xml& xml);
 
 			void render();
+			glm::vec3 getBackgroundRadiance(const glm::vec3& direction, bool light_explicitly_sampled) const;
 
 		private:
 			std::unique_ptr<integrator::Integrator> m_integrator;

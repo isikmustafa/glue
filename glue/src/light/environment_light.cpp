@@ -16,7 +16,9 @@ namespace glue
 		EnvironmentLight::Xml::Xml(const xml::Node& node)
 			: hdri(node.child("Texture", true))
 			, transformation(node.child("Transformation") ? geometry::Transformation::Xml(node.child("Transformation")) : geometry::Transformation::Xml())
-		{}
+		{
+			attributes = node.attributes();
+		}
 
 		std::unique_ptr<Light> EnvironmentLight::Xml::create() const
 		{

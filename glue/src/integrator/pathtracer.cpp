@@ -52,10 +52,13 @@ namespace glue
 		glm::vec3 Pathtracer::estimate(const core::Scene& scene, const geometry::Ray& ray,
 			core::UniformSampler& uniform_sampler, float importance, bool light_explicitly_sampled) const
 		{
+			constexpr float cutoff_probability = 0.5f;
+			constexpr float calc_weight = 1.0f / (1.0f - cutoff_probability);
+
 			//Russian roulette.
 			if (importance < m_rr_threshold)
 			{
-				if (uniform_sampler.sample() > 0.5f)
+				if (uniform_sampler.sample() < cutoff_probability)
 				{
 					return glm::vec3(0.0f);
 				}
@@ -64,18 +67,8 @@ namespace glue
 			geometry::Intersection intersection;
 			if (!scene.bvh.intersect(ray, intersection, std::numeric_limits<float>::max()))
 			{
-				if (!light_explicitly_sampled)
-				{
-					const auto* light = scene.lights[0].get();
-
-					auto le = light->getLe(ray.get_direction(), glm::vec3(0.0f), 0.0f);
-
-					return importance < m_rr_threshold ? le * 2.0f : le;
-				}
-				else
-				{
-					return glm::vec3(0.0f);
-				}
+				auto le = scene.getBackgroundRadiance(ray.get_direction(), light_explicitly_sampled);
+				return importance < m_rr_threshold ? le * calc_weight : le;
 			}
 
 			intersection.computeDifferentials(ray);
@@ -88,7 +81,7 @@ namespace glue
 				{
 					auto le = itr->second->getLe(ray.get_direction(), intersection.plane.normal, intersection.distance);
 
-					return importance < m_rr_threshold ? le * 2.0f : le;
+					return importance < m_rr_threshold ? le * calc_weight : le;
 				}
 				else
 				{
@@ -193,7 +186,7 @@ namespace glue
 			}
 
 			auto lo = direct_lo + indirect_lo;
-			return importance < m_rr_threshold ? lo * 2.0f : lo;
+			return importance < m_rr_threshold ? lo * calc_weight : lo;
 		}
 	}
 }
