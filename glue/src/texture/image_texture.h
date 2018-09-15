@@ -17,6 +17,7 @@ namespace glue
 			struct Xml : public Texture::Xml
 			{
 				std::string datapath;
+				bool mipmapping;
 
 				explicit Xml(const xml::Node& node);
 				std::unique_ptr<Texture> create() const override;

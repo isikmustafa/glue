@@ -12,6 +12,7 @@ namespace glue
 		ImageTexture::Xml::Xml(const xml::Node& node)
 		{
 			node.parseChildText("Datapath", &datapath);
+			mipmapping = std::string("true") == node.attribute("mipmapping", true);
 		}
 
 		std::unique_ptr<Texture> ImageTexture::Xml::create() const
@@ -20,7 +21,7 @@ namespace glue
 		}
 
 		ImageTexture::ImageTexture(const ImageTexture::Xml& xml)
-			: m_images(xml::Parser::loadImage(xml.datapath))
+			: m_images(xml::Parser::loadImage(xml.datapath, xml.mipmapping))
 		{
 			auto ratio = static_cast<float>((*m_images)[0].get_width()) / (*m_images)[0].get_height();
 			m_coeff_u = (ratio > 1.0f ? ratio : 1.0f);

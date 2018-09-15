@@ -58,7 +58,7 @@ namespace glue
 							tex_coords[k] = glm::vec2(uv.x, uv.y);
 						}
 					}
-					bvh->addObject(geometry::Triangle(face_vertices[0], face_vertices[1] - face_vertices[0], face_vertices[2] - face_vertices[0], 
+					bvh->addObject(geometry::Triangle(face_vertices[0], face_vertices[1] - face_vertices[0], face_vertices[2] - face_vertices[0],
 						tex_coords[0], tex_coords[1], tex_coords[2]));
 				}
 
@@ -68,7 +68,7 @@ namespace glue
 			return path_to_bvh[path];
 		}
 
-		std::shared_ptr<std::vector<core::Image>> Parser::loadImage(const std::string& path)
+		std::shared_ptr<std::vector<core::Image>> Parser::loadImage(const std::string& path, bool mipmapping)
 		{
 			static std::unordered_map<std::string, std::shared_ptr<std::vector<core::Image>>> path_to_image;
 
@@ -76,7 +76,14 @@ namespace glue
 			{
 				core::Image image(path);
 
-				auto& mipmaps = path_to_image[path] = std::make_shared<std::vector<core::Image>>(image.generateMipmaps());
+				if (mipmapping)
+				{
+					path_to_image[path] = std::make_shared<std::vector<core::Image>>(image.generateMipmaps());
+				}
+				else
+				{
+					path_to_image[path] = std::make_shared<std::vector<core::Image>>(1, std::move(image));
+				}
 			}
 
 			return path_to_image[path];

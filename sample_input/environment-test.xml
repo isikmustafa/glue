@@ -17,83 +17,92 @@
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/cornell-lucy-0.36-1.0</Path>
+		<Path>../sample_output/cornell-lucy-0.72-1.0</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.72</Key>
 			<MaxLuminance>1.0</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/cornell-lucy-0.36-0.9</Path>
+		<Path>../sample_output/cornell-lucy-0.72-0.9</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.72</Key>
 			<MaxLuminance>0.9</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/cornell-lucy-0.36-0.8</Path>
+		<Path>../sample_output/cornell-lucy-0.72-0.8</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.72</Key>
 			<MaxLuminance>0.8</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/cornell-lucy-0.36-0.7</Path>
+		<Path>../sample_output/cornell-lucy-0.72-0.7</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.72</Key>
 			<MaxLuminance>0.7</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/cornell-lucy-0.36-0.6</Path>
+		<Path>../sample_output/cornell-lucy-0.72-0.6</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.72</Key>
 			<MaxLuminance>0.6</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/cornell-lucy-0.36-0.5</Path>
+		<Path>../sample_output/cornell-lucy-0.72-0.5</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.72</Key>
 			<MaxLuminance>0.5</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/cornell-lucy-0.36-0.4</Path>
+		<Path>../sample_output/cornell-lucy-0.72-0.4</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.72</Key>
 			<MaxLuminance>0.4</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/cornell-lucy-0.36-0.3</Path>
+		<Path>../sample_output/cornell-lucy-0.72-0.3</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.72</Key>
 			<MaxLuminance>0.3</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/cornell-lucy-0.36-0.2</Path>
+		<Path>../sample_output/cornell-lucy-0.72-0.2</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.72</Key>
 			<MaxLuminance>0.2</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.72-0.1</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.72</Key>
+			<MaxLuminance>0.1</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
@@ -173,7 +182,7 @@
 		<Transformation>
 			<Rotation>-90 0 0</Rotation>
 		</Transformation>
-		<Texture type="Image">
+		<Texture type="Image" mipmapping="false">
 			<Datapath>../sample_input/spruit_sunrise_4k.hdr</Datapath>
 		</Texture>
 	</Light>
