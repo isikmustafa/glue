@@ -12,7 +12,7 @@ int main()
 		glue::core::Timer timer;
 
 		timer.start();
-		glue::core::Scene scene(glue::xml::Parser::parse("../sample_input/environment-test.xml"));
+		glue::core::Scene scene(glue::xml::Parser::parse("../sample_input/material-test.xml"));
 		std::cout << "BVH build and input read time: " << timer.getTime() << std::endl;
 
 		timer.start();

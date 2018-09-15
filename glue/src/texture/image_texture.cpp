@@ -58,7 +58,7 @@ namespace glue
 
 			//Always in REPEAT mode.
 			auto u = glm::fract(uv.x);
-			auto v = glm::fract(uv.y);
+			auto v = 1.0f - glm::fract(uv.y);
 
 			return mipmap.get(static_cast<int>(mipmap.get_width() * u), static_cast<int>(mipmap.get_height() * v));
 		}
