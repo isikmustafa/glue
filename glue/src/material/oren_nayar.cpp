@@ -14,12 +14,12 @@ namespace glue
 	{
 		OrenNayar::Xml::Xml(const xml::Node& node)
 		{
-			node.parseChildText("Kd", &kd.x, &kd.y, &kd.z);
+			kd = texture::Texture::Xml::factory(node.child("Kd", true));
 			node.parseChildText("Roughness", &roughness);
 		}
 
-		OrenNayar::Xml::Xml(const glm::vec3& p_kd, float p_roughness)
-			: kd(p_kd)
+		OrenNayar::Xml::Xml(std::unique_ptr<texture::Texture::Xml> p_kd, float p_roughness)
+			: kd(std::move(p_kd))
 			, roughness(p_roughness)
 		{}
 
@@ -29,7 +29,7 @@ namespace glue
 		}
 
 		OrenNayar::OrenNayar(const OrenNayar::Xml& xml)
-			: m_kd(xml.kd * glm::one_over_pi<float>())
+			: m_kd(xml.kd->create())
 		{
 			auto r2 = xml.roughness * xml.roughness;
 			m_A = 1.0f - r2 / (2.0f * (r2 + 0.33f));
@@ -50,8 +50,8 @@ namespace glue
 			geometry::SphericalCoordinate wi_ts(wi_tangent);
 			geometry::SphericalCoordinate wo_ts(wo_tangent);
 
-			return m_kd * (m_A + m_B * glm::max(0.0f, glm::cos(wi_ts.phi - wo_ts.phi)) * glm::sin(glm::max(wi_ts.theta, wo_ts.theta)) *
-				glm::tan(glm::min(wi_ts.theta, wo_ts.theta)));
+			return m_kd->fetch(intersection) * glm::one_over_pi<float>() * (m_A + m_B * glm::max(0.0f, glm::cos(wi_ts.phi - wo_ts.phi)) *
+				glm::sin(glm::max(wi_ts.theta, wo_ts.theta)) * glm::tan(glm::min(wi_ts.theta, wo_ts.theta)));
 		}
 
 		float OrenNayar::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const

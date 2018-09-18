@@ -2,6 +2,7 @@
 #define __GLUE__MATERIAL__ORENNAYAR__
 
 #include "bsdf_material.h"
+#include "..\texture\texture.h"
 
 namespace glue
 {
@@ -13,11 +14,11 @@ namespace glue
 			//Xml structure of the class.
 			struct Xml : public BsdfMaterial::Xml
 			{
-				glm::vec3 kd;
+				std::unique_ptr<texture::Texture::Xml> kd;
 				float roughness;
 
 				explicit Xml(const xml::Node& node);
-				Xml(const glm::vec3& p_kd, float p_roughness);
+				Xml(std::unique_ptr<texture::Texture::Xml> p_kd, float p_roughness);
 				std::unique_ptr<BsdfMaterial> create() const override;
 			};
 
@@ -31,7 +32,7 @@ namespace glue
 			bool useMultipleImportanceSampling() const override;
 
 		private:
-			glm::vec3 m_kd;
+			std::unique_ptr<texture::Texture> m_kd;
 			float m_A;
 			float m_B;
 		};
