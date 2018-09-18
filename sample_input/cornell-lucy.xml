@@ -1,9 +1,10 @@
 <Scene>
+	<SecondaryRayEpsilon>0.001</SecondaryRayEpsilon>
     <Integrator type="Pathtracer">
 		<Filter type="Gaussian">
 			<Sigma>0.5</Sigma>
 		</Filter>
-		<SampleCount>16</SampleCount>
+		<SampleCount>32</SampleCount>
 		<RRThreshold>0.2</RRThreshold>
     </Integrator>
 	
@@ -16,6 +17,96 @@
 		</Tonemapper>
 	</Output>
 	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.18-1.0</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.18</Key>
+			<MaxLuminance>1.0</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.18-0.9</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.18</Key>
+			<MaxLuminance>0.9</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.18-0.8</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.18</Key>
+			<MaxLuminance>0.8</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.18-0.7</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.18</Key>
+			<MaxLuminance>0.7</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.18-0.6</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.18</Key>
+			<MaxLuminance>0.6</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.18-0.5</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.18</Key>
+			<MaxLuminance>0.5</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.18-0.4</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.18</Key>
+			<MaxLuminance>0.4</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.18-0.3</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.18</Key>
+			<MaxLuminance>0.3</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.18-0.2</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.18</Key>
+			<MaxLuminance>0.2</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cornell-lucy-0.18-0.1</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.18</Key>
+			<MaxLuminance>0.1</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
     <Camera>
         <Position>0 0.95 1.49</Position>
         <Direction>0 0 -1</Direction>
@@ -25,7 +116,7 @@
         <NearDistance>0.01</NearDistance>
     </Camera>
 	
-	<!-- Lucy 
+	<!-- Lucy -->
 	<Object type="Mesh">
 		<Datapath>../sample_input/lucy.obj</Datapath>
 		<Transformation>
@@ -34,15 +125,13 @@
 			<Translation>0 0 -0.5</Translation>
 		</Transformation>
 		<BsdfMaterial type="Lambertian">
-			<Kd>
-				<Texture type="Image">
-					<Datapath>../sample_input/checkerboard.png</Datapath>
-				</Texture>
+			<Kd textureType="Constant">
+				<Value>0.73 0.48 0.34</Value>
 			</Kd>
 		</BsdfMaterial>
-	</Object>-->
+	</Object>
 
-	<Object type="Sphere">
+	<!--<Object type="Sphere">
 		<Radius>0.3</Radius>
 		<Center>0 0.5 -0.5</Center>
 		<Transformation>
@@ -55,25 +144,29 @@
 				<Frequency>10</Frequency>
 			</Kd>
 		</BsdfMaterial>
-		<!--<BsdfMaterial type="Metal">
+		<BsdfMaterial type="Metal">
 			<IorN>3.1099 1.1851 0.9132</IorN>
 			<IorK>2.9567 2.2785 1.5698</IorK>
 			<Roughness>0.01</Roughness>
-		</BsdfMaterial>-->
-	</Object>
+		</BsdfMaterial>
+	</Object>-->
 	
-	<!-- Glass 
+	<!-- Glass -->
 	<Object type="Mesh">
 		<Datapath>../sample_input/box.obj</Datapath>
 		<Transformation>
 			<Scaling>0.4 0.4 0.01</Scaling>
-			<Translation>0 0.9 0.5</Translation>
+			<Translation>0 0.9 0.49</Translation>
 		</Transformation>
 		<BsdfMaterial type="Dielectric">
 			<IorN>1.5</IorN>
-			<Roughness>0.1</Roughness>
+			<Roughness textureType="Checkerboard3D">
+				<First>0.001 0 0</First>
+				<Second>0.027 0 0</Second>
+				<Frequency>20</Frequency>
+			</Roughness>
 		</BsdfMaterial>
-	</Object>-->
+	</Object>
 	
 	<!-- Front -->
 	<Object type="Mesh">
@@ -166,7 +259,7 @@
 			<Transformation>
 				<Scaling>0.3 0.3 0.3</Scaling>
 				<Rotation>90 0 0</Rotation>
-				<Translation>0 1.5 -0.5</Translation>
+				<Translation>0 1.999 0</Translation>
 			</Transformation>
 		</Object>
 	</Light>

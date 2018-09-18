@@ -6,6 +6,7 @@
 #include "..\microfacet\fresnel.h"
 #include "..\microfacet\ggx_distribution.h"
 #include "..\microfacet\beckmann_distribution.h"
+#include "..\texture\texture.h"
 
 namespace glue
 {
@@ -22,10 +23,10 @@ namespace glue
 			{
 				glm::vec3 ior_n;
 				glm::vec3 ior_k;
-				float roughness;
+				std::unique_ptr<texture::Texture::Xml> roughness;
 
 				explicit Xml(const xml::Node& node);
-				Xml(const glm::vec3& p_ior_n, const glm::vec3& p_ior_k, float p_roughness);
+				Xml(const glm::vec3& p_ior_n, const glm::vec3& p_ior_k, std::unique_ptr<texture::Texture::Xml> p_roughness);
 				std::unique_ptr<BsdfMaterial> create() const override;
 			};
 
@@ -41,7 +42,7 @@ namespace glue
 		private:
 			glm::vec3 m_ior_n;
 			glm::vec3 m_ior_k;
-			microfacet::MicrofacetReflection<microfacet::GGXDistribution> m_microfacet;
+			std::unique_ptr<texture::Texture> m_roughness;
 		};
 	}
 }

@@ -182,7 +182,7 @@ namespace glue
 				auto wo_world = tangent_space.vectorToWorldSpace(wo_tangent);
 				geometry::Ray wo_ray(intersection.plane.point + wo_world * scene.secondary_ray_epsilon, wo_world);
 
-				indirect_lo = f * estimate(scene, wo_ray, uniform_sampler, importance * glm::max(glm::max(f.x, f.y), f.z), light_explicitly_sampled);
+				indirect_lo = f * estimate(scene, wo_ray, uniform_sampler, importance * glm::min(1.0f, glm::max(glm::max(f.x, f.y), f.z)), light_explicitly_sampled);
 			}
 
 			auto lo = direct_lo + indirect_lo;
