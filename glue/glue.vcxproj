@@ -187,6 +187,7 @@
     <ClCompile Include="src\texture\checkerboard_3d_texture.cpp" />
     <ClCompile Include="src\texture\constant_texture.cpp" />
     <ClCompile Include="src\texture\image_texture.cpp" />
+    <ClCompile Include="src\texture\perlin_texture.cpp" />
     <ClCompile Include="src\texture\texture.cpp" />
     <ClCompile Include="src\xml\node.cpp" />
     <ClCompile Include="src\xml\parser.cpp" />
@@ -237,6 +238,7 @@
     <ClInclude Include="src\texture\checkerboard_3d_texture.h" />
     <ClInclude Include="src\texture\constant_texture.h" />
     <ClInclude Include="src\texture\image_texture.h" />
+    <ClInclude Include="src\texture\perlin_texture.h" />
     <ClInclude Include="src\texture\texture.h" />
     <ClInclude Include="src\xml\node.h" />
     <ClInclude Include="src\xml\parser.h" />

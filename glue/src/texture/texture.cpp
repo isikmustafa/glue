@@ -2,6 +2,7 @@
 #include "image_texture.h"
 #include "checkerboard_2d_texture.h"
 #include "checkerboard_3d_texture.h"
+#include "perlin_texture.h"
 #include "..\xml\node.h"
 
 namespace glue
@@ -27,6 +28,10 @@ namespace glue
 			else if (texture_type == std::string("Checkerboard3D"))
 			{
 				return std::make_unique<Checkerboard3DTexture::Xml>(node);
+			}
+			else if (texture_type == std::string("Perlin"))
+			{
+				return std::make_unique<PerlinTexture::Xml>(node);
 			}
 			else
 			{

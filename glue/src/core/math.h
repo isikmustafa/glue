@@ -66,7 +66,7 @@ namespace glue
 			template<typename Value>
 			inline Value lerp(float t, Value v0, Value v1)
 			{
-				return (1.0f - t) * v0 + t * v1;
+				return v0 + t * (v1 - v0);
 			}
 
 			//Following trigonometric functions assumes the parameters are given in tangent space.

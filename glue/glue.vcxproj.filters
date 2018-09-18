@@ -163,6 +163,9 @@
     <ClCompile Include="src\light\pointlight.cpp">
       <Filter>Source Files\light</Filter>
     </ClCompile>
+    <ClCompile Include="src\texture\perlin_texture.cpp">
+      <Filter>Source Files\texture</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\geometry\triangle.h">
@@ -308,6 +311,9 @@
     </ClInclude>
     <ClInclude Include="src\light\pointlight.h">
       <Filter>Source Files\light</Filter>
+    </ClInclude>
+    <ClInclude Include="src\texture\perlin_texture.h">
+      <Filter>Source Files\texture</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
