@@ -3,12 +3,12 @@
 		<Filter type="Gaussian">
 			<Sigma>0.5</Sigma>
 		</Filter>
-		<SampleCount>128</SampleCount>
+		<SampleCount>4</SampleCount>
 		<RRThreshold>0.2</RRThreshold>
     </Integrator>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/veach-mis</Path>
+		<Path>../sample_output/veach-mis-bsdf</Path>
 		<Format>png</Format>
 		<Tonemapper type="Clamp">
 			<Min>0.0</Min>
@@ -30,7 +30,9 @@
 		<BsdfMaterial type="Metal">
 			<IorN>3.1099 1.1851 0.9132</IorN>
 			<IorK>2.9567 2.2785 1.5698</IorK>
-			<Roughness>0.001</Roughness>
+			<Roughness textureType="Constant">
+				<Value>0.001 0 0</Value>
+			</Roughness>
 		</BsdfMaterial>
 	</Object>
 	
@@ -39,7 +41,9 @@
 		<BsdfMaterial type="Metal">
 			<IorN>3.1099 1.1851 0.9132</IorN>
 			<IorK>2.9567 2.2785 1.5698</IorK>
-			<Roughness>0.01</Roughness>
+			<Roughness textureType="Constant">
+				<Value>0.01 0 0</Value>
+			</Roughness>
 		</BsdfMaterial>
 	</Object>
 	
@@ -48,7 +52,9 @@
 		<BsdfMaterial type="Metal">
 			<IorN>3.1099 1.1851 0.9132</IorN>
 			<IorK>2.9567 2.2785 1.5698</IorK>
-			<Roughness>0.04</Roughness>
+			<Roughness textureType="Constant">
+				<Value>0.04 0 0</Value>
+			</Roughness>
 		</BsdfMaterial>
 	</Object>
 	
@@ -57,14 +63,18 @@
 		<BsdfMaterial type="Metal">
 			<IorN>3.1099 1.1851 0.9132</IorN>
 			<IorK>2.9567 2.2785 1.5698</IorK>
-			<Roughness>0.09</Roughness>
+			<Roughness textureType="Constant">
+				<Value>0.09 0 0</Value>
+			</Roughness>
 		</BsdfMaterial>
 	</Object>
 	
 	<Object type="Mesh">
 		<Datapath>../sample_input/floor.obj</Datapath>
 		<BsdfMaterial type="Lambertian">
-			<Kd>0.5 0.5 0.5</Kd>
+			<Kd textureType="Constant">
+				<Value>0.5 0.5 0.5</Value>
+			</Kd>
 		</BsdfMaterial>
 	</Object>
 	
