@@ -67,7 +67,7 @@ namespace glue
 
 		bool OrenNayar::useMultipleImportanceSampling() const
 		{
-			return true;
+			return false;
 		}
 	}
 }

@@ -57,7 +57,7 @@ namespace glue
 
 		bool Lambertian::useMultipleImportanceSampling() const
 		{
-			return true;
+			return false;
 		}
 	}
 }
