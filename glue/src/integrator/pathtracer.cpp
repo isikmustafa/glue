@@ -92,10 +92,12 @@ namespace glue
 			core::CoordinateSpace tangent_space(intersection.plane.point, intersection.plane.normal, intersection.dpdu);
 			auto wi_tangent = tangent_space.vectorToLocalSpace(-ray.get_direction());
 
+			intersection.bsdf_choice = intersection.bsdf_material->chooseBsdf(wi_tangent, uniform_sampler, intersection);
+
 			//DIRECT LIGHTING//
 			glm::vec3 direct_lo(0.0f);
 			//If the material does not have a delta pdf, then estimate light directly.
-			if (!intersection.bsdf_material->hasDeltaDistribution())
+			if (!intersection.bsdf_material->hasDeltaDistribution(intersection))
 			{
 				int size = scene.lights.size();
 				for (int i = 0; i < size; ++i)
@@ -122,7 +124,7 @@ namespace glue
 					}
 
 					//Apply multiple importance sampling if possible.
-					if (intersection.bsdf_material->useMultipleImportanceSampling() && !light->hasDeltaDistribution())
+					if (intersection.bsdf_material->useMultipleImportanceSampling(intersection) && !light->hasDeltaDistribution())
 					{
 						//Compute the weight of the sample from light pdf using power heuristic with beta=2
 						auto pdf_bsdf = intersection.bsdf_material->getPdf(wi_tangent, wo_tangent_light, intersection);

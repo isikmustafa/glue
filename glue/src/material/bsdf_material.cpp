@@ -1,6 +1,7 @@
 #include "lambertian.h"
 #include "oren_nayar.h"
 #include "metal.h"
+#include "smooth_layered.h"
 #include "dielectric.h"
 #include "..\xml\node.h"
 
@@ -27,6 +28,10 @@ namespace glue
 			else if (bsdf_type == std::string("Dielectric"))
 			{
 				return std::make_unique<material::Dielectric::Xml>(node);
+			}
+			else if (bsdf_type == std::string("SmoothLayered"))
+			{
+				return std::make_unique<material::SmoothLayered::Xml>(node);
 			}
 			else
 			{

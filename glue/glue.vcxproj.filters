@@ -166,6 +166,9 @@
     <ClCompile Include="src\texture\perlin_texture.cpp">
       <Filter>Source Files\texture</Filter>
     </ClCompile>
+    <ClCompile Include="src\material\smooth_layered.cpp">
+      <Filter>Source Files\material</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\geometry\triangle.h">
@@ -314,6 +317,9 @@
     </ClInclude>
     <ClInclude Include="src\texture\perlin_texture.h">
       <Filter>Source Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\material\smooth_layered.h">
+      <Filter>Source Files\material</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

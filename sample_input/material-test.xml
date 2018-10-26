@@ -5,7 +5,7 @@
 		<Filter type="Gaussian">
 			<Sigma>0.5</Sigma>
 		</Filter>
-		<SampleCount>32</SampleCount>
+		<SampleCount>4096</SampleCount>
 		<RRThreshold>0.2</RRThreshold>
     </Integrator>
 	
@@ -18,95 +18,95 @@
 		</Tonemapper>
 	</Output>
 	
-	<!--<Output type="Ldr">
-		<Path>../sample_output/material-lucy-0.36-1.0</Path>
+	<Output type="Ldr">
+		<Path>../sample_output/material-lucy-0.18-1.0</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.18</Key>
 			<MaxLuminance>1.0</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/material-lucy-0.36-0.9</Path>
+		<Path>../sample_output/material-lucy-0.18-0.9</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.18</Key>
 			<MaxLuminance>0.9</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/material-lucy-0.36-0.8</Path>
+		<Path>../sample_output/material-lucy-0.18-0.8</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.18</Key>
 			<MaxLuminance>0.8</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/material-lucy-0.36-0.7</Path>
+		<Path>../sample_output/material-lucy-0.18-0.7</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.18</Key>
 			<MaxLuminance>0.7</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/material-lucy-0.36-0.6</Path>
+		<Path>../sample_output/material-lucy-0.18-0.6</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.18</Key>
 			<MaxLuminance>0.6</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/material-lucy-0.36-0.5</Path>
+		<Path>../sample_output/material-lucy-0.18-0.5</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.18</Key>
 			<MaxLuminance>0.5</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/material-lucy-0.36-0.4</Path>
+		<Path>../sample_output/material-lucy-0.18-0.4</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.18</Key>
 			<MaxLuminance>0.4</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/material-lucy-0.36-0.3</Path>
+		<Path>../sample_output/material-lucy-0.18-0.3</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.18</Key>
 			<MaxLuminance>0.3</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/material-lucy-0.36-0.2</Path>
+		<Path>../sample_output/material-lucy-0.18-0.2</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.18</Key>
 			<MaxLuminance>0.2</MaxLuminance>
 		</Tonemapper>
 	</Output>
 	
 	<Output type="Ldr">
-		<Path>../sample_output/material-lucy-0.36-0.1</Path>
+		<Path>../sample_output/material-lucy-0.18-0.1</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
-			<Key>0.36</Key>
+			<Key>0.18</Key>
 			<MaxLuminance>0.1</MaxLuminance>
 		</Tonemapper>
-	</Output>-->
+	</Output>
 	
     <Camera>
         <Position>0 1.5 1</Position>
@@ -117,13 +117,20 @@
         <NearDistance>0.01</NearDistance>
     </Camera>
 	
-	<Object type="Mesh">
+	<!--<Object type="Mesh">
 		<Datapath>../sample_input/lucy.obj</Datapath>
 		<Transformation>
 			<Scaling>0.0021 0.0021 0.0021</Scaling>
-			<Rotation>0 60 0</Rotation>
-			<Translation>0 -0.03 -1.1</Translation>
+			<Rotation>0 70 0</Rotation>
+			<Translation>0 -0.03 -1.0</Translation>
 		</Transformation>
+		
+		<BsdfMaterial type="SmoothLayered">
+			<Kd textureType="Constant">
+				<Value>0.73 0.48 0.34</Value>
+			</Kd>
+			<IorN>1.33</IorN>
+		</BsdfMaterial>
 		
 		<BsdfMaterial type="Lambertian">
 			<Kd textureType="Constant">
@@ -145,22 +152,26 @@
 			<IorK>3.7391 2.2124 1.9255</IorK>
 			<Roughness>0.06</Roughness>
 		</BsdfMaterial>
-	</Object>
+	</Object>-->
 	
-	<!--<Object type="Sphere">
+	<Object type="Sphere">
 		<Radius>0.4</Radius>
 		<Center>0 0.4 -1.1</Center>
 		<Transformation>
 			<Rotation>-90 0 0</Rotation>
 		</Transformation>
-		<BsdfMaterial type="Metal">
-			<IorN>0.13046 0.48358 1.5599</IorN>
-			<IorK>3.7391 2.2124 1.9255</IorK>
-			<Roughness textureType="Checkerboard2D">
-				<First>0.001 0 0</First>
-				<Second>0.1 0 0</Second>
-				<Frequency>10</Frequency>
-			</Roughness>
+		<BsdfMaterial type="SmoothLayered">
+			<Kd textureType="Perlin">
+				<First>0.48 0.73 0.24</First>
+				<Second>0.192 0.292 0.096</Second>
+				<Frequency>25</Frequency>
+			</Kd>
+			<IorN>1.33</IorN>
+		</BsdfMaterial>
+		<BsdfMaterial type="Lambertian">
+			<Kd textureType="Constant">
+				<Value>0.73 0.48 0.34</Value>
+			</Kd>
 		</BsdfMaterial>
 		<BsdfMaterial type="Metal">
 			<IorN>0.13046 0.48358 1.5599</IorN>
@@ -169,7 +180,7 @@
 				<Value>0.001 0 0</Value>
 			</Roughness>
 		</BsdfMaterial>
-	</Object>-->
+	</Object>
 	
 	<Object type="Mesh">
 		<Datapath>../sample_input/rectangle.obj</Datapath>

@@ -124,6 +124,12 @@
 			<Rotation>0 60 0</Rotation>
 			<Translation>0 0 -0.5</Translation>
 		</Transformation>
+		<BsdfMaterial type="SmoothLayered">
+			<Kd textureType="Constant">
+				<Value>0.73 0.48 0.34</Value>
+			</Kd>
+			<IorN>1.33</IorN>
+		</BsdfMaterial>
 		<BsdfMaterial type="Lambertian">
 			<Kd textureType="Constant">
 				<Value>0.73 0.48 0.34</Value>
@@ -151,7 +157,7 @@
 		</BsdfMaterial>
 	</Object>-->
 	
-	<!-- Glass -->
+	<!-- Glass 
 	<Object type="Mesh">
 		<Datapath>../sample_input/box.obj</Datapath>
 		<Transformation>
@@ -166,7 +172,7 @@
 				<Frequency>20</Frequency>
 			</Roughness>
 		</BsdfMaterial>
-	</Object>
+	</Object>-->
 	
 	<!-- Front -->
 	<Object type="Mesh">

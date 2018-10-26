@@ -48,12 +48,12 @@ namespace glue
 			return microfacet.getPdf(wi_tangent, wo_tangent);
 		}
 
-		bool Metal::hasDeltaDistribution() const
+		bool Metal::hasDeltaDistribution(const geometry::Intersection& intersection) const
 		{
 			return false;
 		}
 
-		bool Metal::useMultipleImportanceSampling() const
+		bool Metal::useMultipleImportanceSampling(const geometry::Intersection& intersection) const
 		{
 			return true;
 		}

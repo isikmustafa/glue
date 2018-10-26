@@ -12,6 +12,7 @@ namespace glue
 			struct Dielectric
 			{
 				float operator()(float no_over_ni, float costheta);
+				float criticAngle(float no_over_ni);
 			};
 
 			struct Conductor

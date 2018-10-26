@@ -46,12 +46,12 @@ namespace glue
 			return microfacet.getPdf(wi_tangent, wo_tangent, core::math::cosTheta(wi_tangent) > 0.0f ? m_ior_n : 1.0f / m_ior_n);
 		}
 
-		bool Dielectric::hasDeltaDistribution() const
+		bool Dielectric::hasDeltaDistribution(const geometry::Intersection& intersection) const
 		{
 			return false;
 		}
 
-		bool Dielectric::useMultipleImportanceSampling() const
+		bool Dielectric::useMultipleImportanceSampling(const geometry::Intersection& intersection) const
 		{
 			return true;
 		}

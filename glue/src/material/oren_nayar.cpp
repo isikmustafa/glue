@@ -47,6 +47,11 @@ namespace glue
 
 		glm::vec3 OrenNayar::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
 		{
+			if (core::math::cosTheta(wi_tangent) < 0.0f || core::math::cosTheta(wo_tangent) < 0.0f)
+			{
+				return glm::vec3(0.0f);
+			}
+
 			geometry::SphericalCoordinate wi_ts(wi_tangent);
 			geometry::SphericalCoordinate wo_ts(wo_tangent);
 
@@ -60,12 +65,12 @@ namespace glue
 			return glm::max(core::math::cosTheta(wo_tangent), 0.0f) * glm::one_over_pi<float>();
 		}
 
-		bool OrenNayar::hasDeltaDistribution() const
+		bool OrenNayar::hasDeltaDistribution(const geometry::Intersection& intersection) const
 		{
 			return false;
 		}
 
-		bool OrenNayar::useMultipleImportanceSampling() const
+		bool OrenNayar::useMultipleImportanceSampling(const geometry::Intersection& intersection) const
 		{
 			return false;
 		}

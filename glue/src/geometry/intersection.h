@@ -20,6 +20,7 @@ namespace glue
 			glm::vec2 duvdx;
 			glm::vec2 duvdy;
 			float distance;
+			int bsdf_choice;
 			//Pointers will be kept as raw pointers.
 			//The reason is to prevent overhead due to shared_ptr destruction and construction
 			//and to protect the ownership of the pointers kept by unique_ptrs.

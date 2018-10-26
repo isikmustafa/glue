@@ -1,6 +1,8 @@
 #include "fresnel.h"
 
+#include <glm\gtc\constants.hpp>
 #include <glm\geometric.hpp>
+#include <glm\trigonometric.hpp>
 
 namespace glue
 {
@@ -25,6 +27,18 @@ namespace glue
 				auto temp_div = (costheta * g_plus_c - 1.0f) / (costheta * g_minus_c + 1.0f);
 
 				return 0.5f * (g_minus_c * g_minus_c) * (1.0f + temp_div * temp_div) / (g_plus_c * g_plus_c);
+			}
+
+			float Dielectric::criticAngle(float no_over_ni)
+			{
+				auto d = 1.0f - no_over_ni * no_over_ni;
+
+				if (d < 0.0f)
+				{
+					return glm::half_pi<float>();
+				}
+
+				return glm::acos(glm::sqrt(d));
 			}
 
 			glm::vec3 Conductor::operator()(const glm::vec3& no_over_ni, const glm::vec3& ko_over_ki, float costheta)
