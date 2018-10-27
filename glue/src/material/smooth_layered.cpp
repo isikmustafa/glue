@@ -40,7 +40,7 @@ namespace glue
 			constexpr int N = 100000;
 			for (int i = 0; i < N; ++i)
 			{
-				auto dir = geometry::SphericalCoordinate(1.0f, glm::acos(sampler.sample()), glm::two_pi<float>() * sampler.sample()).toCartesianCoordinate();				m_fsum += 2.0f * microfacet::fresnel::Dielectric()(1.0f / m_ior_n, core::math::cosTheta(dir)) * core::math::cosTheta(dir);
+				auto dir = geometry::SphericalCoordinate(1.0f, glm::acos(glm::sqrt(sampler.sample())), glm::two_pi<float>() * sampler.sample()).toCartesianCoordinate();				m_fsum += microfacet::fresnel::Dielectric()(1.0f / m_ior_n, core::math::cosTheta(dir));
 			}
 			m_fsum /= N;
 		}
