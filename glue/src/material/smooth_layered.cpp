@@ -8,7 +8,6 @@
 #include <glm\gtc\constants.hpp>
 #include <glm\geometric.hpp>
 #include <glm\trigonometric.hpp>
-#include <iostream>
 
 namespace glue
 {
