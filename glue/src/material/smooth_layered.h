@@ -36,7 +36,6 @@ namespace glue
 			std::unique_ptr<texture::Texture> m_kd;
 			float m_ior_n;
 			float m_fsum;
-			float m_sinthetac;
 		};
 	}
 }
