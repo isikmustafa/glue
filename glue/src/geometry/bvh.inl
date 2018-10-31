@@ -242,6 +242,13 @@ namespace glue
 					{
 						stack[stack_size++] = top->left.get();
 						stack[stack_size++] = top->right.get();
+
+						//If min of left bbox is closer to ray, process left node first in the next iteration.
+						if (glm::dot(top->left->bbox.get_min() - top->right->bbox.get_min(), ray.get_direction()) < 0.0f)
+						{
+							stack[stack_size - 2] = top->right.get();
+							stack[stack_size - 1] = top->left.get();
+						}
 					}
 					else
 					{
