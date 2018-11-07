@@ -71,8 +71,6 @@ namespace glue
 				return importance < m_rr_threshold ? le * calc_weight : le;
 			}
 
-			intersection.computeDifferentials(ray);
-
 			//Check if the ray hits a light source.
 			auto itr = scene.object_to_light.find(intersection.object);
 			if (itr != scene.object_to_light.end())

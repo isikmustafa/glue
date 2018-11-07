@@ -35,6 +35,14 @@ namespace glue
 			glm::vec3 pixel_coordinate(m_screen_coordinates.x + m_pixel_length.x * (static_cast<float>(x) + offset_x),
 				m_screen_coordinates.w - m_pixel_length.y * (static_cast<float>(y) + offset_y), -m_near_distance);
 
+			return geometry::Ray(m_camera_space.get_origin(), glm::normalize(m_camera_space.vectorToWorldSpace(pixel_coordinate)));
+		}
+
+		geometry::Ray PinholeCamera::castPrimayRayRxRy(int x, int y, float offset_x, float offset_y) const
+		{
+			glm::vec3 pixel_coordinate(m_screen_coordinates.x + m_pixel_length.x * (static_cast<float>(x) + offset_x),
+				m_screen_coordinates.w - m_pixel_length.y * (static_cast<float>(y) + offset_y), -m_near_distance);
+
 			return geometry::Ray(m_camera_space.get_origin(), glm::normalize(m_camera_space.vectorToWorldSpace(pixel_coordinate)),
 				std::make_unique<geometry::Ray>(m_camera_space.get_origin(), glm::normalize(m_camera_space.vectorToWorldSpace(pixel_coordinate + glm::vec3(m_pixel_length.x, 0.0f, 0.0f)))),
 				std::make_unique<geometry::Ray>(m_camera_space.get_origin(), glm::normalize(m_camera_space.vectorToWorldSpace(pixel_coordinate + glm::vec3(0.0f, -m_pixel_length.y, 0.0f)))));

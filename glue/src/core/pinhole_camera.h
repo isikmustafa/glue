@@ -33,6 +33,7 @@ namespace glue
 			PinholeCamera(const PinholeCamera::Xml& xml);
 
 			geometry::Ray castPrimayRay(int x, int y, float offset_x = 0.5f, float offset_y = 0.5f) const;
+			geometry::Ray castPrimayRayRxRy(int x, int y, float offset_x = 0.5f, float offset_y = 0.5f) const;
 
 			const glm::ivec2& get_resolution() const { return m_resolution; }
 

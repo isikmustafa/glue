@@ -57,7 +57,7 @@ namespace glue
 			return values;
 		}
 
-		Mapper::Values SphericalMapper::mapOnlyUV(const glm::vec3 & cartesian, const glm::vec3 & barycentric) const
+		Mapper::Values SphericalMapper::mapOnlyUV(const glm::vec3& cartesian, const glm::vec3& barycentric) const
 		{
 			Values values;
 
