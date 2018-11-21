@@ -5,7 +5,6 @@
 #include "..\texture\constant_texture.h"
 #include "..\xml\node.h"
 
-#include <ctpl_stl.h>
 #include <memory>
 
 namespace glue
@@ -100,26 +99,7 @@ namespace glue
 
 		void Scene::render()
 		{
-			constexpr int cPatchSize = 16;
-			auto resolution = camera->get_resolution();
-			ctpl::thread_pool pool(std::thread::hardware_concurrency());
-			for (int x = 0; x < resolution.x; x += cPatchSize)
-			{
-				for (int y = 0; y < resolution.y; y += cPatchSize)
-				{
-					pool.push([x, y, cPatchSize, resolution, this](int id)
-					{
-						for (int i = x; i < x + cPatchSize && i < resolution.x; ++i)
-						{
-							for (int j = y; j < y + cPatchSize && j < resolution.y; ++j)
-							{
-								this->m_image->set(i, j, this->m_integrator->integratePixel(*this, i, j));
-							}
-						}
-					});
-				}
-			}
-			pool.stop(true);
+			m_integrator->integrate(*this, *m_image);
 
 			for (const auto& output : m_outputs)
 			{

@@ -12,7 +12,6 @@ namespace glue
 		ImageTexture::Xml::Xml(const xml::Node& node)
 		{
 			node.parseChildText("Datapath", &datapath);
-			mipmapping = std::string("true") == node.attribute("mipmapping", true);
 		}
 
 		std::unique_ptr<Texture> ImageTexture::Xml::create() const
@@ -21,35 +20,12 @@ namespace glue
 		}
 
 		ImageTexture::ImageTexture(const ImageTexture::Xml& xml)
-			: m_images(xml::Parser::loadImage(xml.datapath, xml.mipmapping))
-		{
-			auto ratio = static_cast<float>((*m_images)[0].get_width()) / (*m_images)[0].get_height();
-			m_coeff_u = (ratio > 1.0f ? ratio : 1.0f);
-			m_coeff_v = (ratio < 1.0f ? 1.0f / ratio : 1.0f);
-		}
+			: m_images(xml::Parser::loadImage(xml.datapath, false))
+		{}
 
 		glm::vec3 ImageTexture::fetch(const geometry::Intersection& intersection) const
 		{
-			auto max_u = glm::max(intersection.duvdx.x, intersection.duvdy.x) * m_coeff_u;
-			auto max_v = glm::max(intersection.duvdx.y, intersection.duvdy.y) * m_coeff_v;
-
-			auto width = glm::max(max_u, max_v);
-			auto mipmap_level = m_images->size() - 2 + glm::log2(width);
-
-			if (mipmap_level < 0.0f)
-			{
-				return fetchTexelNearest(intersection.uv, 0);
-			}
-			else if (mipmap_level < m_images->size() - 1.0f)
-			{
-				//Always blend between mipmap levels with a triangle filter (linear interpolation).
-				int floor_level = static_cast<int>(glm::floor(mipmap_level));
-				return core::math::lerp(mipmap_level - floor_level, fetchTexelNearest(intersection.uv, floor_level), fetchTexelNearest(intersection.uv, floor_level + 1));
-			}
-			else
-			{
-				return fetchTexelNearest(intersection.uv, m_images->size() - 1);
-			}
+			return fetchTexelNearest(intersection.uv, 0);
 		}
 
 		glm::vec3 ImageTexture::fetchTexelNearest(const glm::vec2& uv, int mipmap_level) const

@@ -10,6 +10,7 @@
 
 #include <limits>
 #include <glm\geometric.hpp>
+#include <ctpl_stl.h>
 
 namespace glue
 {
@@ -28,47 +29,99 @@ namespace glue
 		}
 
 		Pathtracer::Pathtracer(const Pathtracer::Xml& xml)
-			: m_filter(xml.filter->create())
+			: m_uniform_samplers(std::thread::hardware_concurrency())
+			, m_filter(xml.filter->create())
 			, m_sample_count(xml.sample_count)
 			, m_rr_threshold(xml.rr_threshold)
-		{}
-
-		glm::vec3 Pathtracer::integratePixel(const core::Scene& scene, int x, int y) const
 		{
-			auto offset_sampler = m_filter->generateSampler();
-			core::UniformSampler uniform_sampler;
-
-			glm::vec3 pixel_acc(0.0f);
-			for (int i = 0; i < m_sample_count; ++i)
+			int numof_cores = std::thread::hardware_concurrency();
+			for (int i = 0; i < numof_cores; ++i)
 			{
-				auto ray = scene.camera->castPrimayRay(x, y, offset_sampler->sample(), offset_sampler->sample());
-				pixel_acc *= (static_cast<float>(i) / (i + 1));
-				pixel_acc += 1.0f / (i + 1) * estimate(scene, ray, uniform_sampler, 1.0f, false);
+				m_offset_samplers.push_back(m_filter->generateSampler());
 			}
-
-			return pixel_acc;
 		}
 
-		glm::vec3 Pathtracer::estimate(const core::Scene& scene, const geometry::Ray& ray,
+		void Pathtracer::integrate(const core::Scene& scene, core::Image& output)
+		{
+			ctpl::thread_pool pool(std::thread::hardware_concurrency());
+			auto resolution = scene.camera->get_resolution();
+			auto y_increase = cPatchSize;
+			int y = 0;
+			for (int x = 0; x < resolution.x; x += cPatchSize)
+			{
+				for (; y < resolution.y && y >= 0; y += y_increase)
+				{
+					pool.push([&scene, &output, x, y, this](int id)
+					{
+						integratePatch(scene, output, x, y, id);
+					});
+				}
+				y -= y_increase;
+				y_increase = -y_increase;
+			}
+			pool.stop(true);
+		}
+
+		void Pathtracer::integratePatch(const core::Scene& scene, core::Image& output, int x, int y, int id)
+		{
+			auto resolution = scene.camera->get_resolution();
+			auto bound_x = glm::min(cPatchSize, resolution.x - x);
+			auto bound_y = glm::min(cPatchSize, resolution.y - y);
+
+			std::array<std::array<glm::vec3, cPatchSize>, cPatchSize> final_values;
+			std::array<std::array<geometry::Ray, cPatchSize>, cPatchSize> ray_pool;
+			std::array<std::array<geometry::Intersection, cPatchSize>, cPatchSize> intersection_pool;
+
+			for (int k = 0; k < m_sample_count; ++k)
+			{
+				for (int i = 0; i < bound_x; ++i)
+				{
+					for (int j = 0; j < bound_y; ++j)
+					{
+						ray_pool[i][j] = scene.camera->castPrimayRay(x + i, y + j, m_offset_samplers[id]->sample(), m_offset_samplers[id]->sample());
+						intersection_pool[i][j] = geometry::Intersection();
+					}
+				}
+
+				for (int i = 0; i < bound_x; ++i)
+				{
+					for (int j = 0; j < bound_y; ++j)
+					{
+						scene.bvh.intersect(ray_pool[i][j], intersection_pool[i][j], std::numeric_limits<float>::max());
+					}
+				}
+
+				auto new_factor = 1.0f / (k + 1);
+				auto old_factor = k * new_factor;
+				for (int i = 0; i < bound_x; ++i)
+				{
+					for (int j = 0; j < bound_y; ++j)
+					{
+						auto& pixel_acc = final_values[i][j];
+						pixel_acc *= old_factor;
+						pixel_acc += new_factor * estimatePixel(scene, ray_pool[i][j], intersection_pool[i][j], m_uniform_samplers[id], 1.0f, false);
+					}
+				}
+			}
+
+			for (int i = 0; i < bound_x; ++i)
+			{
+				for (int j = 0; j < bound_y; ++j)
+				{
+					output.set(x + i, y + j, final_values[i][j]);
+				}
+			}
+		}
+
+		glm::vec3 Pathtracer::estimatePixel(const core::Scene& scene, geometry::Ray& ray, geometry::Intersection& intersection,
 			core::UniformSampler& uniform_sampler, float importance, bool light_explicitly_sampled) const
 		{
 			constexpr float cutoff_probability = 0.5f;
 			constexpr float calc_weight = 1.0f / (1.0f - cutoff_probability);
 
-			//Russian roulette.
-			if (importance < m_rr_threshold)
+			if (!intersection.object)
 			{
-				if (uniform_sampler.sample() < cutoff_probability)
-				{
-					return glm::vec3(0.0f);
-				}
-			}
-
-			geometry::Intersection intersection;
-			if (!scene.bvh.intersect(ray, intersection, std::numeric_limits<float>::max()))
-			{
-				auto le = scene.getBackgroundRadiance(ray.get_direction(), light_explicitly_sampled);
-				return importance < m_rr_threshold ? le * calc_weight : le;
+				return scene.getBackgroundRadiance(ray.get_direction(), light_explicitly_sampled);
 			}
 
 			//Check if the ray hits a light source.
@@ -77,9 +130,7 @@ namespace glue
 			{
 				if (!light_explicitly_sampled)
 				{
-					auto le = itr->second->getLe(ray.get_direction(), intersection.plane.normal, intersection.distance);
-
-					return importance < m_rr_threshold ? le * calc_weight : le;
+					return itr->second->getLe(ray.get_direction(), intersection.plane.normal, intersection.distance);
 				}
 				else
 				{
@@ -179,14 +230,19 @@ namespace glue
 			auto f_sum = f.x + f.y + f.z;
 			if (f_sum > 0.0f && !std::isinf(f_sum))
 			{
-				auto wo_world = tangent_space.vectorToWorldSpace(wo_tangent);
-				geometry::Ray wo_ray(intersection.plane.point + wo_world * scene.secondary_ray_epsilon, wo_world);
+				//Russian roulette.
+				importance *= glm::min(1.0f, glm::max(glm::max(f.x, f.y), f.z));
+				if (importance > m_rr_threshold || uniform_sampler.sample() > cutoff_probability)
+				{
+					auto wo_world = tangent_space.vectorToWorldSpace(wo_tangent);
+					ray = geometry::Ray(intersection.plane.point + wo_world * scene.secondary_ray_epsilon, wo_world);
 
-				indirect_lo = f * estimate(scene, wo_ray, uniform_sampler, importance * glm::min(1.0f, glm::max(glm::max(f.x, f.y), f.z)), light_explicitly_sampled);
+					scene.bvh.intersect(ray, intersection, std::numeric_limits<float>::max());
+					indirect_lo = f * estimatePixel(scene, ray, intersection, uniform_sampler, importance, light_explicitly_sampled);
+				}
 			}
 
-			auto lo = direct_lo + indirect_lo;
-			return importance < m_rr_threshold ? lo * calc_weight : lo;
+			return direct_lo + (importance < m_rr_threshold ? indirect_lo * calc_weight : indirect_lo);
 		}
 	}
 }

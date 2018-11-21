@@ -24,7 +24,7 @@ namespace glue
 		public:
 			virtual ~Integrator() {}
 
-			virtual glm::vec3 integratePixel(const core::Scene& scene, int x, int y) const = 0;
+			virtual void integrate(const core::Scene& scene, core::Image& output) = 0;
 		};
 	}
 }

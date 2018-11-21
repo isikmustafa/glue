@@ -142,9 +142,6 @@
     <ClCompile Include="src\geometry\mapper.cpp">
       <Filter>Source Files\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="src\geometry\intersection.cpp">
-      <Filter>Source Files\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="src\geometry\plane.cpp">
       <Filter>Source Files\geometry</Filter>
     </ClCompile>

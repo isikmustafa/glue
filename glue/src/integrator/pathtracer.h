@@ -5,10 +5,14 @@
 #include "..\core\filter.h"
 #include "..\core\forward_decl.h"
 
+#include <vector>
+
 namespace glue
 {
 	namespace integrator
 	{
+		const int cPatchSize = 16;
+
 		class Pathtracer : public Integrator
 		{
 		public:
@@ -26,15 +30,18 @@ namespace glue
 		public:
 			Pathtracer(const Pathtracer::Xml& xml);
 
-			glm::vec3 integratePixel(const core::Scene& scene, int x, int y) const override;
+			void integrate(const core::Scene& scene, core::Image& output) override;
 
 		private:
+			std::vector<std::unique_ptr<core::RealSampler>> m_offset_samplers;
+			std::vector<core::UniformSampler> m_uniform_samplers;
 			std::unique_ptr<core::Filter> m_filter;
 			int m_sample_count;
 			float m_rr_threshold;
 
 		private:
-			glm::vec3 estimate(const core::Scene& scene, const geometry::Ray& ray,
+			void integratePatch(const core::Scene& scene, core::Image& output, int x, int y, int id);
+			glm::vec3 estimatePixel(const core::Scene& scene, geometry::Ray& ray, geometry::Intersection& intersection,
 				core::UniformSampler& uniform_sampler, float importance, bool light_explicitly_sampled) const;
 		};
 	}
