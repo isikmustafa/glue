@@ -1,7 +1,7 @@
-glue/Release/
-glue/.vs/
+.idea/
+debug/
+release/
 desktop.ini
-glue/Debug/
 sample_output/
 *.png
 *.jpg
