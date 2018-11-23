@@ -1,0 +1,9 @@
+[submodule "3rd/CTPL"]
+	path = 3rd/CTPL
+	url = https://github.com/vit-vit/CTPL.git
+[submodule "3rd/glm"]
+	path = 3rd/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "3rd/tinyobjloader"]
+	path = 3rd/tinyobjloader
+	url = https://github.com/syoyo/tinyobjloader.git
