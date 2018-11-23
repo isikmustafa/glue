@@ -1,0 +1,194 @@
+<Scene>
+    <Integrator type="Pathtracer">
+		<Filter type="Gaussian">
+			<Sigma>0.5</Sigma>
+		</Filter>
+		<SampleCount>16</SampleCount>
+		<RRThreshold>0.2</RRThreshold>
+    </Integrator>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/environment-lucy-clamp</Path>
+		<Format>png</Format>
+		<Tonemapper type="Clamp">
+			<Min>0.0</Min>
+			<Max>1.0</Max>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/environment-lucy-0.36-1.0</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>1.0</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/environment-lucy-0.36-0.9</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>0.9</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/environment-lucy-0.36-0.8</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>0.8</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/environment-lucy-0.36-0.7</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>0.7</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/environment-lucy-0.36-0.6</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>0.6</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/environment-lucy-0.36-0.5</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>0.5</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/environment-lucy-0.36-0.4</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>0.4</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/environment-lucy-0.36-0.3</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>0.3</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/environment-lucy-0.36-0.2</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>0.2</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/environment-lucy-0.36-0.1</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.36</Key>
+			<MaxLuminance>0.1</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+    <Camera>
+        <Position>0 1.5 1</Position>
+        <Direction>0 -0.25 -1</Direction>
+        <Up>0 1 0</Up>
+        <FovXY>42 56</FovXY>
+		<Resolution>600 800</Resolution>
+        <NearDistance>0.01</NearDistance>
+    </Camera>
+	
+	<Object type="Mesh">
+		<Datapath>../sample_input/lucy.obj</Datapath>
+		<Transformation>
+			<Scaling>0.0021 0.0021 0.0021</Scaling>
+			<Rotation>0 60 0</Rotation>
+			<Translation>0 -0.03 -1.1</Translation>
+		</Transformation>
+		<BsdfMaterial type="Lambertian">
+			<Kd textureType="Constant">
+				<Value>0.73 0.48 0.34</Value>
+			</Kd>
+		</BsdfMaterial>
+		<!--<BsdfMaterial type="Metal">
+			<IorN>0.13046 0.48358 1.5599</IorN>
+			<IorK>3.7391 2.2124 1.9255</IorK>
+			<Roughness>0.06</Roughness>
+		</BsdfMaterial>-->
+	</Object>
+	
+	<Object type="Mesh">
+		<Datapath>../sample_input/rectangle.obj</Datapath>
+		<Transformation>
+			<Scaling>6 6 6</Scaling>
+			<Translation>0 3 -3</Translation>
+		</Transformation>
+		<BsdfMaterial type="Lambertian">
+			<Kd textureType="Checkerboard2D">
+				<First>0.2 0.2 0.2</First>
+				<Second>0.25 0.25 0.25</Second>
+				<Frequency>20</Frequency>
+			</Kd>
+		</BsdfMaterial>
+	</Object>
+	
+	<Object type="Mesh">
+		<Datapath>../sample_input/rectangle.obj</Datapath>
+		<Transformation>
+			<Scaling>6 6 6</Scaling>
+			<Rotation>-90 0 0</Rotation>
+			<Translation>0 0 0</Translation>
+		</Transformation>
+		<BsdfMaterial type="Lambertian">
+			<Kd textureType="Checkerboard2D">
+				<First>0.2 0.2 0.2</First>
+				<Second>0.25 0.25 0.25</Second>
+				<Frequency>20</Frequency>
+			</Kd>
+		</BsdfMaterial>
+	</Object>
+	
+	<!--<Object type="Sphere">
+		<Radius>0.3</Radius>
+		<Center>0 0 -1</Center>
+		<Transformation>
+			<Rotation>-90 0 0</Rotation>
+		</Transformation>
+		<BsdfMaterial type="Metal">
+			<IorN>3.1099 1.1851 0.9132</IorN>
+			<IorK>2.9567 2.2785 1.5698</IorK>
+			<Roughness>0.001</Roughness>
+		</BsdfMaterial>
+		<BsdfMaterial type="Lambertian">
+			<Kd textureType="Constant">
+				<Value>0.6 0.6 0.6</Value>
+			</Kd>
+		</BsdfMaterial>
+	</Object>-->
+	
+	<Light type="EnvironmentLight">
+		<Transformation>
+			<Rotation>90 0 0</Rotation>
+		</Transformation>
+		<Texture type="Image" mipmapping="false">
+			<Datapath>../sample_input/machine_shop_02_4k.hdr</Datapath>
+		</Texture>
+	</Light>
+</Scene>

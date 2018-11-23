@@ -29,7 +29,7 @@ namespace glue
                 std::string warn;
 
                 auto res = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, path.c_str(), nullptr, true, false);
-                std::cout << warn << std::endl;
+                //std::cout << warn << std::endl;
 				if (!res)
 				{
                     std::cout << err << std::endl;
