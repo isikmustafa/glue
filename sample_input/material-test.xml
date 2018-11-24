@@ -5,8 +5,8 @@
 		<Filter type="Gaussian">
 			<Sigma>0.5</Sigma>
 		</Filter>
-		<SampleCount>16</SampleCount>
-		<RRThreshold>0.2</RRThreshold>
+		<SampleCount>4</SampleCount>
+		<RRThreshold>0.01</RRThreshold>
     </Integrator>
 	
 	<Output type="Ldr">

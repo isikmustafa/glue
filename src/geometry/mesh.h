@@ -39,6 +39,7 @@ namespace glue
 			glm::vec2 getBoundsOnAxis(int axis) const override;
 			bool intersect(const Ray& ray, Intersection& intersection, float max_distance) const override;
 			bool intersectShadowRay(const Ray& ray, float max_distance) const override;
+			void fillIntersection(const Ray& ray, Intersection& intersection) const override;
 
 		private:
 			Transformation m_transformation;

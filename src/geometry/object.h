@@ -35,6 +35,7 @@ namespace glue
 			virtual glm::vec2 getBoundsOnAxis(int axis) const = 0;
 			virtual bool intersect(const Ray& ray, Intersection& intersection, float max_distance) const = 0;
 			virtual bool intersectShadowRay(const Ray& ray, float max_distance) const = 0;
+			virtual void fillIntersection(const Ray& ray, Intersection& intersection) const = 0;
 		};
 	}
 }

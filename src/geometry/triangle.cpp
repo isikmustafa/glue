@@ -83,12 +83,8 @@ namespace glue
 			auto distance = glm::dot(m_edge2, qvec) * inv_det;
 			if (distance > 0.0f && distance < max_distance)
 			{
-				intersection.plane.normal = m_normal;
-				auto values = m_mapper->map(ray.getPoint(distance), glm::vec3(1.0f - w1 - w2, w1, w2));
-				intersection.uv = values.uv;
-				intersection.dpdu = values.dpdu;
-				intersection.dpdv = values.dpdv;
 				intersection.distance = distance;
+				intersection.triangle = this;
 
 				return true;
 			}
@@ -113,6 +109,24 @@ namespace glue
 
 			auto distance = glm::dot(m_edge2, qvec) * inv_det;
 			return distance > 0.0f && distance < max_distance;
+		}
+
+		void Triangle::fillIntersection(const Ray& ray, Intersection& intersection) const
+		{
+			auto pvec = glm::cross(ray.get_direction(), m_edge2);
+			auto inv_det = 1.0f / glm::dot(m_edge1, pvec);
+
+			auto tvec = ray.get_origin() - m_v0;
+			auto w1 = glm::dot(tvec, pvec) * inv_det;
+
+			auto qvec = glm::cross(tvec, m_edge1);
+			auto w2 = glm::dot(ray.get_direction(), qvec) * inv_det;
+
+			intersection.plane.normal = m_normal;
+			auto values = m_mapper->map(ray.getPoint(intersection.distance), glm::vec3(1.0f - w1 - w2, w1, w2));
+			intersection.uv = values.uv;
+			intersection.dpdu = values.dpdu;
+			intersection.dpdv = values.dpdv;
 		}
 	}
 }

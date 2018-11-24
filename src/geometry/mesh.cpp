@@ -71,13 +71,7 @@ namespace glue
 		{
 			if (m_bvh->intersect(m_transformation.rayToObjectSpace(ray), intersection, max_distance))
 			{
-				intersection.plane.point = ray.getPoint(intersection.distance);
-				intersection.plane.normal = glm::normalize(m_transformation.normalToWorldSpace(intersection.plane.normal));
-				intersection.dpdu = m_transformation.vectorToWorldSpace(intersection.dpdu);
-				intersection.dpdv = m_transformation.vectorToWorldSpace(intersection.dpdv);
 				intersection.object = this;
-				intersection.bsdf_material = m_bsdf_material.get();
-
 				return true;
 			}
 			return false;
@@ -86,6 +80,17 @@ namespace glue
 		bool Mesh::intersectShadowRay(const Ray& ray, float max_distance) const
 		{
 			return m_bvh->intersectShadowRay(m_transformation.rayToObjectSpace(ray), max_distance);
+		}
+
+		void Mesh::fillIntersection(const Ray& ray, Intersection& intersection) const
+		{
+			intersection.triangle->fillIntersection(m_transformation.rayToObjectSpace(ray), intersection);
+
+			intersection.plane.point = ray.getPoint(intersection.distance);
+			intersection.plane.normal = glm::normalize(m_transformation.normalToWorldSpace(intersection.plane.normal));
+			intersection.dpdu = m_transformation.vectorToWorldSpace(intersection.dpdu);
+			intersection.dpdv = m_transformation.vectorToWorldSpace(intersection.dpdv);
+			intersection.bsdf_material = m_bsdf_material.get();
 		}
 	}
 }

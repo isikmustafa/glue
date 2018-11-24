@@ -4,7 +4,7 @@
 		<Filter type="Gaussian">
 			<Sigma>0.5</Sigma>
 		</Filter>
-		<SampleCount>64</SampleCount>
+		<SampleCount>4</SampleCount>
 		<RRThreshold>0.2</RRThreshold>
     </Integrator>
 	
@@ -25,8 +25,8 @@
 			<MaxLuminance>1.0</MaxLuminance>
 		</Tonemapper>
 	</Output>
-	
-	<Output type="Ldr">
+
+	<!--<Output type="Ldr">
 		<Path>../sample_output/cornell-lucy-0.18-0.9</Path>
 		<Format>png</Format>
 		<Tonemapper type="GlobalReinhard">
@@ -105,7 +105,7 @@
 			<Key>0.18</Key>
 			<MaxLuminance>0.1</MaxLuminance>
 		</Tonemapper>
-	</Output>
+	</Output>-->
 	
     <Camera>
         <Position>0 0.95 1.49</Position>

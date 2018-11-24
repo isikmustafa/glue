@@ -32,6 +32,7 @@ namespace glue
 			std::array<glm::vec3, 3> getVertices() const;
 			bool intersect(const Ray& ray, Intersection& intersection, float max_distance) const;
 			bool intersectShadowRay(const Ray& ray, float max_distance) const;
+			void fillIntersection(const Ray& ray, Intersection& intersection) const;
 
 		private:
 			glm::vec3 m_v0;

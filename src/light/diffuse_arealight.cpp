@@ -51,6 +51,8 @@ namespace glue
 				auto itr = scene.object_to_light.find(intersection.object);
 				if (itr != scene.object_to_light.end() && itr->second == this)
 				{
+					intersection.object->fillIntersection(ray, intersection);
+
 					light_sample.wo_world = ray.get_direction();
 					light_sample.le = getLe(light_sample.wo_world, intersection.plane.normal, intersection.distance);
 					light_sample.pdf_w = getPdf(light_sample.wo_world, intersection.plane.normal, intersection.distance);

@@ -23,6 +23,7 @@ namespace glue
 			//The reason is to prevent overhead due to shared_ptr destruction and construction
 			//and to protect the ownership of the pointers kept by unique_ptrs.
 			const Object* object{nullptr};
+			const Triangle* triangle{nullptr};
 			const material::BsdfMaterial* bsdf_material{nullptr};
 		};
 	}

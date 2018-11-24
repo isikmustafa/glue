@@ -95,18 +95,8 @@ namespace glue
 
 			if (distance > 0.0f && distance < max_distance)
 			{
-				intersection.plane.point = ray.getPoint(distance);
-				auto local_point = transformed_ray.getPoint(distance);
-				intersection.plane.normal = glm::normalize(m_transformation.normalToWorldSpace(local_point));
-
-				auto values = SphericalMapper().map(local_point, glm::vec3(0.0f));
-				intersection.uv = values.uv;
-				intersection.dpdu = m_transformation.vectorToWorldSpace(values.dpdu);
-				intersection.dpdv = m_transformation.vectorToWorldSpace(values.dpdv);
-
 				intersection.distance = distance;
 				intersection.object = this;
-				intersection.bsdf_material = m_bsdf_material.get();
 
 				return true;
 			}
@@ -137,6 +127,21 @@ namespace glue
 			}
 
 			return (distance > 0.0f && distance < max_distance);
+		}
+
+		void Sphere::fillIntersection(const Ray& ray, Intersection& intersection) const
+		{
+			auto transformed_ray = m_transformation.rayToObjectSpace(ray);
+
+			intersection.plane.point = ray.getPoint(intersection.distance);
+			auto local_point = transformed_ray.getPoint(intersection.distance);
+			intersection.plane.normal = glm::normalize(m_transformation.normalToWorldSpace(local_point));
+
+			auto values = SphericalMapper().map(local_point, glm::vec3(0.0f));
+			intersection.uv = values.uv;
+			intersection.dpdu = m_transformation.vectorToWorldSpace(values.dpdu);
+			intersection.dpdv = m_transformation.vectorToWorldSpace(values.dpdv);
+			intersection.bsdf_material = m_bsdf_material.get();
 		}
 	}
 }

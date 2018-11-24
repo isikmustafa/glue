@@ -120,6 +120,8 @@ namespace glue
 				return scene.getBackgroundRadiance(ray.get_direction(), light_explicitly_sampled);
 			}
 
+			intersection.object->fillIntersection(ray, intersection);
+
 			//Check if the ray hits a light source.
 			auto itr = scene.object_to_light.find(intersection.object);
 			if (itr != scene.object_to_light.end())
