@@ -5,15 +5,21 @@
 
 #include <iostream>
 
-int main()
+int main(int argc, char* argv[])
 {
+    if (argc != 2)
+    {
+        std::cout << "Please indicate input location as the first argument of the program." << std::endl;
+        std::cout << "Do not add any other program arguments." << std::endl;
+        return 0;
+    }
+
 	try
 	{
 		glue::core::Timer timer;
 
 		timer.start();
-		//glue::core::Scene scene(glue::xml::Parser::parse("../sample_input/cornell-lucy.xml"));
-		glue::core::Scene scene(glue::xml::Parser::parse("../sample_input/material-test.xml"));
+        glue::core::Scene scene(glue::xml::Parser::parse(argv[1]));
 		std::cout << "BVH build and input read time: " << timer.getTime() << std::endl;
 
 		scene.render();
@@ -21,10 +27,7 @@ int main()
 	catch (const std::runtime_error& e)
 	{
 		std::cout << e.what() << std::endl;
-		system("PAUSE");
-		return 0;
 	}
 
-	system("PAUSE");
 	return 0;
 }
