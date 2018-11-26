@@ -105,9 +105,12 @@ namespace glue
 			m_integrator->integrate(*this, *m_image);
 			std::cout << "Render time: " << timer.getTime() << std::endl;
 
-			for (const auto& output : m_outputs)
+			int size = m_outputs.size();
+			int i;
+			#pragma omp parallel for
+			for (i = 0; i < size; ++i)
 			{
-				output->save(*m_image);
+				m_outputs[i]->save(*m_image);
 			}
 		}
 
