@@ -20,9 +20,8 @@ namespace glue
 			static const std::unordered_set<std::string> gSupportedFormatsSave;
 
 		public:
-			static core::Scene::Xml parse(const std::string& xml_filepath);
 			static std::shared_ptr<geometry::BVH<geometry::Triangle>> loadModel(const std::string& path);
-			static std::shared_ptr<std::vector<core::Image>> loadImage(const std::string& path, bool mipmapping);
+			static std::shared_ptr<std::vector<core::Image>> loadImage(const std::string& path, bool mipmapping = false);
 		};
 	}
 }

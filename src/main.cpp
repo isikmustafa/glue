@@ -1,7 +1,7 @@
 #include "core/scene.h"
 #include "core/timer.h"
 #include "integrator/pathtracer.h"
-#include "xml/parser.h"
+#include "xml/node.h"
 
 #include <iostream>
 
@@ -16,10 +16,11 @@ int main(int argc, char* argv[])
 
 	try
 	{
-		glue::core::Timer timer;
+        using namespace glue;
+        core::Timer timer;
 
 		timer.start();
-        glue::core::Scene scene(glue::xml::Parser::parse(argv[1]));
+        core::Scene scene(core::Scene::Xml(xml::Node::getRoot(argv[1])));
 		std::cout << "BVH build and input read time: " << timer.getTime() << std::endl;
 
 		scene.render();

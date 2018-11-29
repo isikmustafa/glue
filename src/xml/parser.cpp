@@ -11,11 +11,6 @@ namespace glue
 		const std::unordered_set<std::string> Parser::gSupportedFormatsLoad{ "jpg", "png", "tga", "bmp", "psd", "gif", "hdr", "pic" };
 		const std::unordered_set<std::string> Parser::gSupportedFormatsSave{ "png", "bmp", "tga" };
 
-		core::Scene::Xml Parser::parse(const std::string& xml_filepath)
-		{
-			return core::Scene::Xml(glue::xml::Node::getRoot(xml_filepath));
-		}
-
 		std::shared_ptr<geometry::BVH<geometry::Triangle>> Parser::loadModel(const std::string& path)
 		{
 			static std::unordered_map<std::string, std::shared_ptr<geometry::BVH<geometry::Triangle>>> path_to_bvh;

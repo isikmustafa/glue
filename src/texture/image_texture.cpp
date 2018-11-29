@@ -9,6 +9,12 @@ namespace glue
 		ImageTexture::Xml::Xml(const xml::Node& node)
 		{
 			node.parseChildText("Datapath", &datapath);
+
+			auto image_format = datapath.substr(datapath.find_last_of('.') + 1);
+			if (xml::Parser::gSupportedFormatsLoad.find(image_format) == xml::Parser::gSupportedFormatsLoad.end())
+			{
+				node.child("Datapath").throwError("Unsupported Format.");
+			}
 		}
 
 		std::unique_ptr<Texture> ImageTexture::Xml::create() const
@@ -17,7 +23,7 @@ namespace glue
 		}
 
 		ImageTexture::ImageTexture(const ImageTexture::Xml& xml)
-			: m_images(xml::Parser::loadImage(xml.datapath, false))
+			: m_images(xml::Parser::loadImage(xml.datapath))
 		{}
 
 		glm::vec3 ImageTexture::fetch(const geometry::Intersection& intersection) const
