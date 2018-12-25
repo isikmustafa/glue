@@ -41,11 +41,7 @@ namespace glue
 
 		LightSample Pointlight::getVisibleSample(const core::Scene& scene, const geometry::Ray& ray) const
 		{
-			light::LightSample light_sample;
-
-			light_sample.le = glm::vec3(0.0f);
-
-			return light_sample;
+			return light::LightSample();
 		}
 
 		glm::vec3 Pointlight::getLe(const glm::vec3& wo_world, const glm::vec3& light_plane_normal, float distance) const

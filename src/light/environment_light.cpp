@@ -70,10 +70,6 @@ namespace glue
 				light_sample.pdf_w = getPdf(light_sample.wo_world, glm::vec3(0.0f), 0.0f);
 				light_sample.distance = std::numeric_limits<float>::max();
 			}
-			else
-			{
-				light_sample.le = glm::vec3(0.0f);
-			}
 
 			return light_sample;
 		}

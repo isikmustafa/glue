@@ -16,8 +16,8 @@ namespace glue
 		struct LightSample
 		{
 			glm::vec3 wo_world;
-			glm::vec3 le;
-			float pdf_w;
+			glm::vec3 le{0.0f, 0.0f, 0.0f};
+			float pdf_w{0.0f};
 			float distance;
 		};
 

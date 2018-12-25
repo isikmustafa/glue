@@ -58,10 +58,6 @@ namespace glue
 					light_sample.pdf_w = getPdf(light_sample.wo_world, intersection.plane.normal, intersection.distance);
 					light_sample.distance = intersection.distance;
 				}
-				else
-				{
-					light_sample.le = glm::vec3(0.0f);
-				}
 			}
 
 			return light_sample;
@@ -69,13 +65,13 @@ namespace glue
 
 		glm::vec3 DiffuseArealight::getLe(const glm::vec3& wo_world, const glm::vec3& light_plane_normal, float distance) const
 		{
-			return m_le * static_cast<float>(glm::dot(-wo_world, light_plane_normal) > 0.0f);
+			return glm::dot(-wo_world, light_plane_normal) > 0.0f ? m_le : glm::vec3(0.0f);
 		}
 
 		float DiffuseArealight::getPdf(const glm::vec3& wo_world, const glm::vec3& light_plane_normal, float distance) const
 		{
 			//Transform p(A) to p(w)
-			return m_pdf * distance * distance / glm::max(glm::dot(-wo_world, light_plane_normal), 0.0f);
+			return m_pdf * distance * distance / glm::abs(glm::dot(-wo_world, light_plane_normal));
 		}
 
 		bool DiffuseArealight::hasDeltaDistribution() const
