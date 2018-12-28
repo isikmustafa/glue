@@ -51,10 +51,10 @@ namespace glue
 
 			auto ij = m_sampler.sample(sampler);
 			glm::vec2 uv((ij.first + 0.5f) / m_hdri.getWidth(), (ij.second + 0.5f) / m_hdri.getHeight());
-			auto wo_object = geometry::SphericalCoordinate(1.0f, uv.y * glm::pi<float>(), uv.x * glm::two_pi<float>()).toCartesianCoordinate();
-			light_sample.le = getLeObjectSpace(wo_object, glm::vec3(0.0f), 0.0f);
-			light_sample.pdf_w = getPdfObjectSpace(wo_object, glm::vec3(0.0f), 0.0f);
-			light_sample.wo_world = glm::normalize(m_transformation.vectorToWorldSpace(wo_object));
+			auto wi_object = geometry::SphericalCoordinate(1.0f, uv.y * glm::pi<float>(), uv.x * glm::two_pi<float>()).toCartesianCoordinate();
+			light_sample.le = getLeObjectSpace(wi_object, glm::vec3(0.0f), 0.0f);
+			light_sample.pdf_w = getPdfObjectSpace(wi_object, glm::vec3(0.0f), 0.0f);
+			light_sample.wi_world = glm::normalize(m_transformation.vectorToWorldSpace(wi_object));
 			light_sample.distance = std::numeric_limits<float>::max();
 
 			return light_sample;
@@ -65,25 +65,25 @@ namespace glue
 			light::LightSample light_sample;
 			if (!scene.bvh.intersectShadowRay(ray, std::numeric_limits<float>::max()))
 			{
-				light_sample.wo_world = ray.get_direction();
-				light_sample.le = getLe(light_sample.wo_world, glm::vec3(0.0f), 0.0f);
-				light_sample.pdf_w = getPdf(light_sample.wo_world, glm::vec3(0.0f), 0.0f);
+				light_sample.wi_world = ray.get_direction();
+				light_sample.le = getLe(light_sample.wi_world, glm::vec3(0.0f), 0.0f);
+				light_sample.pdf_w = getPdf(light_sample.wi_world, glm::vec3(0.0f), 0.0f);
 				light_sample.distance = std::numeric_limits<float>::max();
 			}
 
 			return light_sample;
 		}
 
-		glm::vec3 EnvironmentLight::getLe(const glm::vec3& wo_world, const glm::vec3& light_plane_normal, float distance) const
+		glm::vec3 EnvironmentLight::getLe(const glm::vec3& wi_world, const glm::vec3& light_plane_normal, float distance) const
 		{
-			auto uv = geometry::SphericalMapper().mapOnlyUV(m_transformation.vectorToObjectSpace(wo_world), glm::vec3(0.0f)).uv;
+			auto uv = geometry::SphericalMapper().mapOnlyUV(m_transformation.vectorToObjectSpace(wi_world), glm::vec3(0.0f)).uv;
 
 			return m_hdri.fetchTexelNearest(uv, 0);
 		}
 
-		float EnvironmentLight::getPdf(const glm::vec3& wo_world, const glm::vec3& light_plane_normal, float distance) const
+		float EnvironmentLight::getPdf(const glm::vec3& wi_world, const glm::vec3& light_plane_normal, float distance) const
 		{
-			auto uv = geometry::SphericalMapper().mapOnlyUV(m_transformation.vectorToObjectSpace(wo_world), glm::vec3(0.0f)).uv;
+			auto uv = geometry::SphericalMapper().mapOnlyUV(m_transformation.vectorToObjectSpace(wi_world), glm::vec3(0.0f)).uv;
 			auto i = static_cast<int>(uv.x * m_hdri.getWidth() - 0.5f);
 			auto j = static_cast<int>(uv.y * m_hdri.getHeight() - 0.5f);
 
@@ -100,16 +100,16 @@ namespace glue
 			return nullptr;
 		}
 
-		glm::vec3 EnvironmentLight::getLeObjectSpace(const glm::vec3& wo_object, const glm::vec3& light_plane_normal, float distance) const
+		glm::vec3 EnvironmentLight::getLeObjectSpace(const glm::vec3& wi_object, const glm::vec3& light_plane_normal, float distance) const
 		{
-			auto uv = geometry::SphericalMapper().mapOnlyUV(wo_object, glm::vec3(0.0f)).uv;
+			auto uv = geometry::SphericalMapper().mapOnlyUV(wi_object, glm::vec3(0.0f)).uv;
 
 			return m_hdri.fetchTexelNearest(uv, 0);
 		}
 
-		float EnvironmentLight::getPdfObjectSpace(const glm::vec3& wo_object, const glm::vec3& light_plane_normal, float distance) const
+		float EnvironmentLight::getPdfObjectSpace(const glm::vec3& wi_object, const glm::vec3& light_plane_normal, float distance) const
 		{
-			auto uv = geometry::SphericalMapper().mapOnlyUV(wo_object, glm::vec3(0.0f)).uv;
+			auto uv = geometry::SphericalMapper().mapOnlyUV(wi_object, glm::vec3(0.0f)).uv;
 			auto i = static_cast<int>(uv.x * m_hdri.getWidth() - 0.5f);
 			auto j = static_cast<int>(uv.y * m_hdri.getHeight() - 0.5f);
 

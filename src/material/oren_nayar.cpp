@@ -35,33 +35,43 @@ namespace glue
 			m_B = 0.45f * r2 / (r2 + 0.09f);
 		}
 
-		std::pair<glm::vec3, glm::vec3> OrenNayar::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
+		std::pair<glm::vec3, glm::vec3> OrenNayar::sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
 		{
-			//Sample from cosine-weighted distribution.
-			auto wo = geometry::SphericalCoordinate(1.0f, glm::acos(glm::sqrt(sampler.sample())), glm::two_pi<float>() * sampler.sample()).toCartesianCoordinate();
-			auto f = getBsdf(wi_tangent, wo, intersection) * glm::pi<float>();
+			glm::vec3 wi(0.0f);
+			glm::vec3 f(0.0f);
 
-			return std::make_pair(wo, f);
+			if (core::math::cosTheta(wo_tangent) > 0.0f)
+			{
+				wi = geometry::SphericalCoordinate(1.0f, glm::acos(glm::sqrt(sampler.sample())), glm::two_pi<float>() * sampler.sample()).toCartesianCoordinate();
+				f = getBsdf(wi, wo_tangent, intersection) * glm::pi<float>();
+			}
+
+			return std::make_pair(wi, f);
 		}
 
 		glm::vec3 OrenNayar::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
 		{
-			if (core::math::cosTheta(wi_tangent) < 0.0f || core::math::cosTheta(wo_tangent) < 0.0f)
+			if (core::math::cosTheta(wi_tangent) > 0.0f && core::math::cosTheta(wo_tangent) > 0.0f)
 			{
-				return glm::vec3(0.0f);
+				geometry::SphericalCoordinate wi_ts(wi_tangent);
+				geometry::SphericalCoordinate wo_ts(wo_tangent);
+
+				return m_kd->fetch(intersection) * glm::one_over_pi<float>() *
+				        (m_A + m_B * glm::max(0.0f, glm::cos(wi_ts.phi - wo_ts.phi)) *
+				        glm::sin(glm::max(wi_ts.theta, wo_ts.theta)) * glm::tan(glm::min(wi_ts.theta, wo_ts.theta)));
 			}
 
-			geometry::SphericalCoordinate wi_ts(wi_tangent);
-			geometry::SphericalCoordinate wo_ts(wo_tangent);
-
-			return m_kd->fetch(intersection) * glm::one_over_pi<float>() * (m_A + m_B * glm::max(0.0f, glm::cos(wi_ts.phi - wo_ts.phi)) *
-				glm::sin(glm::max(wi_ts.theta, wo_ts.theta)) * glm::tan(glm::min(wi_ts.theta, wo_ts.theta)));
+			return glm::vec3(0.0f);
 		}
 
 		float OrenNayar::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
 		{
-			//Cosine-weighted pdf.
-			return glm::max(core::math::cosTheta(wo_tangent), 0.0f) * glm::one_over_pi<float>();
+			if (core::math::cosTheta(wi_tangent) > 0.0f && core::math::cosTheta(wo_tangent) > 0.0f)
+			{
+				return core::math::cosTheta(wi_tangent) * glm::one_over_pi<float>();
+			}
+
+			return 0.0f;
 		}
 
 		bool OrenNayar::hasDeltaDistribution(const geometry::Intersection& intersection) const

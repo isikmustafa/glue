@@ -28,8 +28,8 @@ namespace glue
 
 			LightSample sample(core::UniformSampler& sampler, const geometry::Intersection& intersection) const override;
 			LightSample getVisibleSample(const core::Scene& scene, const geometry::Ray& ray) const override;
-			glm::vec3 getLe(const glm::vec3& wo_world, const glm::vec3& light_plane_normal, float distance) const override;
-			float getPdf(const glm::vec3& wo_world, const glm::vec3& light_plane_normal, float distance) const override;
+			glm::vec3 getLe(const glm::vec3& wi_world, const glm::vec3& light_plane_normal, float distance) const override;
+			float getPdf(const glm::vec3& wi_world, const glm::vec3& light_plane_normal, float distance) const override;
 			bool hasDeltaDistribution() const override;
 			std::shared_ptr<geometry::Object> getObject() const override;
 

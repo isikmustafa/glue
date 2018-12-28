@@ -2,7 +2,7 @@
 #define __GLUE__MATERIAL__DIELECTRIC__
 
 #include "bsdf_material.h"
-#include "../microfacet/microfacet_scattering.h"
+#include "../microfacet/microfacet_refraction.h"
 #include "../microfacet/fresnel.h"
 #include "../microfacet/ggx_distribution.h"
 #include "../microfacet/beckmann_distribution.h"
@@ -32,7 +32,8 @@ namespace glue
 		public:
 			explicit Dielectric(const Dielectric::Xml& xml);
 
-			std::pair<glm::vec3, glm::vec3> sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const override;
+            std::pair<int, float> chooseBsdf(const glm::vec3& wo_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const override;
+			std::pair<glm::vec3, glm::vec3> sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const override;
 			glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const override;
 			float getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const override;
 			bool hasDeltaDistribution(const geometry::Intersection& intersection) const override;

@@ -34,63 +34,66 @@ namespace glue
 			, m_fsum(0.0f)
 		{
 			core::UniformSampler sampler;
-			constexpr int N = 100000;
-			for (int i = 0; i < N; ++i)
+			constexpr int n = 100000;
+			auto one_over_ior = 1.0f / m_ior_n;
+			for (int i = 0; i < n; ++i)
 			{
 				auto dir = geometry::SphericalCoordinate(1.0f, glm::acos(glm::sqrt(sampler.sample())), glm::two_pi<float>() * sampler.sample()).toCartesianCoordinate();
 
-				m_fsum += microfacet::fresnel::Dielectric()(1.0f / m_ior_n, core::math::cosTheta(dir));
+				m_fsum += microfacet::fresnel::Dielectric()(one_over_ior, core::math::cosTheta(dir));
 			}
 
-			m_fsum /= N;
+			m_fsum /= n;
 		}
 
-		int SmoothLayered::chooseBsdf(const glm::vec3& wi_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
+		std::pair<int, float> SmoothLayered::chooseBsdf(const glm::vec3& wo_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
 		{
-			auto fresnel = microfacet::fresnel::Dielectric()(m_ior_n, core::math::cosTheta(wi_tangent));
+			auto fresnel = microfacet::fresnel::Dielectric()(m_ior_n, core::math::cosTheta(wo_tangent));
 
-			return sampler.sample() < fresnel ? 0 : 1;
+			return sampler.sample() < fresnel ? std::make_pair(0, fresnel) : std::make_pair(1, 1.0f - fresnel);
 		}
 
-		std::pair<glm::vec3, glm::vec3> SmoothLayered::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
+		std::pair<glm::vec3, glm::vec3> SmoothLayered::sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
 		{
-			glm::vec3 wo(0.0f);
+			glm::vec3 wi(0.0f);
 			glm::vec3 f(0.0f);
 
-			if (core::math::cosTheta(wi_tangent) > 0.0f)
+			if (core::math::cosTheta(wo_tangent) > 0.0f)
 			{
+                auto f_out = microfacet::fresnel::Dielectric()(m_ior_n, core::math::cosTheta(wo_tangent));
+
 				switch (intersection.bsdf_choice)
 				{
 				case 0:
-					wo = glm::reflect(-wi_tangent, glm::vec3(0.0f, 0.0f, 1.0f));
-					f = glm::vec3(1.0f);
+					wi = glm::reflect(-wo_tangent, glm::vec3(0.0f, 0.0f, 1.0f));
+					f = glm::vec3(f_out);
 					break;
 
 				case 1:
-					wo = geometry::SphericalCoordinate(1.0f, glm::acos(glm::sqrt(sampler.sample())), glm::two_pi<float>() * sampler.sample()).toCartesianCoordinate();
-					auto f_in = microfacet::fresnel::Dielectric()(m_ior_n, core::math::cosTheta(wo));
+					wi = geometry::SphericalCoordinate(1.0f, glm::acos(glm::sqrt(sampler.sample())), glm::two_pi<float>() * sampler.sample()).toCartesianCoordinate();
+					auto f_in = microfacet::fresnel::Dielectric()(m_ior_n, core::math::cosTheta(wi));
 					auto kd = m_kd->fetch(intersection);
-					f = 1.0f / (m_ior_n * m_ior_n) * (1.0f - f_in) * kd / (1.0f - m_fsum * kd);
+					f = 1.0f / (m_ior_n * m_ior_n) * (1.0f - f_in) * (1.0f - f_out) * kd / (1.0f - m_fsum * kd);
 					break;
 				}
 			}
 
-			return std::make_pair(wo, f);
+			return std::make_pair(wi, f);
 		}
 
 		glm::vec3 SmoothLayered::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
 		{
 			if (core::math::cosTheta(wi_tangent) > 0.0f && core::math::cosTheta(wo_tangent) > 0.0f)
 			{
-				auto f_out = microfacet::fresnel::Dielectric()(m_ior_n, core::math::cosTheta(wi_tangent));
-
 				switch (intersection.bsdf_choice)
 				{
 				case 0:
-					return glm::vec3(f_out) / core::math::cosTheta(wo_tangent);
+				    //Dirac delta function.
+					return glm::vec3(0.0f);
 
 				case 1:
-					auto f_in = microfacet::fresnel::Dielectric()(m_ior_n, core::math::cosTheta(wo_tangent));
+                    auto f_in = microfacet::fresnel::Dielectric()(m_ior_n, core::math::cosTheta(wi_tangent));
+                    auto f_out = microfacet::fresnel::Dielectric()(m_ior_n, core::math::cosTheta(wo_tangent));
 					auto kd = m_kd->fetch(intersection);
 					return 1.0f / (m_ior_n * m_ior_n) * (1.0f - f_in) * (1.0f - f_out) * kd * glm::one_over_pi<float>() / (1.0f - m_fsum * kd);
 				}
@@ -106,11 +109,11 @@ namespace glue
 				switch (intersection.bsdf_choice)
 				{
 				case 0:
+                    //Dirac delta function.
 					return 0.0f;
 
 				case 1:
-					auto fresnel = microfacet::fresnel::Dielectric()(m_ior_n, core::math::cosTheta(wi_tangent));
-					return (1.0f - fresnel) * core::math::cosTheta(wo_tangent) * glm::one_over_pi<float>();
+					return core::math::cosTheta(wi_tangent) * glm::one_over_pi<float>();
 				}
 			}
 

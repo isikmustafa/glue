@@ -11,12 +11,12 @@ namespace glue
 		{
 			struct Dielectric
 			{
-				float operator()(float no_over_ni, float costheta);
+				float operator()(float nt_over_ni, float costheta);
 			};
 
 			struct Conductor
 			{
-				glm::vec3 operator()(const glm::vec3& no_over_ni, const glm::vec3& ko_over_ki, float costheta);
+				glm::vec3 operator()(const glm::vec3& nt_over_ni, const glm::vec3& kt_over_ki, float costheta);
 			};
 		}
 	}

@@ -30,9 +30,9 @@ namespace glue
 		{
 			LightSample light_sample;
 
-			light_sample.wo_world = m_position - intersection.plane.point;
-			light_sample.distance = glm::length(light_sample.wo_world);
-			light_sample.wo_world /= light_sample.distance;
+			light_sample.wi_world = m_position - intersection.plane.point;
+			light_sample.distance = glm::length(light_sample.wi_world);
+			light_sample.wi_world /= light_sample.distance;
 			light_sample.le = m_intensity / (light_sample.distance * light_sample.distance);
 			light_sample.pdf_w = 1.0f;
 
@@ -44,12 +44,12 @@ namespace glue
 			return light::LightSample();
 		}
 
-		glm::vec3 Pointlight::getLe(const glm::vec3& wo_world, const glm::vec3& light_plane_normal, float distance) const
+		glm::vec3 Pointlight::getLe(const glm::vec3& wi_world, const glm::vec3& light_plane_normal, float distance) const
 		{
 			return m_intensity / (distance * distance);
 		}
 
-		float Pointlight::getPdf(const glm::vec3& wo_world, const glm::vec3& light_plane_normal, float distance) const
+		float Pointlight::getPdf(const glm::vec3& wi_world, const glm::vec3& light_plane_normal, float distance) const
 		{
 			return 1.0f;
 		}

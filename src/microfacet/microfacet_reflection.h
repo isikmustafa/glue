@@ -11,10 +11,10 @@ namespace glue
 		public:
 			explicit MicrofacetReflection(float roughness);
 
-			std::pair<glm::vec3, glm::vec3> sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, float no_over_ni) const;
-			std::pair<glm::vec3, glm::vec3> sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, const glm::vec3& no_over_ni, const glm::vec3& ko_over_ki) const;
-			glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, float no_over_ni) const;
-			glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const glm::vec3& no_over_ni, const glm::vec3& ko_over_ki) const;
+			std::pair<glm::vec3, glm::vec3> sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler, float nt_over_ni) const;
+			std::pair<glm::vec3, glm::vec3> sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler, const glm::vec3& nt_over_ni, const glm::vec3& kt_over_ki) const;
+			glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, float nt_over_ni) const;
+			glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const glm::vec3& nt_over_ni, const glm::vec3& kt_over_ki) const;
 			float getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent) const;
 
 		private:

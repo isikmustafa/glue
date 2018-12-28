@@ -1,5 +1,6 @@
 #include "dielectric.h"
 #include "../xml/node.h"
+#include "../microfacet/microfacet_reflection.h"
 
 namespace glue
 {
@@ -26,22 +27,84 @@ namespace glue
 			, m_roughness(xml.roughness->create())
 		{}
 
-		std::pair<glm::vec3, glm::vec3> Dielectric::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
+        std::pair<int, float> Dielectric::chooseBsdf(const glm::vec3& wo_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
 		{
-			microfacet::MicrofacetScattering<microfacet::GGXDistribution> microfacet(m_roughness->fetch(intersection).r);
-			return microfacet.sampleWo(wi_tangent, sampler, core::math::cosTheta(wi_tangent) > 0.0f ? m_ior_n : 1.0f / m_ior_n);
+            return sampler.sample() < 0.5f ? std::make_pair(0, 0.5f) : std::make_pair(1, 0.5f);
+		}
+
+		std::pair<glm::vec3, glm::vec3> Dielectric::sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
+		{
+			auto no_over_ni = core::math::cosTheta(wo_tangent) > 0.0f ? 1.0f / m_ior_n : m_ior_n;
+
+			std::pair<glm::vec3, glm::vec3> wi_f;
+			switch (intersection.bsdf_choice)
+			{
+				case 0:
+				{
+					microfacet::MicrofacetReflection<microfacet::GGXDistribution> microfacet(m_roughness->fetch(intersection).r);
+					wi_f = microfacet.sampleWi(wo_tangent, sampler, 1.0f / no_over_ni);
+				}
+				break;
+
+				case 1:
+				{
+					microfacet::MicrofacetRefraction<microfacet::GGXDistribution> microfacet(m_roughness->fetch(intersection).r);
+					wi_f = microfacet.sampleWi(wo_tangent, sampler, no_over_ni);
+				}
+				break;
+			}
+
+			return wi_f;
 		}
 
 		glm::vec3 Dielectric::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
 		{
-			microfacet::MicrofacetScattering<microfacet::GGXDistribution> microfacet(m_roughness->fetch(intersection).r);
-			return microfacet.getBsdf(wi_tangent, wo_tangent, core::math::cosTheta(wi_tangent) > 0.0f ? m_ior_n : 1.0f / m_ior_n);
+			auto no_over_ni = core::math::cosTheta(wo_tangent) > 0.0f ? 1.0f / m_ior_n : m_ior_n;
+
+			glm::vec3 bsdf;
+			switch (intersection.bsdf_choice)
+			{
+				case 0:
+				{
+					microfacet::MicrofacetReflection<microfacet::GGXDistribution> microfacet(m_roughness->fetch(intersection).r);
+					bsdf = microfacet.getBsdf(wi_tangent, wo_tangent, 1.0f / no_over_ni);
+				}
+				break;
+
+				case 1:
+				{
+					microfacet::MicrofacetRefraction<microfacet::GGXDistribution> microfacet(m_roughness->fetch(intersection).r);
+					bsdf = microfacet.getBsdf(wi_tangent, wo_tangent, no_over_ni);
+				}
+				break;
+			}
+
+			return bsdf;
 		}
 
 		float Dielectric::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
 		{
-			microfacet::MicrofacetScattering<microfacet::GGXDistribution> microfacet(m_roughness->fetch(intersection).r);
-			return microfacet.getPdf(wi_tangent, wo_tangent, core::math::cosTheta(wi_tangent) > 0.0f ? m_ior_n : 1.0f / m_ior_n);
+			auto no_over_ni = core::math::cosTheta(wo_tangent) > 0.0f ? 1.0f / m_ior_n : m_ior_n;
+
+			float pdf;
+			switch (intersection.bsdf_choice)
+			{
+				case 0:
+				{
+					microfacet::MicrofacetReflection<microfacet::GGXDistribution> microfacet(m_roughness->fetch(intersection).r);
+					pdf = microfacet.getPdf(wi_tangent, wo_tangent);
+				}
+				break;
+
+				case 1:
+				{
+					microfacet::MicrofacetRefraction<microfacet::GGXDistribution> microfacet(m_roughness->fetch(intersection).r);
+					pdf = microfacet.getPdf(wi_tangent, wo_tangent, no_over_ni);
+				}
+				break;
+			}
+
+			return pdf;
 		}
 
 		bool Dielectric::hasDeltaDistribution(const geometry::Intersection& intersection) const

@@ -27,9 +27,9 @@ namespace glue
 			return glm::abs(d(wh_tangent) * core::math::cosTheta(wh_tangent));
 		}
 
-		glm::vec3 BeckmannDistribution::sampleWhHd14(const glm::vec3& wi_tangent, core::UniformSampler& sampler) const
+		glm::vec3 BeckmannDistribution::sampleWhHd14(const glm::vec3& wv_tangent, core::UniformSampler& sampler) const
 		{
-			auto wi = core::math::cosTheta(wi_tangent) < 0.0f ? -wi_tangent : wi_tangent;
+			auto wi = core::math::cosTheta(wv_tangent) < 0.0f ? -wv_tangent : wv_tangent;
 
 			//1-Stretch
 			auto stretched_wi = glm::normalize(glm::vec3(m_ab * wi.x, m_ab * wi.y, wi.z));
@@ -116,9 +116,9 @@ namespace glue
 			return glm::normalize(glm::vec3(-slope, 1.0f));
 		}
 
-		float BeckmannDistribution::pdfHd14(const glm::vec3& wi_tangent, const glm::vec3& wh_tangent) const
+		float BeckmannDistribution::pdfHd14(const glm::vec3& wv_tangent, const glm::vec3& wh_tangent) const
 		{
-			return glm::abs(g1(wi_tangent, wh_tangent) * glm::dot(wi_tangent, wh_tangent) * d(wh_tangent) / core::math::cosTheta(wi_tangent));
+			return glm::abs(g1(wv_tangent, wh_tangent) * glm::dot(wv_tangent, wh_tangent) * d(wh_tangent) / core::math::cosTheta(wv_tangent));
 		}
 
 		float BeckmannDistribution::d(const glm::vec3& wh_tangent) const

@@ -14,72 +14,72 @@ namespace glue
 		{}
 
 		template<typename MicrofacetDistribution, bool tSampleVisibleNormals>
-		std::pair<glm::vec3, glm::vec3> MicrofacetReflection<MicrofacetDistribution, tSampleVisibleNormals>::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler,
-			float no_over_ni) const
+		std::pair<glm::vec3, glm::vec3> MicrofacetReflection<MicrofacetDistribution, tSampleVisibleNormals>::sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler,
+				float nt_over_ni) const
 		{
 			glm::vec3 wh;
 			if constexpr (tSampleVisibleNormals)
 			{
-				wh = m_microfacet.sampleWhHd14(wi_tangent, sampler);
+				wh = m_microfacet.sampleWhHd14(wo_tangent, sampler);
 			}
 			else
 			{
 				wh = m_microfacet.sampleWhWmlt07(sampler);
 			}
-			auto wi_wh = glm::dot(wi_tangent, wh);
+			auto wo_wh = glm::dot(wo_tangent, wh);
 
-			auto wo_tangent = glm::reflect(-wi_tangent, wh);
+			auto wi_tangent = glm::reflect(-wo_tangent, wh);
 			float f;
-			auto fresnel = fresnel::Dielectric()(no_over_ni, glm::abs(wi_wh));
+			auto fresnel = fresnel::Dielectric()(nt_over_ni, glm::abs(wo_wh));
 			if constexpr (tSampleVisibleNormals)
 			{
-				f = fresnel * m_microfacet.g1(wo_tangent, wh);
+				f = fresnel * m_microfacet.g1(wi_tangent, wh);
 			}
 			else
 			{
 				auto fg = fresnel * m_microfacet.g1(wi_tangent, wh) * m_microfacet.g1(wo_tangent, wh);
-				f = fg * glm::abs(wi_wh / (core::math::cosTheta(wi_tangent) * core::math::cosTheta(wh)));
+				f = fg * glm::abs(wo_wh / (core::math::cosTheta(wo_tangent) * core::math::cosTheta(wh)));
 			}
 
-			return std::make_pair(wo_tangent, glm::vec3(f));
+			return std::make_pair(wi_tangent, glm::vec3(f));
 		}
 
 		template<typename MicrofacetDistribution, bool tSampleVisibleNormals>
-		std::pair<glm::vec3, glm::vec3> MicrofacetReflection<MicrofacetDistribution, tSampleVisibleNormals>::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler,
-			const glm::vec3& no_over_ni, const glm::vec3& ko_over_ki) const
+		std::pair<glm::vec3, glm::vec3> MicrofacetReflection<MicrofacetDistribution, tSampleVisibleNormals>::sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler,
+			const glm::vec3& nt_over_ni, const glm::vec3& kt_over_ki) const
 		{
 			glm::vec3 wh;
 			if constexpr (tSampleVisibleNormals)
 			{
-				wh = m_microfacet.sampleWhHd14(wi_tangent, sampler);
+				wh = m_microfacet.sampleWhHd14(wo_tangent, sampler);
 			}
 			else
 			{
 				wh = m_microfacet.sampleWhWmlt07(sampler);
 			}
-			auto wi_wh = glm::dot(wi_tangent, wh);
+			auto wo_wh = glm::dot(wo_tangent, wh);
 
-			auto wo_tangent = glm::reflect(-wi_tangent, wh);
+			auto wi_tangent = glm::reflect(-wo_tangent, wh);
 			glm::vec3 f;
-			auto fresnel = fresnel::Conductor()(no_over_ni, ko_over_ki, glm::abs(wi_wh));
+			auto fresnel = fresnel::Conductor()(nt_over_ni, kt_over_ki, glm::abs(wo_wh));
 			if constexpr (tSampleVisibleNormals)
 			{
-				f = fresnel * m_microfacet.g1(wo_tangent, wh);
+				f = fresnel * m_microfacet.g1(wi_tangent, wh);
 			}
 			else
 			{
 				auto fg = fresnel * m_microfacet.g1(wi_tangent, wh) * m_microfacet.g1(wo_tangent, wh);
-				f = fg * glm::abs(wi_wh / (core::math::cosTheta(wi_tangent) * core::math::cosTheta(wh)));
+				f = fg * glm::abs(wo_wh / (core::math::cosTheta(wo_tangent) * core::math::cosTheta(wh)));
 			}
 
-			return std::make_pair(wo_tangent, f);
+			return std::make_pair(wi_tangent, f);
 		}
 
 		template<typename MicrofacetDistribution, bool tSampleVisibleNormals>
-		glm::vec3 MicrofacetReflection<MicrofacetDistribution, tSampleVisibleNormals>::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, float no_over_ni) const
+		glm::vec3 MicrofacetReflection<MicrofacetDistribution, tSampleVisibleNormals>::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, float nt_over_ni) const
 		{
 			auto wh = glm::normalize(wi_tangent + wo_tangent);
-			auto fresnel = fresnel::Dielectric()(no_over_ni, glm::abs(glm::dot(wi_tangent, wh)));
+			auto fresnel = fresnel::Dielectric()(nt_over_ni, glm::abs(glm::dot(wi_tangent, wh)));
 			auto dg = m_microfacet.d(wh) * m_microfacet.g1(wi_tangent, wh) * m_microfacet.g1(wo_tangent, wh);
 
 			auto brdf = fresnel * dg / glm::abs(4.0f * core::math::cosTheta(wi_tangent) * core::math::cosTheta(wo_tangent));
@@ -89,10 +89,10 @@ namespace glue
 
 		template<typename MicrofacetDistribution, bool tSampleVisibleNormals>
 		glm::vec3 MicrofacetReflection<MicrofacetDistribution, tSampleVisibleNormals>::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent,
-			const glm::vec3& no_over_ni, const glm::vec3& ko_over_ki) const
+			const glm::vec3& nt_over_ni, const glm::vec3& kt_over_ki) const
 		{
 			auto wh = glm::normalize(wi_tangent + wo_tangent);
-			auto fresnel = fresnel::Conductor()(no_over_ni, ko_over_ki, glm::abs(glm::dot(wi_tangent, wh)));
+			auto fresnel = fresnel::Conductor()(nt_over_ni, kt_over_ki, glm::abs(glm::dot(wi_tangent, wh)));
 			auto dg = m_microfacet.d(wh) * m_microfacet.g1(wi_tangent, wh) * m_microfacet.g1(wo_tangent, wh);
 
 			auto brdf = fresnel * dg / glm::abs(4.0f * core::math::cosTheta(wi_tangent) * core::math::cosTheta(wo_tangent));
@@ -106,7 +106,7 @@ namespace glue
 			auto wh = glm::normalize(wi_tangent + wo_tangent);
 			if constexpr (tSampleVisibleNormals)
 			{
-				return glm::abs(m_microfacet.pdfHd14(wi_tangent, wh) / (4.0f * glm::dot(wo_tangent, wh)));
+				return glm::abs(m_microfacet.pdfHd14(wo_tangent, wh) / (4.0f * glm::dot(wo_tangent, wh)));
 			}
 			else
 			{

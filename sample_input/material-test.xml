@@ -5,7 +5,7 @@
 		<Filter type="Gaussian">
 			<Sigma>0.5</Sigma>
 		</Filter>
-		<SampleCount>4</SampleCount>
+		<SampleCount>2048</SampleCount>
 		<RRThreshold>0.01</RRThreshold>
     </Integrator>
 	
@@ -17,7 +17,7 @@
 			<Max>1.0</Max>
 		</Tonemapper>
 	</Output>
-	
+
 	<Output type="Ldr">
 		<Path>../sample_output/material-lucy-0.18-1.0</Path>
 		<Format>png</Format>
@@ -26,7 +26,7 @@
 			<MaxLuminance>1.0</MaxLuminance>
 		</Tonemapper>
 	</Output>
-	
+
 	<!--<Output type="Ldr">
 		<Path>../sample_output/material-lucy-0.18-0.9</Path>
 		<Format>png</Format>
@@ -124,14 +124,14 @@
 			<Rotation>0 60 0</Rotation>
 			<Translation>0 -0.03 -1.1</Translation>
 		</Transformation>
-		
+
 		<BsdfMaterial type="SmoothLayered">
 			<Kd textureType="Constant">
 				<Value>0.73 0.48 0.34</Value>
 			</Kd>
-			<IorN>1.33</IorN>
+			<IorN>1.5</IorN>
 		</BsdfMaterial>
-		
+
 		<BsdfMaterial type="Lambertian">
 			<Kd textureType="Constant">
 				<Value>0.73 0.48 0.34</Value>
@@ -145,12 +145,6 @@
 				<Frequency>25</Frequency>
 			</Kd>
 			<Roughness>0.2</Roughness>
-		</BsdfMaterial>
-		
-		<BsdfMaterial type="Metal">
-			<IorN>0.13046 0.48358 1.5599</IorN>
-			<IorK>3.7391 2.2124 1.9255</IorK>
-			<Roughness>0.06</Roughness>
 		</BsdfMaterial>
 	</Object>
 	

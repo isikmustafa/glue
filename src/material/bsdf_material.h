@@ -29,8 +29,15 @@ namespace glue
 			//wi, wo should be in tangent space for sampleWo, getBsdf and getPdf.
 			//This makes it easier and efficient to calculate some computations.
 			//sampleWo returns <wo, f> pair where f = bsdf * cos / pdf
-			virtual int chooseBsdf(const glm::vec3& wi_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const { return 0; }
-			virtual std::pair<glm::vec3, glm::vec3> sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const = 0;
+
+			//wi_tangent indicates the incoming direction of the light&importance transport equation integrand.
+			//So, if you are path tracing (radiance transport), wi_tangent is the incoming light direction.
+			//If you are light tracing (importance transport), wi_tangent is the incoming importance direction.
+			//This also means that wo_tangent is the known direction and wi_tangent is the direction to be sampled.
+
+			virtual std::pair<int, float> chooseBsdf(const glm::vec3& wo_tangent, core::UniformSampler& sampler,
+					const geometry::Intersection& intersection) const { return std::make_pair(0, 1.0f); }
+			virtual std::pair<glm::vec3, glm::vec3> sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const = 0;
 			virtual glm::vec3 getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const = 0;
 			virtual float getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const = 0;
 			virtual bool hasDeltaDistribution(const geometry::Intersection& intersection) const = 0;

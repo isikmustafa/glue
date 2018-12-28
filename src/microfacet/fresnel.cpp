@@ -11,9 +11,9 @@ namespace glue
 		namespace fresnel
 		{
 			//This fresnel implementation for dielectric does not consider wavelength varying index of refractions.
-			float Dielectric::operator()(float no_over_ni, float costheta)
+			float Dielectric::operator()(float nt_over_ni, float costheta)
 			{
-				auto g = no_over_ni * no_over_ni - 1.0f + costheta * costheta;
+				auto g = nt_over_ni * nt_over_ni - 1.0f + costheta * costheta;
 
 				//In the case of total internal reflection, return 1.
 				if (g < 0.0f)
@@ -29,13 +29,13 @@ namespace glue
 				return 0.5f * (g_minus_c * g_minus_c) * (1.0f + temp_div * temp_div) / (g_plus_c * g_plus_c);
 			}
 
-			glm::vec3 Conductor::operator()(const glm::vec3& no_over_ni, const glm::vec3& ko_over_ki, float costheta)
+			glm::vec3 Conductor::operator()(const glm::vec3& nt_over_ni, const glm::vec3& kt_over_ki, float costheta)
 			{
 				/*From https://seblagarde.wordpress.com/2013/04/29/memo-on-fresnel-equations*/
 				auto cos2theta = costheta * costheta;
 				auto sin2theta = 1.0f - cos2theta;
-				auto n2 = no_over_ni * no_over_ni;
-				auto k2 = ko_over_ki * ko_over_ki;
+				auto n2 = nt_over_ni * nt_over_ni;
+				auto k2 = kt_over_ki * kt_over_ki;
 
 				auto t0 = n2 - k2 - sin2theta;
 				auto a2_plus_b2 = glm::sqrt(t0 * t0 + 4.0f * n2 * k2);

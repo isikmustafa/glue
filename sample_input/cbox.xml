@@ -1,0 +1,129 @@
+<Scene>
+	<SecondaryRayEpsilon>0.01</SecondaryRayEpsilon>
+    <Integrator type="Pathtracer">
+		<Filter type="Gaussian">
+			<Sigma>0.5</Sigma>
+		</Filter>
+		<SampleCount>256</SampleCount>
+		<RRThreshold>0.2</RRThreshold>
+    </Integrator>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cbox-clamp</Path>
+		<Format>png</Format>
+		<Tonemapper type="Clamp">
+			<Min>0.0</Min>
+			<Max>1.0</Max>
+		</Tonemapper>
+	</Output>
+	
+	<Output type="Ldr">
+		<Path>../sample_output/cbox-1.0</Path>
+		<Format>png</Format>
+		<Tonemapper type="GlobalReinhard">
+			<Key>0.18</Key>
+			<MaxLuminance>1.0</MaxLuminance>
+		</Tonemapper>
+	</Output>
+	
+    <Camera>
+        <Position>278 273 -800</Position>
+        <Direction>0 0 1</Direction>
+        <Up>0 1 0</Up>
+        <FovXY>39.3077 39.3077</FovXY>
+		<Resolution>600 600</Resolution>
+        <NearDistance>0.01</NearDistance>
+    </Camera>
+	
+	<Object type="Mesh">
+		<Datapath>../sample_input/cbox/cbox_floor.obj</Datapath>
+		<BsdfMaterial type="Lambertian">
+			<Kd textureType="Constant">
+				<Value>0.708 0.721 0.758</Value>
+			</Kd>
+		</BsdfMaterial>
+	</Object>
+	
+	<Object type="Mesh">
+		<Datapath>../sample_input/cbox/cbox_ceiling.obj</Datapath>
+		<BsdfMaterial type="Lambertian">
+			<Kd textureType="Constant">
+				<Value>0.708 0.721 0.758</Value>
+			</Kd>
+		</BsdfMaterial>
+	</Object>
+	
+	<Object type="Mesh">
+		<Datapath>../sample_input/cbox/cbox_back.obj</Datapath>
+		<BsdfMaterial type="Lambertian">
+			<Kd textureType="Constant">
+				<Value>0.708 0.721 0.758</Value>
+			</Kd>
+		</BsdfMaterial>
+	</Object>
+	
+	<Object type="Mesh">
+		<Datapath>../sample_input/cbox/cbox_greenwall.obj</Datapath>
+		<BsdfMaterial type="Lambertian">
+			<Kd textureType="Constant">
+				<Value>0.115 0.476 0.098</Value>
+			</Kd>
+		</BsdfMaterial>
+	</Object>
+	
+	<Object type="Mesh">
+		<Datapath>../sample_input/cbox/cbox_redwall.obj</Datapath>
+		<BsdfMaterial type="Lambertian">
+			<Kd textureType="Constant">
+				<Value>0.651 0.055 0.057</Value>
+			</Kd>
+		</BsdfMaterial>
+	</Object>
+
+	<!--
+	<Object type="Mesh">
+		<Datapath>../sample_input/cbox/cbox_smallbox.obj</Datapath>
+		<BsdfMaterial type="Lambertian">
+			<Kd textureType="Constant">
+				<Value>0.708 0.721 0.745</Value>
+			</Kd>
+		</BsdfMaterial>
+	</Object>
+	-->
+
+	<Object type="Sphere">
+		<Radius>100</Radius>
+		<Center>101 101 150</Center>
+		<BsdfMaterial type="Dielectric">
+			<IorN>1.5</IorN>
+			<Roughness textureType="Constant">
+				<Value>0.0001 0 0</Value>
+			</Roughness>
+		</BsdfMaterial>
+		<BsdfMaterial type="Lambertian">
+			<Kd textureType="Constant">
+				<Value>0.708 0.721 0.745</Value>
+			</Kd>
+		</BsdfMaterial>
+	</Object>
+	
+	<Object type="Mesh">
+		<Datapath>../sample_input/cbox/cbox_largebox.obj</Datapath>
+		<BsdfMaterial type="Lambertian">
+			<Kd textureType="Constant">
+				<Value>0.708 0.721 0.745</Value>
+			</Kd>
+		</BsdfMaterial>
+	</Object>
+	
+	<Light type="DiffuseArealight">
+		<Flux>500000 500000 500000</Flux>
+		<Object type="Mesh">
+		<Datapath>../sample_input/cbox/cbox_luminaire.obj</Datapath>
+			<Transformation>
+				<Translation>0.0 -0.5 0.0</Translation>
+			</Transformation>
+		</Object>
+	</Light>
+	
+</Scene>

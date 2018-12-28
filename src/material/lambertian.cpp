@@ -29,29 +29,38 @@ namespace glue
 			: m_kd(xml.kd->create())
 		{}
 
-		std::pair<glm::vec3, glm::vec3> Lambertian::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
+		std::pair<glm::vec3, glm::vec3> Lambertian::sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
 		{
-			//Sample from cosine-weighted distribution.
-			auto wo = geometry::SphericalCoordinate(1.0f, glm::acos(glm::sqrt(sampler.sample())), glm::two_pi<float>() * sampler.sample()).toCartesianCoordinate();
-			auto f = m_kd->fetch(intersection);
+			glm::vec3 wi(0.0f);
+			glm::vec3 f(0.0f);
 
-			return std::make_pair(wo, f);
+			if (core::math::cosTheta(wo_tangent) > 0.0f)
+			{
+				wi = geometry::SphericalCoordinate(1.0f, glm::acos(glm::sqrt(sampler.sample())), glm::two_pi<float>() * sampler.sample()).toCartesianCoordinate();
+				f = m_kd->fetch(intersection);
+			}
+
+			return std::make_pair(wi, f);
 		}
 
 		glm::vec3 Lambertian::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
 		{
-			if (core::math::cosTheta(wi_tangent) < 0.0f || core::math::cosTheta(wo_tangent) < 0.0f)
+			if (core::math::cosTheta(wi_tangent) > 0.0f && core::math::cosTheta(wo_tangent) > 0.0f)
 			{
-				return glm::vec3(0.0f);
+				return m_kd->fetch(intersection) * glm::one_over_pi<float>();
 			}
 
-			return m_kd->fetch(intersection) * glm::one_over_pi<float>();
+			return glm::vec3(0.0f);
 		}
 
 		float Lambertian::getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
 		{
-			//Cosine-weighted pdf.
-			return glm::max(core::math::cosTheta(wo_tangent), 0.0f) * glm::one_over_pi<float>();
+			if (core::math::cosTheta(wi_tangent) > 0.0f && core::math::cosTheta(wo_tangent) > 0.0f)
+			{
+				return core::math::cosTheta(wi_tangent) * glm::one_over_pi<float>();
+			}
+
+			return 0.0f;
 		}
 
 		bool Lambertian::hasDeltaDistribution(const geometry::Intersection& intersection) const

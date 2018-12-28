@@ -30,10 +30,10 @@ namespace glue
 			, m_roughness(xml.roughness->create())
 		{}
 
-		std::pair<glm::vec3, glm::vec3> Metal::sampleWo(const glm::vec3& wi_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
+		std::pair<glm::vec3, glm::vec3> Metal::sampleWi(const glm::vec3& wo_tangent, core::UniformSampler& sampler, const geometry::Intersection& intersection) const
 		{
 			microfacet::MicrofacetReflection<microfacet::GGXDistribution> microfacet(m_roughness->fetch(intersection).r);
-			return microfacet.sampleWo(wi_tangent, sampler, m_ior_n, m_ior_k);
+			return microfacet.sampleWi(wo_tangent, sampler, m_ior_n, m_ior_k);
 		}
 
 		glm::vec3 Metal::getBsdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const
