@@ -74,7 +74,7 @@ namespace glue
 				{
 					for (int j = 0; j < bound_y; ++j)
 					{
-						ray_pool[i][j] = scene.camera->castPrimayRay(x + i, y + j, m_offset_samplers[id]->sample(), m_offset_samplers[id]->sample());
+						ray_pool[i][j] = scene.camera->castRay(x + i, y + j, m_offset_samplers[id]->sample(), m_offset_samplers[id]->sample());
 					}
 				}
 

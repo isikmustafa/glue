@@ -29,7 +29,7 @@ namespace glue
 			m_pixel_length = glm::vec2((m_screen_coordinates.y - m_screen_coordinates.x) / m_resolution.x, (m_screen_coordinates.w - m_screen_coordinates.z) / m_resolution.y);
 		}
 
-		geometry::Ray PinholeCamera::castPrimayRay(int x, int y, float offset_x, float offset_y) const
+		geometry::Ray PinholeCamera::castRay(int x, int y, float offset_x, float offset_y) const
 		{
 			glm::vec3 pixel_coordinate(m_screen_coordinates.x + m_pixel_length.x * (static_cast<float>(x) + offset_x),
 				m_screen_coordinates.w - m_pixel_length.y * (static_cast<float>(y) + offset_y), -m_near_distance);

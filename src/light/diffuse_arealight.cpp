@@ -2,6 +2,7 @@
 #include "../core/real_sampler.h"
 #include "../core/scene.h"
 #include "../xml/node.h"
+#include "../core/math.h"
 
 #include <glm/gtc/constants.hpp>
 
@@ -22,10 +23,23 @@ namespace glue
 		}
 
 		DiffuseArealight::DiffuseArealight(const DiffuseArealight::Xml& xml)
-			: m_object(xml.object->create())
+			: m_flux(xml.flux)
+			, m_le(xml.flux * glm::one_over_pi<float>() / m_object->getSurfaceArea())
+			, m_object(xml.object->create())
 			, m_pdf(1.0f / m_object->getSurfaceArea())
-			, m_le(xml.flux * glm::one_over_pi<float>() * m_pdf)
 		{}
+
+		Photon DiffuseArealight::castPhoton(core::UniformSampler& sampler) const
+		{
+			//We sample hemisphere with cosine-weighted sampling.
+			//Initial throughput is glm::dot(ray.dir, plane.normal) * Le / (glm::dot(ray.dir, plane.normal) * one_over_pi * m_pdf)
+			//After cancellations, it is (Le * pi / m_pdf) which equals to total flux as we want.
+			auto plane = m_object->samplePlane(sampler);
+			core::CoordinateSpace tangent_space(plane.point, plane.normal);
+
+			auto dir = core::math::sampleHemisphereCosine(sampler.sample(), sampler.sample()).toCartesianCoordinate();
+			return Photon(geometry::Ray(plane.point, tangent_space.vectorToWorldSpace(dir)), m_flux);
+		}
 
 		LightSample DiffuseArealight::sample(core::UniformSampler& sampler, const geometry::Intersection& intersection) const
 		{

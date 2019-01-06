@@ -26,6 +26,7 @@ namespace glue
 		public:
 			explicit DiffuseArealight(const DiffuseArealight::Xml& xml);
 
+			Photon castPhoton(core::UniformSampler& sampler) const override;
 			LightSample sample(core::UniformSampler& sampler, const geometry::Intersection& intersection) const override;
 			LightSample getVisibleSample(const core::Scene& scene, const geometry::Ray& ray) const override;
 			glm::vec3 getLe(const glm::vec3& wi_world, const glm::vec3& light_plane_normal, float distance) const override;
@@ -34,9 +35,10 @@ namespace glue
 			std::shared_ptr<geometry::Object> getObject() const override;
 
 		private:
+			glm::vec3 m_flux;
+			glm::vec3 m_le;
 			std::shared_ptr<geometry::Object> m_object;
 			float m_pdf;
-			glm::vec3 m_le;
 		};
 	}
 }
