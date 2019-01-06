@@ -38,7 +38,7 @@ namespace glue
 			auto one_over_ior = 1.0f / m_ior_n;
 			for (int i = 0; i < n; ++i)
 			{
-				auto dir = geometry::SphericalCoordinate(1.0f, glm::acos(glm::sqrt(sampler.sample())), glm::two_pi<float>() * sampler.sample()).toCartesianCoordinate();
+				auto dir = core::math::sampleHemisphereCosine(sampler.sample(), sampler.sample()).toCartesianCoordinate();
 
 				m_fsum += microfacet::fresnel::Dielectric()(one_over_ior, core::math::cosTheta(dir));
 			}
@@ -70,7 +70,7 @@ namespace glue
 					break;
 
 				case 1:
-					wi = geometry::SphericalCoordinate(1.0f, glm::acos(glm::sqrt(sampler.sample())), glm::two_pi<float>() * sampler.sample()).toCartesianCoordinate();
+                    wi = core::math::sampleHemisphereCosine(sampler.sample(), sampler.sample()).toCartesianCoordinate();
 					auto f_in = microfacet::fresnel::Dielectric()(m_ior_n, core::math::cosTheta(wi));
 					auto kd = m_kd->fetch(intersection);
 					f = 1.0f / (m_ior_n * m_ior_n) * (1.0f - f_in) * (1.0f - f_out) * kd / (1.0f - m_fsum * kd);

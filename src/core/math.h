@@ -1,8 +1,12 @@
 #ifndef __GLUE__CORE__MATH__
 #define __GLUE__CORE__MATH__
 
+#include "../geometry/spherical_coordinate.h"
+
 #include <glm/vec3.hpp>
 #include <glm/geometric.hpp>
+#include <glm/gtc/constants.hpp>
+#include <glm/trigonometric.hpp>
 
 namespace glue
 {
@@ -99,6 +103,21 @@ namespace glue
 			inline float tan2Theta(const glm::vec3& w_tangent)
 			{
 				return (1.0f - w_tangent.z * w_tangent.z) / (w_tangent.z * w_tangent.z);
+			}
+
+			inline geometry::SphericalCoordinate sampleHemisphereCosine(float u1, float u2)
+			{
+				return geometry::SphericalCoordinate(1.0f, glm::acos(glm::sqrt(u1)), glm::two_pi<float>() * u2);
+			}
+
+			inline geometry::SphericalCoordinate sampleHemisphereUniform(float u1, float u2)
+			{
+				return geometry::SphericalCoordinate(1.0f, glm::acos(u1), glm::two_pi<float>() * u2);
+			}
+
+			inline geometry::SphericalCoordinate sampleSphereUniform(float u1, float u2)
+			{
+				return geometry::SphericalCoordinate(1.0f, glm::acos(1.0f - 2.0f * u1), glm::two_pi<float>() * u2);
 			}
 		}
 	}

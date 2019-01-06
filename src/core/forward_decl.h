@@ -61,6 +61,7 @@ namespace glue
 		class Lambertian;
 		class Metal;
 		class OrenNayar;
+        class SmoothLayered;
 	}
 
 	namespace microfacet

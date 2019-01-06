@@ -42,7 +42,7 @@ namespace glue
 
 			if (core::math::cosTheta(wo_tangent) > 0.0f)
 			{
-				wi = geometry::SphericalCoordinate(1.0f, glm::acos(glm::sqrt(sampler.sample())), glm::two_pi<float>() * sampler.sample()).toCartesianCoordinate();
+				wi = core::math::sampleHemisphereCosine(sampler.sample(), sampler.sample()).toCartesianCoordinate();
 				f = getBsdf(wi, wo_tangent, intersection) * glm::pi<float>();
 			}
 

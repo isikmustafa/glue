@@ -4,6 +4,7 @@
 #include "../core/real_sampler.h"
 #include "../geometry/spherical_coordinate.h"
 #include "../xml/node.h"
+#include "../core/math.h"
 
 #include <glm/trigonometric.hpp>
 #include <glm/gtc/constants.hpp>
@@ -51,7 +52,7 @@ namespace glue
 
 		geometry::Plane Sphere::samplePlane(core::UniformSampler& sampler) const
 		{
-			auto point = SphericalCoordinate(1.0f, glm::acos(1.0f - 2.0f * sampler.sample()), glm::two_pi<float>() * sampler.sample()).toCartesianCoordinate();
+			auto point = core::math::sampleSphereUniform(sampler.sample(), sampler.sample()).toCartesianCoordinate();
 
 			return m_transformation.planeToWorldSpace(Plane(point, point));
 		}
