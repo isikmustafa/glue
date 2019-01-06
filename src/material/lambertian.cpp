@@ -72,5 +72,10 @@ namespace glue
 		{
 			return false;
 		}
+
+		bool Lambertian::isSpecular(const geometry::Intersection& intersection) const
+		{
+			return false;
+		}
 	}
 }

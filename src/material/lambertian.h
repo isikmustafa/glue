@@ -29,6 +29,7 @@ namespace glue
 			float getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const override;
 			bool hasDeltaDistribution(const geometry::Intersection& intersection) const override;
 			bool useMultipleImportanceSampling(const geometry::Intersection& intersection) const override;
+			bool isSpecular(const geometry::Intersection& intersection) const override;
 
 		private:
 			std::unique_ptr<texture::Texture> m_kd;

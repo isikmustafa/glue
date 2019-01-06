@@ -129,5 +129,10 @@ namespace glue
 		{
 			return intersection.bsdf_choice == 1;
 		}
+
+		bool SmoothLayered::isSpecular(const geometry::Intersection& intersection) const
+		{
+			return intersection.bsdf_choice == 0;
+		}
 	}
 }

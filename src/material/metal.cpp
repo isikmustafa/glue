@@ -57,5 +57,10 @@ namespace glue
 		{
 			return true;
 		}
+
+		bool Metal::isSpecular(const geometry::Intersection& intersection) const
+		{
+			return true;
+		}
 	}
 }

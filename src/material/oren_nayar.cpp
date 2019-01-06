@@ -83,5 +83,10 @@ namespace glue
 		{
 			return false;
 		}
+
+		bool OrenNayar::isSpecular(const geometry::Intersection& intersection) const
+		{
+			return false;
+		}
 	}
 }

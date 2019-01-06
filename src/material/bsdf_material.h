@@ -42,6 +42,7 @@ namespace glue
 			virtual float getPdf(const glm::vec3& wi_tangent, const glm::vec3& wo_tangent, const geometry::Intersection& intersection) const = 0;
 			virtual bool hasDeltaDistribution(const geometry::Intersection& intersection) const = 0;
 			virtual bool useMultipleImportanceSampling(const geometry::Intersection& intersection) const = 0;
+			virtual bool isSpecular(const geometry::Intersection& intersection) const = 0;
 		};
 	}
 }

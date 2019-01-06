@@ -116,5 +116,10 @@ namespace glue
 		{
 			return true;
 		}
+
+		bool Dielectric::isSpecular(const geometry::Intersection& intersection) const
+		{
+			return true;
+		}
 	}
 }
