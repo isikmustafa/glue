@@ -41,9 +41,9 @@ namespace glue
 		{
 			ctpl::thread_pool pool(std::thread::hardware_concurrency());
 			auto resolution = scene.camera->get_resolution();
-			auto y_increase = cPatchSize;
+			auto y_increase = cPTPatchSize;
 			int y = 0;
-			for (int x = 0; x < resolution.x; x += cPatchSize)
+			for (int x = 0; x < resolution.x; x += cPTPatchSize)
 			{
 				for (; y < resolution.y && y >= 0; y += y_increase)
 				{
@@ -61,12 +61,12 @@ namespace glue
 		void Pathtracer::integratePatch(const core::Scene& scene, core::Image& output, int x, int y, int id)
 		{
 			auto resolution = scene.camera->get_resolution();
-			auto bound_x = glm::min(cPatchSize, resolution.x - x);
-			auto bound_y = glm::min(cPatchSize, resolution.y - y);
+			auto bound_x = glm::min(cPTPatchSize, resolution.x - x);
+			auto bound_y = glm::min(cPTPatchSize, resolution.y - y);
 
-			std::array<std::array<glm::vec3, cPatchSize>, cPatchSize> final_values;
-			std::array<std::array<geometry::Ray, cPatchSize>, cPatchSize> ray_pool;
-			std::array<std::array<geometry::Intersection, cPatchSize>, cPatchSize> intersection_pool;
+			std::array<std::array<glm::vec3, cPTPatchSize>, cPTPatchSize> final_values;
+			std::array<std::array<geometry::Ray, cPTPatchSize>, cPTPatchSize> ray_pool;
+			std::array<std::array<geometry::Intersection, cPTPatchSize>, cPTPatchSize> intersection_pool;
 
 			for (int k = 0; k < m_sample_count; ++k)
 			{
@@ -83,7 +83,7 @@ namespace glue
 					for (int j = 0; j < bound_y; ++j)
 					{
 						intersection_pool[i][j] = geometry::Intersection();
-						scene.bvh.intersect(ray_pool[i][j], intersection_pool[i][j], std::numeric_limits<float>::max());
+						scene.intersect(ray_pool[i][j], intersection_pool[i][j], std::numeric_limits<float>::max());
 					}
 				}
 
@@ -119,8 +119,6 @@ namespace glue
 			{
 				return scene.getBackgroundRadiance(ray.get_direction(), light_explicitly_sampled);
 			}
-
-			intersection.object->fillIntersection(ray, intersection);
 
 			//Check if the ray hits a light source.
 			auto itr = scene.object_to_light.find(intersection.object);
@@ -166,7 +164,7 @@ namespace glue
 					if (f_sum > 0.0f && !std::isinf(f_sum))
 					{
 						geometry::Ray shadow_ray(intersection.plane.point + light_sample.wi_world * scene.secondary_ray_epsilon, light_sample.wi_world);
-						if (!scene.bvh.intersectShadowRay(shadow_ray, light_sample.distance - 1.1f * scene.secondary_ray_epsilon))
+						if (!scene.intersectShadowRay(shadow_ray, light_sample.distance - 1.1f * scene.secondary_ray_epsilon))
 						{
 							direct_lo_light = f;
 						}
@@ -241,7 +239,7 @@ namespace glue
 					ray = geometry::Ray(intersection.plane.point + wi_world * scene.secondary_ray_epsilon, wi_world);
 
 					intersection = geometry::Intersection();
-					scene.bvh.intersect(ray, intersection, std::numeric_limits<float>::max());
+					scene.intersect(ray, intersection, std::numeric_limits<float>::max());
 					indirect_lo = f * estimatePixel(scene, ray, intersection, uniform_sampler, importance, light_explicitly_sampled);
 				}
 			}

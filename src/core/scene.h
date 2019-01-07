@@ -37,7 +37,6 @@ namespace glue
 
 		public:
 			std::unique_ptr<PinholeCamera> camera;
-			geometry::BVH<std::shared_ptr<geometry::Object>> bvh;
 			std::vector<std::shared_ptr<light::Light>> lights;
 			std::shared_ptr<light::Light> environment_light;
 			std::unordered_map<const geometry::Object*, const light::Light*> object_to_light;
@@ -47,10 +46,13 @@ namespace glue
 		public:
 			explicit Scene(const Scene::Xml& xml);
 
+			bool intersect(const geometry::Ray& ray, geometry::Intersection& intersection, float max_distance) const;
+			bool intersectShadowRay(const geometry::Ray& ray, float max_distance) const;
 			void render();
 			glm::vec3 getBackgroundRadiance(const glm::vec3& direction, bool light_explicitly_sampled) const;
 
 		private:
+			geometry::BVH<std::shared_ptr<geometry::Object>> m_bvh;
 			std::unique_ptr<integrator::Integrator> m_integrator;
 			std::unique_ptr<Image> m_image;
 			std::vector<std::unique_ptr<Output>> m_outputs;

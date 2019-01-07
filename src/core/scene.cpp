@@ -61,11 +61,11 @@ namespace glue
 						auto bsdf_material = std::make_unique<material::Lambertian::Xml>(std::make_unique<texture::ConstantTexture::Xml>(glm::vec3(0.8f, 0.0f, 0.0f)));
 						geometry::Sphere::Xml debug_sphere_xml(radius, center, transformation, std::move(bsdf_material));
 
-						bvh.addObject(debug_sphere_xml.create());
+						m_bvh.addObject(debug_sphere_xml.create());
 					}
 				}
 
-				bvh.addObject(std::move(object));
+				m_bvh.addObject(std::move(object));
 			}
 			for (const auto& light_xml : xml.lights)
 			{
@@ -74,7 +74,7 @@ namespace glue
 				if (object)
 				{
 					object_to_light[object.get()] = light.get();
-					bvh.addObject(object);
+					m_bvh.addObject(object);
 				}
 				lights.push_back(std::move(light));
 
@@ -88,14 +88,31 @@ namespace glue
 				}
 			}
 
-			if (bvh.get_objects().size() < 1024)
+			if (m_bvh.get_objects().size() < 1024)
 			{
-				bvh.buildWithMedianSplit();
+				m_bvh.buildWithMedianSplit();
 			}
 			else
 			{
-				bvh.buildWithSAHSplit();
+				m_bvh.buildWithSAHSplit();
 			}
+		}
+
+		bool Scene::intersect(const geometry::Ray& ray, geometry::Intersection& intersection, float max_distance) const
+		{
+			auto result = m_bvh.intersect(ray, intersection, max_distance);
+
+			if (intersection.object)
+			{
+				intersection.object->fillIntersection(ray, intersection);
+			}
+
+			return result;
+		}
+
+		bool Scene::intersectShadowRay(const geometry::Ray& ray, float max_distance) const
+		{
+			return m_bvh.intersectShadowRay(ray, max_distance);
 		}
 
 		void Scene::render()

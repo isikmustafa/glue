@@ -1,4 +1,5 @@
 #include "pathtracer.h"
+#include "sppm.h"
 #include "../xml/node.h"
 
 namespace glue
@@ -13,6 +14,10 @@ namespace glue
 			{
 				return std::make_unique<Pathtracer::Xml>(node);
 			}
+			else if (integrator_type == std::string("SPPM"))
+            {
+                return std::make_unique<SPPM::Xml>(node);
+            }
 			else
 			{
 				node.throwError("Unknown Integrator type.");

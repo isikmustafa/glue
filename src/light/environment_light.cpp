@@ -63,7 +63,7 @@ namespace glue
 		LightSample EnvironmentLight::getVisibleSample(const core::Scene& scene, const geometry::Ray& ray) const
 		{
 			light::LightSample light_sample;
-			if (!scene.bvh.intersectShadowRay(ray, std::numeric_limits<float>::max()))
+			if (!scene.intersectShadowRay(ray, std::numeric_limits<float>::max()))
 			{
 				light_sample.wi_world = ray.get_direction();
 				light_sample.le = getLe(light_sample.wi_world, glm::vec3(0.0f), 0.0f);

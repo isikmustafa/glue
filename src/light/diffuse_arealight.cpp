@@ -59,14 +59,12 @@ namespace glue
 		{
 			light::LightSample light_sample;
 			geometry::Intersection intersection;
-			if (scene.bvh.intersect(ray, intersection, std::numeric_limits<float>::max()))
+			if (scene.intersect(ray, intersection, std::numeric_limits<float>::max()))
 			{
 				//If ray through sampled direction hits this light, add its contribution.
 				auto itr = scene.object_to_light.find(intersection.object);
 				if (itr != scene.object_to_light.end() && itr->second == this)
 				{
-					intersection.object->fillIntersection(ray, intersection);
-
 					light_sample.wi_world = ray.get_direction();
 					light_sample.le = getLe(light_sample.wi_world, intersection.plane.normal, intersection.distance);
 					light_sample.pdf_w = getPdf(light_sample.wi_world, intersection.plane.normal, intersection.distance);

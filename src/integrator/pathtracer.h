@@ -11,7 +11,7 @@ namespace glue
 {
 	namespace integrator
 	{
-		const int cPatchSize = 16;
+		constexpr int cPTPatchSize = 16;
 
 		class Pathtracer : public Integrator
 		{
