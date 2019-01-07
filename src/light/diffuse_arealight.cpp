@@ -24,8 +24,8 @@ namespace glue
 
 		DiffuseArealight::DiffuseArealight(const DiffuseArealight::Xml& xml)
 			: m_flux(xml.flux)
-			, m_le(xml.flux * glm::one_over_pi<float>() / m_object->getSurfaceArea())
 			, m_object(xml.object->create())
+			, m_le(xml.flux * glm::one_over_pi<float>() / m_object->getSurfaceArea())
 			, m_pdf(1.0f / m_object->getSurfaceArea())
 		{}
 

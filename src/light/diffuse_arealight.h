@@ -36,8 +36,8 @@ namespace glue
 
 		private:
 			glm::vec3 m_flux;
-			glm::vec3 m_le;
 			std::shared_ptr<geometry::Object> m_object;
+			glm::vec3 m_le;
 			float m_pdf;
 		};
 	}

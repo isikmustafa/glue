@@ -11,6 +11,7 @@ namespace glue
 		class CoordinateSpace
 		{
 		public:
+			CoordinateSpace() = default;
 			CoordinateSpace(const glm::vec3& origin, const glm::vec3& z);
 			CoordinateSpace(const glm::vec3& origin, const glm::vec3& z, const glm::vec3& y);
 
