@@ -32,7 +32,7 @@ set(SOURCE_FILES
         src/geometry/ray.cpp src/geometry/sphere.cpp src/geometry/spherical_coordinate.cpp src/geometry/transformation.cpp
         src/geometry/triangle.cpp
 
-        src/integrator/integrator.cpp src/integrator/pathtracer.cpp
+        src/integrator/integrator.cpp src/integrator/pathtracer.cpp src/integrator/sppm.cpp
 
         src/light/diffuse_arealight.cpp src/light/environment_light.cpp src/light/light.cpp src/light/pointlight.cpp
 

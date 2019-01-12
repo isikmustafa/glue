@@ -1,11 +1,13 @@
 <Scene>
 	<SecondaryRayEpsilon>0.01</SecondaryRayEpsilon>
-    <Integrator type="Pathtracer">
+    <Integrator type="SPPM">
 		<Filter type="Gaussian">
 			<Sigma>0.5</Sigma>
 		</Filter>
 		<SampleCount>256</SampleCount>
+		<PhotonsPerPass>300000</PhotonsPerPass>
 		<RRThreshold>0.2</RRThreshold>
+		<Alpha>0.7</Alpha>
     </Integrator>
 	
 	<Output type="Ldr">
@@ -80,7 +82,7 @@
 		</BsdfMaterial>
 	</Object>
 
-	<!--
+
 	<Object type="Mesh">
 		<Datapath>../sample_input/cbox/cbox_smallbox.obj</Datapath>
 		<BsdfMaterial type="Lambertian">
@@ -89,8 +91,8 @@
 			</Kd>
 		</BsdfMaterial>
 	</Object>
-	-->
 
+	<!--
 	<Object type="Sphere">
 		<Radius>100</Radius>
 		<Center>101 101 150</Center>
@@ -106,6 +108,7 @@
 			</Kd>
 		</BsdfMaterial>
 	</Object>
+	-->
 	
 	<Object type="Mesh">
 		<Datapath>../sample_input/cbox/cbox_largebox.obj</Datapath>
