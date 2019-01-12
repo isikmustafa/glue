@@ -98,6 +98,11 @@ namespace glue
 			}
 		}
 
+		geometry::BBox Scene::getBBox() const
+		{
+			return m_bvh.get_root()->bbox;
+		}
+
 		bool Scene::intersect(const geometry::Ray& ray, geometry::Intersection& intersection, float max_distance) const
 		{
 			auto result = m_bvh.intersect(ray, intersection, max_distance);

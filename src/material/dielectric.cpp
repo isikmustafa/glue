@@ -50,6 +50,11 @@ namespace glue
 				{
 					microfacet::MicrofacetRefraction<microfacet::GGXDistribution> microfacet(m_roughness->fetch(intersection).r);
 					wi_f = microfacet.sampleWi(wo_tangent, sampler, no_over_ni);
+
+					if (!intersection.radiance_transport)
+					{
+                        wi_f.second /= no_over_ni * no_over_ni;
+					}
 				}
 				break;
 			}
@@ -75,6 +80,11 @@ namespace glue
 				{
 					microfacet::MicrofacetRefraction<microfacet::GGXDistribution> microfacet(m_roughness->fetch(intersection).r);
 					bsdf = microfacet.getBsdf(wi_tangent, wo_tangent, no_over_ni);
+
+					if (!intersection.radiance_transport)
+					{
+						bsdf /= no_over_ni * no_over_ni;
+					}
 				}
 				break;
 			}

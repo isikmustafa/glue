@@ -46,6 +46,7 @@ namespace glue
 		public:
 			explicit Scene(const Scene::Xml& xml);
 
+			geometry::BBox getBBox() const;
 			bool intersect(const geometry::Ray& ray, geometry::Intersection& intersection, float max_distance) const;
 			bool intersectShadowRay(const geometry::Ray& ray, float max_distance) const;
 			void render();
