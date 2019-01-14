@@ -27,6 +27,7 @@ namespace glue
 
 		Mesh::Mesh(const Mesh::Xml& xml)
 			: m_transformation(xml.transformation)
+			, m_area(0.0f)
 			, m_bvh(xml::Parser::loadModel(xml.datapath))
 			, m_bsdf_material(xml.bsdf_material ? xml.bsdf_material->create() : nullptr)
 		{
