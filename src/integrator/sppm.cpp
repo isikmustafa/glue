@@ -86,15 +86,19 @@ namespace glue
                 }
             }
 
-            for (int k = 0; k < m_sample_count; ++k)
+            int x, y, p;
+            float new_max_search_radius;
+            #pragma omp parallel num_threads(numof_cores)
             {
-                m_grids.clear();
-                m_grids.resize(numof_cores);
-
-                int x, y, p;
-                float new_max_search_radius = 0.0f;
-                #pragma omp parallel num_threads(numof_cores)
+                for (int k = 0; k < m_sample_count; ++k)
                 {
+                    #pragma omp single
+                    {
+                        new_max_search_radius = 0.0f;
+                        m_grids.clear();
+                        m_grids.resize(numof_cores);
+                    }
+
                     #pragma omp for schedule(dynamic) collapse(2)
                     for (x = 0; x < resolution.x; x += cSPPMPatchSize)
                     {
@@ -103,7 +107,6 @@ namespace glue
                             findHitPoints(scene, x, y, omp_get_thread_num());
                         }
                     }
-
                     #pragma omp barrier
 
                     #pragma omp for schedule(dynamic)
@@ -111,7 +114,6 @@ namespace glue
                     {
                         tracePhoton(scene, omp_get_thread_num(), 0.5f / m_max_search_radius);
                     }
-
                     #pragma omp barrier
 
                     #pragma omp for schedule(dynamic) collapse(2) reduction(max: new_max_search_radius)
@@ -123,10 +125,14 @@ namespace glue
                             new_max_search_radius = glm::max(new_max_search_radius, patch_max_search_radius);
                         }
                     }
-                }
+                    #pragma omp barrier
 
-                //m_max_search_radius = new_max_search_radius;
-                //std::cout << m_max_search_radius << std::endl;
+                    /*#pragma omp single
+                    {
+                        m_max_search_radius = new_max_search_radius;
+                        std::cout << m_max_search_radius << std::endl;
+                    }*/
+                }
             }
 
             //Write final values to output.
