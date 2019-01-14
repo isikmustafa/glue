@@ -61,16 +61,9 @@ namespace glue
             glm::vec3 beta;
             const geometry::Intersection* intersection;
             float acc_count{ 0.0f }; //Total amount of photons contributing to the hitpoint.
-            float curr_count; //Amount of photons contributing to the hitpoint in the current pass.
+            float curr_count{ 0.0f }; //Amount of photons contributing to the hitpoint in the current pass.
             float radius; //Radius of contribution.
         };
-
-        /*
-         * Hitpointleri toplarken soyle. Gelen photon beta * cos(wi, plane.normal) * brdf(wi, wo) kadar unnormalized_flux'a eklencek.
-         * Her contribte curr_count'a 1.0f ekleyeceksin.
-         * Son olarak giden radiance = unnormalized_flux / (totalphotoncount * pi * radius * radius) yapacaksin.
-         * Sonrasinda acc_count, radius, unnormalized_flux'in yeni degerlerini hesapliycan.
-         * */
 
         class SPPM : public Integrator
         {
@@ -95,7 +88,6 @@ namespace glue
 
         private:
             std::vector<std::unordered_map<GridCell, std::vector<HitPoint*>, GridCellHash>> m_grids;
-            std::mutex m_grid_lock;
             std::vector<std::vector<geometry::Intersection>> m_intersection_pool;
             std::vector<std::vector<HitPoint>> m_hitpoint_pool;
             std::vector<std::unique_ptr<core::RealSampler>> m_offset_samplers;
@@ -112,7 +104,7 @@ namespace glue
             void findHitPoints(const core::Scene& scene, int x, int y, int id);
             void tracePhoton(const core::Scene& scene, int id, float one_over_width);
             float update(const core::Scene& scene, int x, int y);
-            glm::vec3 estimateDirect(const core::Scene& scene, geometry::Ray& ray, int x, int y, glm::vec3 beta, bool light_explicitly_sampled, int id);
+            void estimateDirect(const core::Scene& scene, geometry::Ray& ray, int x, int y, int id);
         };
     }
 }
