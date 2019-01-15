@@ -6,7 +6,7 @@
 #include "../material/bsdf_material.h"
 #include "../xml/node.h"
 
-#include <ctpl_stl.h>
+#include <omp.h>
 
 namespace glue
 {
@@ -39,23 +39,20 @@ namespace glue
 
 		void Pathtracer::integrate(const core::Scene& scene, core::Image& output)
 		{
-			ctpl::thread_pool pool(std::thread::hardware_concurrency());
 			auto resolution = scene.camera->get_resolution();
-			auto y_increase = cPTPatchSize;
-			int y = 0;
-			for (int x = 0; x < resolution.x; x += cPTPatchSize)
+			int x, y;
+
+			#pragma omp parallel num_threads(std::thread::hardware_concurrency())
 			{
-				for (; y < resolution.y && y >= 0; y += y_increase)
+				#pragma omp for schedule(dynamic) collapse(2)
+				for (x = 0; x < resolution.x; x += cPTPatchSize)
 				{
-					pool.push([&scene, &output, x, y, this](int id)
+					for (y = 0; y < resolution.y; y += cPTPatchSize)
 					{
-						integratePatch(scene, output, x, y, id);
-					});
+						integratePatch(scene, output, x, y, omp_get_thread_num());
+					}
 				}
-				y -= y_increase;
-				y_increase = -y_increase;
 			}
-			pool.stop(true);
 		}
 
 		void Pathtracer::integratePatch(const core::Scene& scene, core::Image& output, int x, int y, int id)

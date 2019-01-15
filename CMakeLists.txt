@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(3rd/tinyxml2)
 
-include_directories("3rd/CTPL")
 include_directories("3rd/glm")
 include_directories("3rd/stb")
 include_directories("3rd/tinyxml2")

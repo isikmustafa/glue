@@ -218,8 +218,7 @@ namespace glue
                         auto found = grid.find(cell);
                         if (found != grid.end())
                         {
-                            auto& hitpoint_vector = found->second;
-                            for (auto hitpoint : hitpoint_vector)
+                            for (auto hitpoint : found->second)
                             {
                                 auto diff = hitpoint->intersection->plane.point - intersection.plane.point;
                                 if (glm::dot(diff, diff) < hitpoint->radius * hitpoint->radius)
