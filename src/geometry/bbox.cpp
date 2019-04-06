@@ -34,14 +34,10 @@ namespace glue
 			auto t0 = (m_min - origin) * inv_dir;
 			auto t1 = (m_max - origin) * inv_dir;
 
-			auto tm_min = glm::min(t0.x, t1.x);
-			auto tm_max = glm::max(t0.x, t1.x);
-
-			tm_min = glm::max(tm_min, glm::min(t0.y, t1.y));
-			tm_max = glm::min(tm_max, glm::max(t0.y, t1.y));
-
-			tm_min = glm::max(tm_min, glm::min(t0.z, t1.z));
-			tm_max = glm::min(tm_max, glm::max(t0.z, t1.z));
+			auto min = glm::min(t0, t1);
+			auto max = glm::max(t0, t1);
+			auto tm_min = glm::max(min.x, glm::max(min.y, min.z));
+			auto tm_max = glm::min(max.x, glm::min(max.y, max.z));
 
 			if (tm_max < tm_min)
 			{
