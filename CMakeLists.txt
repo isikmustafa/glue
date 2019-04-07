@@ -11,6 +11,8 @@ include_directories("3rd/tinyxml2")
 include_directories("3rd/tinyobjloader")
 
 link_directories("${CMAKE_CURRENT_BINARY_DIR}/3rd/tinyxml2/")
+link_directories("${CMAKE_CURRENT_BINARY_DIR}/3rd/tinyxml2/debug/")
+link_directories("${CMAKE_CURRENT_BINARY_DIR}/3rd/tinyxml2/release/")
 
 find_package(OpenMP)
 if (OPENMP_FOUND)
@@ -48,5 +50,9 @@ set(SOURCE_FILES
 
 add_executable(glue ${SOURCE_FILES})
 
-#Change "libtinyxml2d.dll.a" and "libtinyxml2.dll.a" based on your platform and compiler.
-target_link_libraries(glue debug "libtinyxml2d.dll.a" optimized "libtinyxml2.dll.a")
+string(CONCAT TINYXML2_IMPORT_DEBUG "${CMAKE_IMPORT_LIBRARY_PREFIX}" "tinyxml2d" "${CMAKE_IMPORT_LIBRARY_SUFFIX}")
+string(CONCAT TINYXML2_IMPORT_RELEASE "${CMAKE_IMPORT_LIBRARY_PREFIX}" "tinyxml2" "${CMAKE_IMPORT_LIBRARY_SUFFIX}")
+
+target_link_libraries(glue
+        debug ${TINYXML2_IMPORT_DEBUG}
+        optimized ${TINYXML2_IMPORT_RELEASE})

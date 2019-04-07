@@ -73,7 +73,7 @@ namespace glue
             auto scene_bbox = scene.getBBox();
             auto volume_per_pixel = scene_bbox.get_max().x * scene_bbox.get_max().y * scene_bbox.get_max().z / (resolution.x * resolution.y);
             m_max_search_radius = glm::pow(volume_per_pixel, 0.33333f);
-            std::cout << m_max_search_radius << std::endl;
+            //std::cout << m_max_search_radius << std::endl;
 
             //Initialize hitpoints.
             for (int i = 0; i < resolution.x; ++i)

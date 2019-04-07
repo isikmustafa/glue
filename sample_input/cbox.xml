@@ -1,10 +1,10 @@
 <Scene>
-	<SecondaryRayEpsilon>0.01</SecondaryRayEpsilon>
+	<SecondaryRayEpsilon>0.1</SecondaryRayEpsilon>
     <Integrator type="SPPM">
 		<Filter type="Gaussian">
 			<Sigma>0.5</Sigma>
 		</Filter>
-		<SampleCount>256</SampleCount>
+		<SampleCount>16</SampleCount>
 		<PhotonsPerPass>300000</PhotonsPerPass>
 		<RRThreshold>0.2</RRThreshold>
 		<Alpha>0.7</Alpha>

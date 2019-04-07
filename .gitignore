@@ -6,3 +6,4 @@ sample_output/
 *.png
 *.jpg
 *.hdr
+!sample_input/cbox/*.obj
