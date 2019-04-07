@@ -2,8 +2,9 @@
 debug/
 release/
 desktop.ini
-sample_output/
+sample_output/*.png
 *.png
 *.jpg
 *.hdr
 !sample_input/cbox/*.obj
+!sample_output/cbox.png
