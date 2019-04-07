@@ -1,4 +1,5 @@
 cd ..
+mkdir sample_output
 mkdir release
 cd release
 cmake -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles" ..

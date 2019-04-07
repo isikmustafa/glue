@@ -1,4 +1,5 @@
 cd ..
+mkdir sample_output
 mkdir debug
 cd debug
 cmake -DCMAKE_BUILD_TYPE=Debug -G "MinGW Makefiles" ..
