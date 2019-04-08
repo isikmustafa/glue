@@ -1,6 +1,7 @@
 #include "discrete_1d_sampler.h"
 
 #include <algorithm>
+#include <numeric>
 
 namespace glue
 {

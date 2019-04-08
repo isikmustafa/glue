@@ -72,7 +72,7 @@ namespace glue
             //Initial estimation for maximum search radius.
             auto scene_bbox = scene.getBBox();
             auto volume_per_pixel = scene_bbox.get_max().x * scene_bbox.get_max().y * scene_bbox.get_max().z / (resolution.x * resolution.y);
-            m_max_search_radius = glm::pow(volume_per_pixel, 0.33333f);
+            m_max_search_radius = glm::pow(volume_per_pixel, 0.33333f) * 4.0f;
             //std::cout << m_max_search_radius << std::endl;
 
             //Initialize hitpoints.
@@ -98,6 +98,7 @@ namespace glue
                         m_grids.clear();
                         m_grids.resize(numof_cores);
                     }
+                    #pragma omp barrier
 
                     #pragma omp for schedule(dynamic) collapse(2)
                     for (x = 0; x < resolution.x; x += cSPPMPatchSize)
@@ -127,11 +128,12 @@ namespace glue
                     }
                     #pragma omp barrier
 
-                    /*#pragma omp single
+                    #pragma omp single
                     {
                         m_max_search_radius = new_max_search_radius;
                         std::cout << m_max_search_radius << std::endl;
-                    }*/
+                    }
+                    #pragma omp barrier
                 }
             }
 
@@ -434,27 +436,18 @@ namespace glue
                     hitpoint.wo_tangent = wo_tangent;
                     hitpoint.beta = beta;
 
-                    const auto& point = intersection.plane.point;
                     auto one_over_width = 0.5f / m_max_search_radius;
                     auto radius_over_width = hitpoint.radius * one_over_width;
 
-                    auto cell_x_center = point.x * one_over_width;
-                    auto cell_x_start = static_cast<int>(std::floor(cell_x_center - radius_over_width));
-                    auto cell_x_end = static_cast<int>(std::floor(cell_x_center + radius_over_width));
+                    glm::vec3 scaled_cell = intersection.plane.point * one_over_width;
+                    glm::ivec3 scaled_cell_start = glm::floor(scaled_cell - radius_over_width);
+                    glm::ivec3 scaled_cell_end = glm::floor(scaled_cell + radius_over_width);
 
-                    auto cell_y_center = point.y * one_over_width;
-                    auto cell_y_start = static_cast<int>(std::floor(cell_y_center - radius_over_width));
-                    auto cell_y_end = static_cast<int>(std::floor(cell_y_center + radius_over_width));
-
-                    auto cell_z_center = point.z * one_over_width;
-                    auto cell_z_start = static_cast<int>(std::floor(cell_z_center - radius_over_width));
-                    auto cell_z_end = static_cast<int>(std::floor(cell_z_center + radius_over_width));
-
-                    for (int i = cell_x_start; i <= cell_x_end; ++i)
+                    for (int i = scaled_cell_start.x; i <= scaled_cell_end.x; ++i)
                     {
-                        for (int j = cell_y_start; j <= cell_y_end; ++j)
+                        for (int j = scaled_cell_start.y; j <= scaled_cell_end.y; ++j)
                         {
-                            for (int k = cell_z_start; k <= cell_z_end; ++k)
+                            for (int k = scaled_cell_start.z; k <= scaled_cell_end.z; ++k)
                             {
                                 m_grids[id][GridCell(i, j, k)].push_back(&hitpoint);
                             }
