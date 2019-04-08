@@ -94,7 +94,7 @@ namespace glue
                 {
                     #pragma omp single
                     {
-                        new_max_search_radius = 0.0f;
+                        new_max_search_radius = -std::numeric_limits<float>::max();
                         m_grids.clear();
                         m_grids.resize(numof_cores);
                     }
@@ -230,11 +230,9 @@ namespace glue
                                             photon.beta * hitpoint->beta *
                                             hitpoint->intersection->bsdf_material->getBsdf(wi_tangent, hitpoint->wo_tangent, *hitpoint->intersection);
 
-                                    {
-                                        std::unique_lock<std::mutex> ulock(hitpoint->lock);
-                                        hitpoint->curr_count += 1.0f;
-                                        hitpoint->unnormalized_flux += flux_contribution;
-                                    }
+                                    std::lock_guard<std::mutex> lock(hitpoint->lock);
+                                    hitpoint->curr_count += 1.0f;
+                                    hitpoint->unnormalized_flux += flux_contribution;
                                 }
                             }
                         }
@@ -286,7 +284,7 @@ namespace glue
             auto bound_x = glm::min(cSPPMPatchSize, resolution.x - x);
             auto bound_y = glm::min(cSPPMPatchSize, resolution.y - y);
 
-            auto max_search_radius = 0.0f;
+            auto max_search_radius = -std::numeric_limits<float>::max();
             for (int i = 0; i < bound_x; ++i)
             {
                 for (int j = 0; j < bound_y; ++j)

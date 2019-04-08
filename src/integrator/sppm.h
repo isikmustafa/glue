@@ -53,13 +53,13 @@ namespace glue
             HitPoint(const HitPoint& hp);
             HitPoint& operator = (const HitPoint& hp);
 
-            core::CoordinateSpace tangent_space;
             std::mutex lock;
+            core::CoordinateSpace tangent_space;
             glm::vec3 wo_tangent; //Outgoing direction of "rendering equation", that is, inverse of camera ray.
             glm::vec3 direct_lo{ 0.0f, 0.0f, 0.0f };
             glm::vec3 unnormalized_flux{ 0.0f, 0.0f, 0.0f }; //Accumulation of photon contributions. Will be normalized in the end.
             glm::vec3 beta;
-            const geometry::Intersection* intersection;
+            const geometry::Intersection* intersection{ nullptr };
             float acc_count{ 0.0f }; //Total amount of photons contributing to the hitpoint.
             float curr_count{ 0.0f }; //Amount of photons contributing to the hitpoint in the current pass.
             float radius; //Radius of contribution.
