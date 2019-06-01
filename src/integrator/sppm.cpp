@@ -72,7 +72,7 @@ namespace glue
             //Initial estimation for maximum search radius.
             auto scene_bbox = scene.getBBox();
             auto volume_per_pixel = scene_bbox.get_max().x * scene_bbox.get_max().y * scene_bbox.get_max().z / (resolution.x * resolution.y);
-            m_max_search_radius = glm::pow(volume_per_pixel, 0.33333f) * 4.0f;
+            m_max_search_radius = glm::pow(volume_per_pixel, 0.33333f) * 2.0f;
             //std::cout << m_max_search_radius << std::endl;
 
             //Initialize hitpoints.
@@ -215,19 +215,18 @@ namespace glue
                             static_cast<int>(std::floor(intersection.plane.point.y * one_over_width)),
                             static_cast<int>(std::floor(intersection.plane.point.z * one_over_width)));
 
-                    for (auto& grid : m_grids)
+                    for (const auto& grid : m_grids)
                     {
                         auto found = grid.find(cell);
                         if (found != grid.end())
                         {
-                            for (auto hitpoint : found->second)
+                            for (const auto hitpoint : found->second)
                             {
                                 auto diff = hitpoint->intersection->plane.point - intersection.plane.point;
                                 if (glm::dot(diff, diff) < hitpoint->radius * hitpoint->radius)
                                 {
                                     auto wi_tangent = hitpoint->tangent_space.vectorToLocalSpace(-photon.ray.get_direction());
-                                    auto flux_contribution =
-                                            photon.beta * hitpoint->beta *
+                                    auto flux_contribution = photon.beta * hitpoint->beta *
                                             hitpoint->intersection->bsdf_material->getBsdf(wi_tangent, hitpoint->wo_tangent, *hitpoint->intersection);
 
                                     std::lock_guard<std::mutex> lock(hitpoint->lock);

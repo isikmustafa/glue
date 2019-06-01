@@ -1,13 +1,13 @@
 <Scene>
 	<SecondaryRayEpsilon>0.1</SecondaryRayEpsilon>
-    <Integrator type="SPPM">
+    <Integrator type="Pathtracer">
 		<Filter type="Gaussian">
 			<Sigma>0.5</Sigma>
 		</Filter>
-		<SampleCount>16</SampleCount>
+		<SampleCount>32</SampleCount>
 		<PhotonsPerPass>300000</PhotonsPerPass>
 		<RRThreshold>0.2</RRThreshold>
-		<Alpha>0.7</Alpha>
+		<Alpha>0.5</Alpha>
     </Integrator>
 	
 	<Output type="Ldr">
