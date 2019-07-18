@@ -4,7 +4,7 @@
 		<Filter type="Gaussian">
 			<Sigma>0.5</Sigma>
 		</Filter>
-		<SampleCount>32</SampleCount>
+		<SampleCount>4</SampleCount>
 		<PhotonsPerPass>300000</PhotonsPerPass>
 		<RRThreshold>0.2</RRThreshold>
 		<Alpha>0.5</Alpha>

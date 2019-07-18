@@ -86,7 +86,6 @@ namespace glue
                 }
             }
 
-            int x, y, p;
             float new_max_search_radius;
             #pragma omp parallel num_threads(numof_cores)
             {
@@ -98,42 +97,37 @@ namespace glue
                         m_grids.clear();
                         m_grids.resize(numof_cores);
                     }
-                    #pragma omp barrier
 
                     #pragma omp for schedule(dynamic) collapse(2)
-                    for (x = 0; x < resolution.x; x += cSPPMPatchSize)
+                    for (int x = 0; x < resolution.x; x += cSPPMPatchSize)
                     {
-                        for (y = 0; y < resolution.y; y += cSPPMPatchSize)
+                        for (int y = 0; y < resolution.y; y += cSPPMPatchSize)
                         {
                             findHitPoints(scene, x, y, omp_get_thread_num());
                         }
                     }
-                    #pragma omp barrier
 
                     #pragma omp for schedule(dynamic)
-                    for (p = 0; p < m_photons_per_pass; ++p)
+                    for (int p = 0; p < m_photons_per_pass; ++p)
                     {
                         tracePhoton(scene, omp_get_thread_num(), 0.5f / m_max_search_radius);
                     }
-                    #pragma omp barrier
 
                     #pragma omp for schedule(dynamic) collapse(2) reduction(max: new_max_search_radius)
-                    for (x = 0; x < resolution.x; x += cSPPMPatchSize)
+                    for (int x = 0; x < resolution.x; x += cSPPMPatchSize)
                     {
-                        for (y = 0; y < resolution.y; y += cSPPMPatchSize)
+                        for (int y = 0; y < resolution.y; y += cSPPMPatchSize)
                         {
                             auto patch_max_search_radius = update(scene, x, y);
                             new_max_search_radius = glm::max(new_max_search_radius, patch_max_search_radius);
                         }
                     }
-                    #pragma omp barrier
 
                     #pragma omp single
                     {
                         m_max_search_radius = new_max_search_radius;
                         std::cout << m_max_search_radius << std::endl;
                     }
-                    #pragma omp barrier
                 }
             }
 
